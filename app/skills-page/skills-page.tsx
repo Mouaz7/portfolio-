@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "@/components/header";
 import SkillsGrid from "@/components/skills/SkillsGrid";
+import { useAccentRgb } from "@/src/hooks/useAccentRgb";
 
-const RGB = "24,161,253";
 const PARTICLES_DESKTOP = 220;
 const PARTICLES_MOBILE = 120;
 const SPEED_MULT = 1.6;
@@ -16,6 +16,9 @@ export default function Page() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
+
+  // DB-driven accent, live with the theme toggle.
+  const RGB = useAccentRgb();
 
   // Show particles after a short delay
   useEffect(() => {
@@ -138,7 +141,7 @@ export default function Page() {
       ro.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [RGB]);
 
   return (
     <div 
@@ -149,7 +152,7 @@ export default function Page() {
           radial-gradient(95% 90% at 90% 100%, rgba(${RGB},0.38) 0%, rgba(${RGB},0.22) 32%, rgba(${RGB},0.10) 58%, rgba(0,0,0,0) 82%),
           radial-gradient(70% 65% at 18% 100%, rgba(${RGB},0.18) 0%, rgba(${RGB},0.10) 45%, rgba(0,0,0,0) 78%),
           radial-gradient(70% 65% at 82% 100%, rgba(${RGB},0.18) 0%, rgba(${RGB},0.10) 45%, rgba(0,0,0,0) 78%),
-          linear-gradient(#000, #000)
+          linear-gradient(var(--bg), var(--bg))
         `,
         backgroundRepeat: "no-repeat, no-repeat, no-repeat, no-repeat, no-repeat",
         backgroundSize: "110vw 90vh, 110vw 90vh, 80vw 65vh, 80vw 65vh, 100% 100%",

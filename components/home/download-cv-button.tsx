@@ -293,7 +293,7 @@ export default function DownloadCvButton({
     entered ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-[10px] scale-[0.985]",
     // micro
     "transform-gpu will-change-transform",
-    liftOnHover ? "hover:shadow-[0_10px_28px_rgba(24,161,253,0.25)]" : "",
+    liftOnHover ? "hover:shadow-[0_10px_28px_rgba(var(--accent-rgb),0.25)]" : "",
     "active:translate-y-0 active:scale-[0.99]",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/80",
     // keep it non-interactive while hidden or downloading

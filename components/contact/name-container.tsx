@@ -103,7 +103,7 @@ const NameContainer: NextPage<Props> = ({
             <svg
               aria-hidden
               viewBox="0 0 24 24"
-              className="w-3 h-3 text-gray-400"
+              className="w-3 h-3 text-gray-200"
             >
               <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
               <line x1="12" y1="7" x2="12" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -122,16 +122,16 @@ const NameContainer: NextPage<Props> = ({
           {...inputProps}
           required={required}
           className={[
-            "relative border-[2px] border-cornflowerblue-100/30 bg-[#0f1729]",
+            "relative border-[2px] border-cornflowerblue-100/30 bg-[var(--field)]",
             "w-full [outline:none]",
-            "shadow-[0_4px_20px_rgba(24,161,253,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]",
-            "hover:border-cornflowerblue-100/50 hover:shadow-[0_4px_30px_rgba(24,161,253,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]",
-            "focus:border-cornflowerblue-100/70 focus:shadow-[0_4px_40px_rgba(24,161,253,0.35),inset_0_1px_0_rgba(255,255,255,0.2)]",
+            "shadow-[0_4px_20px_rgba(var(--accent-rgb),0.15),inset_0_1px_0_rgba(255,255,255,0.1)]",
+            "hover:border-cornflowerblue-100/50 hover:shadow-[0_4px_30px_rgba(var(--accent-rgb),0.25),inset_0_1px_0_rgba(255,255,255,0.15)]",
+            "focus:border-cornflowerblue-100/70 focus:shadow-[0_4px_40px_rgba(var(--accent-rgb),0.35),inset_0_1px_0_rgba(255,255,255,0.2)]",
             "transition-all duration-300",
             "before:absolute before:inset-0 before:rounded-[inherit] before:p-[2px]",
             "before:bg-gradient-to-br before:from-white/20 before:to-transparent",
             "before:pointer-events-none before:-z-10",
-            "font-urbanist font-bold text-lg text-white placeholder:text-gray-400", 
+            "font-urbanist font-bold text-lg text-white placeholder:text-gray-200", 
             sizeCls, 
             inputProps?.className || "",
           ].join(" ")}

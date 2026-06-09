@@ -128,7 +128,7 @@ function UiCard({
 
   return (
     <div
-      className={`absolute drop-shadow-xl overflow-hidden bg-[#3d3c3d] ${className}`}
+      className={`absolute drop-shadow-xl overflow-hidden bg-[var(--surface-border)] ${className}`}
       style={{
         width: `${widthPx}px`,
         top: `calc(50% + ${offsetY}px)`,
@@ -150,7 +150,7 @@ function UiCard({
       }}
     >
       <div
-        className="relative z-[1] m-[2px] bg-[#323132] text-white font-urbanist"
+        className="relative z-[1] m-[2px] bg-[var(--surface)] text-white font-urbanist"
         style={{
           borderRadius: innerRadius,
           padding: pad,
@@ -316,7 +316,7 @@ export default function FloatingCards({
         enterDurationMs={enterDurationMs}
       >
         <div style={{ fontSize: `calc(var(--bodySize) * 1.1)`, fontWeight: 600 }}>
-          Bachelor in Science Software Engineering
+B.Sc. Software Engineering · BTH
         </div>
       </UiCard>
     </div>

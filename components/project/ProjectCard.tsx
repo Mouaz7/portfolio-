@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useAccentHex } from "@/src/hooks/useAccentRgb";
 
 export interface Project {
   id: string;
@@ -27,9 +28,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index = 0, categoryC
   // Random delay for flicker animation (between 0 and 1.5 seconds)
   const randomDelay = index * 0.08;
   
+  // DB-driven accent fallback (Mouaz's categories aren't in CATEGORY_COLORS,
+  // so without this they'd all show the old hardcoded blue).
+  const accent = useAccentHex();
   const cardBg = categoryColor?.cardBg || "linear-gradient(to bottom right, #2d3748, #4a5568)";
-  const accentColor = categoryColor?.accent || "#18a1fd";
-  const glowColor = categoryColor?.glow || "rgba(24, 161, 253, 0.6)";
+  const accentColor = categoryColor?.accent || accent;
+  const glowColor = categoryColor?.glow || `${accent}99`;
 
   return (
     <motion.div
@@ -42,7 +46,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index = 0, categoryC
         href={project.github_url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`block bg-[#1b233d] overflow-hidden flex flex-col cursor-pointer ${
+        className={`block bg-[var(--surface)] overflow-hidden flex flex-col cursor-pointer ${
           isMobile 
             ? 'w-full h-full rounded-[12px] p-[3px]' 
             : 'w-[240px] h-[340px] sm:w-[280px] sm:h-[400px] lg:w-[320px] lg:h-[460px] rounded-[20px] p-[5px] transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]'
@@ -72,7 +76,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index = 0, categoryC
           {/* Skewed corner decoration */}
           {!isMobile && (
             <>
-              <div className="absolute top-0 left-0 h-[25px] sm:h-[30px] w-[100px] sm:w-[130px] bg-[#1b233d] transform skew-x-[-40deg] shadow-[-10px_-10px_0_0_#1b233d] rounded-br-[10px] before:content-[''] before:absolute before:w-[12px] sm:before:w-[15px] before:h-[12px] sm:before:h-[15px] before:top-0 before:right-[-12px] sm:before:right-[-15px] before:bg-transparent before:rounded-tl-[10px] before:shadow-[-5px_-5px_0_2px_#1b233d]" />
+              <div className="absolute top-0 left-0 h-[25px] sm:h-[30px] w-[100px] sm:w-[130px] bg-[var(--surface)] transform skew-x-[-40deg] shadow-[-10px_-10px_0_0_var(--surface)] rounded-br-[10px] before:content-[''] before:absolute before:w-[12px] sm:before:w-[15px] before:h-[12px] sm:before:h-[15px] before:top-0 before:right-[-12px] sm:before:right-[-15px] before:bg-transparent before:rounded-tl-[10px] before:shadow-[-5px_-5px_0_2px_var(--surface)]" />
               <div className="absolute top-[25px] sm:top-[30px] left-0 bg-transparent h-[12px] sm:h-[15px] w-[12px] sm:w-[15px] rounded-tl-[15px] shadow-[-5px_-5px_0_2px_#1b233d]" />
             </>
           )}
@@ -94,7 +98,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index = 0, categoryC
             {/* GitHub icon - desktop only, top right */}
             {!isMobile && (
               <div
-                className="flex items-center justify-center p-1.5 sm:p-2 bg-[#1b233d]/80 hover:bg-[#1b233d] backdrop-blur-sm rounded-md transition-all"
+                className="flex items-center justify-center p-1.5 sm:p-2 bg-[var(--surface)]/80 hover:bg-[var(--surface)] backdrop-blur-sm rounded-md transition-all"
                 title="Click card to view code on GitHub"
                 onClick={(e) => e.stopPropagation()}
               >

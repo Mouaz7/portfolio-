@@ -36,7 +36,7 @@ const ProjectsFilter: React.FC<ProjectsFilterProps> = ({
             onClick={() => onCategoryChange(category.id)}
             className={`relative px-6 py-2.5 rounded-full font-medium text-[15px] tracking-[-0.01em] transition-all duration-300 border border-lightgray/50 ${
               isActive
-                ? "bg-cornflowerblue-100 text-white shadow-[0_4px_20px_rgba(24,161,253,0.4)] scale-105"
+                ? "bg-cornflowerblue-100 text-white shadow-[0_4px_20px_rgba(var(--accent-rgb),0.4)] scale-105"
                 : "bg-cornflowerblue-400/20 text-white/80 hover:bg-cornflowerblue-400/40 hover:text-white hover:border-cornflowerblue-100/30"
             }`}
           >

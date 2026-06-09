@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import RouteScrollNavigator from "./RouteScrollNavigator";
+import ThemeToggle from "./ThemeToggle";
 
 export type HeaderType = { className?: string };
 
@@ -165,20 +166,25 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         <NavItem label="Roadmap" active={pathname === "/roadmap-page"} onClick={goRoadmap} />
         <NavItem label="Projects" active={pathname === "/projects-page"} onClick={goProjects} />
         <NavItem label="Contact" active={pathname === "/contact-page"} onClick={goContact} />
+        <ThemeToggle className="ml-1" />
       </nav>
 
-      <button
-        type="button"
-        className="hidden max-[675px]:inline-flex items-center justify-center rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70"
-        aria-label="Open menu"
-        aria-expanded={open}
-        aria-controls="mobile-menu"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
-          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      </button>
+      {/* Mobile: theme toggle + burger */}
+      <div className="hidden max-[675px]:flex items-center gap-2">
+        <ThemeToggle />
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70"
+          aria-label="Open menu"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          onClick={() => setOpen((v) => !v)}
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
 
       <div
         className={[
@@ -194,7 +200,7 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         className={[
           "hidden max-[675px]:flex",
           "fixed z-[80] top-0 right-0 h-dvh w-[78vw] max-w-[360px]",
-          "bg-[#0b0d12]/95 backdrop-blur-md border-l border-white/10",
+          "bg-[var(--surface-2)]/95 backdrop-blur-md border-l border-white/10",
           open ? "translate-x-0" : "translate-x-full",
           "transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
           "flex-col",
@@ -236,8 +242,8 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
           </ul>
         </nav>
 
-        <div className="mt-auto p-4 text-xs text-white/60 select-none">
-          © {new Date().getFullYear()}
+        <div className="mt-auto p-4 flex items-center justify-end">
+          <span className="text-xs text-white/60 select-none">© {new Date().getFullYear()}</span>
         </div>
       </div>
 

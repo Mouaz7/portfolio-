@@ -136,7 +136,7 @@ const PhotoSocialContainer: NextPage<PhotoSocialContainerType> = ({
       className={[
         "overflow-hidden flex flex-col items-center justify-center",
         "pt-0 px-[22px] pb-[30px] box-border relative gap-5 max-w-full",
-        "text-left text-xl text-black font-urbanist",
+        "text-left text-xl text-[#0c0d14] font-urbanist",
         "mq450:min-w-full mq825:flex-1 mq825:pr-0 mq825:box-border",
         className,
       ].join(" ")}

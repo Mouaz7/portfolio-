@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useAccentHex } from "@/src/hooks/useAccentRgb";
 
 type Props = {
   label?: string;
@@ -21,7 +22,7 @@ type Props = {
 
 function hexToRgb(hex: string) {
   const m = hex.replace("#", "").match(/^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
-  const [r, g, b] = m ? [m[1], m[2], m[3]].map((x) => parseInt(x, 16)) : [24, 161, 253];
+  const [r, g, b] = m ? [m[1], m[2], m[3]].map((x) => parseInt(x, 16)) : [25, 227, 194];
   return { r, g, b };
 }
 function lighten(hex: string, amt = 0.26) {
@@ -146,7 +147,7 @@ export default function SendButton({
   className = "",
   onClick,
   type = "button",
-  color = "#18a1fd",
+  color,
   gapPx = 12,
   ringPx = 2,
   sentMs = 5000,
@@ -155,8 +156,11 @@ export default function SendButton({
   iconSize = 28,
   status, // NEW
 }: Props) {
-  const { r, g, b } = hexToRgb(color);
-  const lighter = lighten(color, 0.26);
+  // DB-driven accent when no explicit color is passed.
+  const accent = useAccentHex();
+  const resolvedColor = color ?? accent;
+  const { r, g, b } = hexToRgb(resolvedColor);
+  const lighter = lighten(resolvedColor, 0.26);
 
   const [sent, setSent] = useState(false);
   const tRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -211,7 +215,7 @@ export default function SendButton({
             isSending ? "opacity-90 cursor-progress" : "cursor-pointer",
           ].join(" ")}
           style={{
-            background: `linear-gradient(135deg, ${lighter} 0%, ${color} 60%)`,
+            background: `linear-gradient(135deg, ${lighter} 0%, ${resolvedColor} 60%)`,
             boxShadow: isSent ? "none" : "0 10px 30px rgba(var(--b-r), var(--b-g), var(--b-b), 0.55)",
           }}
         >

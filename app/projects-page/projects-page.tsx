@@ -6,8 +6,8 @@ import { CATEGORY_COLORS } from "@/components/project/CategoryFolder";
 import LoadingAnimation from "@/components/LoadingAnimation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAccentRgb, useAccentHex } from "@/src/hooks/useAccentRgb";
 
-const RGB = "24,161,253";
 const PARTICLES_DESKTOP = 220;
 const PARTICLES_MOBILE = 120;
 const SPEED_MULT = 1.6;
@@ -25,6 +25,10 @@ const ProjectsPageClient: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
+
+  // DB-driven accent, live with the theme toggle.
+  const RGB = useAccentRgb();
+  const ACCENT = useAccentHex();
 
   // Fetch projects from API
   useEffect(() => {
@@ -183,7 +187,7 @@ const ProjectsPageClient: React.FC = () => {
       ro.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [RGB]);
 
   return (
     <div className="bg-black flex flex-col overflow-hidden h-screen">
@@ -198,7 +202,7 @@ const ProjectsPageClient: React.FC = () => {
             radial-gradient(95% 90% at 90% 100%, rgba(${RGB},0.38) 0%, rgba(${RGB},0.22) 32%, rgba(${RGB},0.10) 58%, rgba(0,0,0,0) 82%),
             radial-gradient(70% 65% at 18% 100%, rgba(${RGB},0.18) 0%, rgba(${RGB},0.10) 45%, rgba(0,0,0,0) 78%),
             radial-gradient(70% 65% at 82% 100%, rgba(${RGB},0.18) 0%, rgba(${RGB},0.10) 45%, rgba(0,0,0,0) 78%),
-            linear-gradient(#000, #000)
+            linear-gradient(var(--bg), var(--bg))
           `,
           backgroundRepeat: "no-repeat, no-repeat, no-repeat, no-repeat, no-repeat",
           backgroundSize: "110vw 90vh, 110vw 90vh, 80vw 65vh, 80vw 65vh, 100% 100%",
@@ -267,10 +271,10 @@ const ProjectsPageClient: React.FC = () => {
                       whileTap={{ scale: 0.95 }}
                       className="relative px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base transition-all duration-300 border-2"
                       style={{
-                        backgroundColor: isActive ? `${colors?.accent || '#18a1fd'}25` : 'rgba(255,255,255,0.03)',
-                        borderColor: isActive ? `${colors?.accent || '#18a1fd'}` : 'rgba(255,255,255,0.1)',
-                        color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
-                        boxShadow: isActive ? `0 0 20px ${colors?.glow || 'rgba(24,161,253,0.5)'}` : 'none',
+                        backgroundColor: isActive ? `${colors?.accent || ACCENT}25` : 'var(--fg-10)',
+                        borderColor: isActive ? `${colors?.accent || ACCENT}` : 'var(--surface-border)',
+                        color: isActive ? '#fff' : 'var(--fg-70)',
+                        boxShadow: isActive ? `0 0 20px ${colors?.glow || 'rgba(var(--accent-rgb),0.5)'}` : 'none',
                       }}
                     >
                       <span className="flex items-center gap-1.5 sm:gap-2">
@@ -278,7 +282,7 @@ const ProjectsPageClient: React.FC = () => {
                         <span 
                           className="text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5 rounded-full font-bold"
                           style={{
-                            backgroundColor: isActive ? `${colors?.accent || '#18a1fd'}40` : 'rgba(255,255,255,0.1)',
+                            backgroundColor: isActive ? `${colors?.accent || ACCENT}40` : 'var(--fg-10)',
                           }}
                         >
                           {projectCount}
@@ -304,7 +308,7 @@ const ProjectsPageClient: React.FC = () => {
                   >
                     {projectsByCategory[openCategory].map((project, idx) => {
                       const colors = CATEGORY_COLORS[openCategory];
-                      const accentColor = colors?.accent || '#18a1fd';
+                      const accentColor = colors?.accent || ACCENT;
                       
                       return (
                         <motion.div
@@ -312,14 +316,14 @@ const ProjectsPageClient: React.FC = () => {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.3, delay: idx * 0.05 }}
-                          className="flex items-center gap-4 sm:gap-5 md:gap-6 p-3 sm:p-4 bg-[#0a0e1a]/40 backdrop-blur-sm border border-white/5 hover:border-white/20 transition-all duration-300 rounded-lg"
+                          className="flex items-center gap-4 sm:gap-5 md:gap-6 p-3 sm:p-4 bg-[var(--surface-2)]/40 backdrop-blur-sm border border-white/5 hover:border-white/20 transition-all duration-300 rounded-lg"
                           style={{
                             borderLeftColor: accentColor,
                             borderLeftWidth: '3px'
                           }}
                         >
                           {/* Icon - Fixed Size */}
-                          <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-[#0f1420] to-[#0a0e1a] flex items-center justify-center p-3 border border-white/10 rounded-md">
+                          <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-[var(--surface-2)] to-[var(--surface)] flex items-center justify-center p-3 border border-white/10 rounded-md">
                             {project.cover_image_url ? (
                               <div className="relative w-full h-full">
                                 <Image

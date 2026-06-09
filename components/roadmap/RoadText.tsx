@@ -14,7 +14,7 @@ export default function RoadText({
   description,
   from,
   to,
-  accentColor = "#18a1fd",
+  accentColor = "#19e3c2",
   width = 360,
 }: RoadTextProps) {
   return (
@@ -22,7 +22,7 @@ export default function RoadText({
       className="text-center"
       style={{ width }}
     >
-      <div className="text-sky-50 text-sm font-semibold tracking-wide">
+      <div className="text-white text-sm font-semibold tracking-wide">
         {title}
       </div>
       {from && (
@@ -30,7 +30,7 @@ export default function RoadText({
           {fmtRange(from, to)}
         </div>
       )}
-      <p className="mt-2 text-[14px] leading-snug text-sky-100/85">
+      <p className="mt-2 text-[14px] leading-snug text-gray-100">
         {description}
       </p>
     </div>

@@ -298,7 +298,7 @@ const EmailForm: NextPage<Props> = ({
           >
             <b className="relative">Your Message</b>
             {!message.trim() && (
-              <svg aria-hidden viewBox="0 0 24 24" className="w-3 h-3 text-gray-400">
+              <svg aria-hidden viewBox="0 0 24 24" className="w-3 h-3 text-gray-200">
                 <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
                 <line x1="12" y1="7" x2="12" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <circle cx="12" cy="16" r="1.2" fill="currentColor" />
@@ -306,13 +306,13 @@ const EmailForm: NextPage<Props> = ({
             )}
           </label>
 
-          <div className="relative border-[2px] border-cornflowerblue-100/30 bg-[#0f1729] rounded-2xl w-full box-border flex flex-col shadow-[0_4px_20px_rgba(24,161,253,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-cornflowerblue-100/50 hover:shadow-[0_4px_30px_rgba(24,161,253,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] focus-within:border-cornflowerblue-100/70 focus-within:shadow-[0_4px_40px_rgba(24,161,253,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 overflow-hidden">
+          <div className="relative border-[2px] border-cornflowerblue-100/30 bg-[var(--field)] rounded-2xl w-full box-border flex flex-col shadow-[0_4px_20px_rgba(var(--accent-rgb),0.15),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-cornflowerblue-100/50 hover:shadow-[0_4px_30px_rgba(var(--accent-rgb),0.25),inset_0_1px_0_rgba(255,255,255,0.15)] focus-within:border-cornflowerblue-100/70 focus-within:shadow-[0_4px_40px_rgba(var(--accent-rgb),0.35),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 overflow-hidden">
             {/* Glossy top edge effect */}
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
             
             <textarea
               id="contact-message"
-              className="w-full resize-none bg-transparent border-0 h-[150px] sm:h-[180px] px-5 pt-3.5 pb-3 font-urbanist font-bold text-lg text-white placeholder:text-gray-400 [outline:none]"
+              className="w-full resize-none bg-transparent border-0 h-[150px] sm:h-[180px] px-5 pt-3.5 pb-3 font-urbanist font-bold text-lg text-white placeholder:text-gray-200 [outline:none]"
               placeholder="Message"
               value={message}
               maxLength={MESSAGE_MAX}
@@ -371,7 +371,7 @@ const EmailForm: NextPage<Props> = ({
                       return (
                         <div
                           key={k}
-                          className="flex items-center gap-1.5 rounded-md border border-steelblue/60 bg-[#1e293b]/80 px-2 py-1"
+                          className="flex items-center gap-1.5 rounded-md border border-steelblue/60 bg-[var(--surface)]/80 px-2 py-1"
                           title={f.name}
                         >
                           <svg viewBox="0 0 24 24" className="w-3 h-3 text-gray-200" fill="none" stroke="currentColor" strokeWidth="2">

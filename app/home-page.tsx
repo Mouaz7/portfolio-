@@ -6,12 +6,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import Header from "@/components/header";
-import MainPicPlaceholder from "@/components/home/MainPicPlaceholder";
+import NexbotRobot from "@/components/home/NexbotRobot";
 import WordBubble from "@/components/home/WordBubble";
 import HelloBadge from "@/components/home/HelloBadge";
 import BgBlur from "@/components/home/BgBlur";
-import FloatingCards from "@/components/home/FloatingCards";
-import DownloadCvButton from "@/components/home/download-cv-button";
 import TypeText from "@/components/home/TypeText";
 import RoleCycler from "@/components/home/RoleCycler";
 
@@ -19,7 +17,6 @@ import { useViewport } from "@/src/hooks/useViewport";
 import { useElementRect } from "@/src/hooks/useElementRect";
 import { useSlideScale } from "@/src/hooks/useSlideScale";
 import { usePortraitHeight } from "@/src/hooks/usePortraitHeight";
-import { useImageContainScale } from "@/src/hooks/useImageContainScale";
 import { useMounted } from "@/src/hooks/useMounted";
 
 const MIN_SLIDE_H = 560;
@@ -35,9 +32,7 @@ const HomePage: NextPage = () => {
   const [goSoftwareType, setGoSoftwareType] = useState(false);
   const [goRoles, setGoRoles] = useState(false);
   const [showPortrait, setShowPortrait] = useState(false);
-  const [showCards, setShowCards] = useState(false);
   const [showSoftwareVector, setShowSoftwareVector] = useState(false);
-  const [showCvBtn, setShowCvBtn] = useState(false);
   const [showGlow, setShowGlow] = useState(false);
 
   // Kick off the hello badge shortly after mount
@@ -55,13 +50,10 @@ const HomePage: NextPage = () => {
   const mounted = useMounted();
   const seRef = useRef<HTMLSpanElement>(null);
   const artBoxRef = useRef<HTMLDivElement>(null);
-  const [imgAR, setImgAR] = useState<number>(0);
 
   const { vh } = useViewport();
   const { slideScale, style: computedSlideStyle } = useSlideScale(vh, MIN_SLIDE_H);
   const seRect = useElementRect(seRef);
-  const artBoxRect = useElementRect(artBoxRef);
-  const boxW = artBoxRect?.width ?? 0;
 
   const artHeight = usePortraitHeight({
     vh,
@@ -71,7 +63,6 @@ const HomePage: NextPage = () => {
     minH: MIN_H,
   });
 
-  const imgScale = useImageContainScale(artHeight, boxW, imgAR);
   const slideStyle = mounted ? computedSlideStyle : { height: "100dvh" };
 
   return (
@@ -111,7 +102,7 @@ const HomePage: NextPage = () => {
                 onDone={() => setGoIm(true)}
               />
 
-              {/* 2) "I'm " + "Adam" (typed inside WordBubble) + "Software " */}
+              {/* 2) "I'm " + "Mouaz" (typed inside WordBubble) + "Software " */}
               <h1 className="mt-4 leading-[1] tracking-[-0.01em] font-semibold text-[clamp(2rem,7vw,96px)] whitespace-nowrap">
                 <TypeText
                   text={"I’m "}
@@ -122,7 +113,7 @@ const HomePage: NextPage = () => {
                 />
 
                 <WordBubble
-                  text="Adam"
+                  text="Mouaz"
                   svgSrc="/home/Vector-22.svg"
                   padRatio={0.18}
                   yNudge={-8}
@@ -147,11 +138,8 @@ const HomePage: NextPage = () => {
                       setShowSoftwareVector(true);   // show the swoosh
                       setGoRoles(true);              // then fade the roles
                       setShowPortrait(true);         // show portrait immediately
-                      // let the portrait animation breathe, then bring cards
-                      setTimeout(() => setShowCards(true), 520);  
-                      setTimeout(() => setShowCvBtn(true), 520 + 420);
-                      // Show glow as the final animation (after CV button)
-                      setTimeout(() => setShowGlow(true), 520 + 420 + 600);
+                      // let the portrait animation breathe, then bring in the glow
+                      setTimeout(() => setShowGlow(true), 520 + 600);
                     }}
                     className="inline"
                   />
@@ -201,46 +189,12 @@ const HomePage: NextPage = () => {
           <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
             <div
               ref={artBoxRef}
-              className="relative w-[min(95vw,720px)]"
-              style={{ height: `${artHeight}px` }}
+              className="relative w-screen max-w-[1100px]"
+              style={{ height: `min(82vh, ${Math.max(artHeight, 560)}px)` }}
             >
               {showPortrait && (
-                <MainPicPlaceholder
-                  className="h-full w-full"
-                  scale={imgScale}
-                  onImgReady={(ar: number) => setImgAR(ar)}
-                />
+                <NexbotRobot className="h-full w-full" />
               )}
-
-              {/* 5) Floating cards wait a beat after portrait mounts, then animate themselves */}
-              {showPortrait && (
-                <div
-                  className={[
-                    "absolute inset-0 z-20",
-                    showCards ? "opacity-100" : "opacity-0",
-                    "transition-opacity duration-400 ease-[cubic-bezier(.22,1,.36,1)]",
-                  ].join(" ")}
-                >
-                  {showCards && (
-                    <FloatingCards
-                      className="absolute inset-0"
-                      sizeBoost={1.3}
-                      gapBoost={1.4}
-                    />
-                  )}
-                </div>
-              )}
-
-              <DownloadCvButton
-                className="absolute left-1/2 -translate-x-1/2 bottom-6 z-40"
-                href="/api/cv"
-                downloadCV="Download CV"
-                iconPlaceholder="/home/icon-placeholder.svg"
-                show={showCvBtn}       
-                animateIn               
-                enterDurationMs={520}
-                liftOnHover
-              />
             </div>
           </div>
         </main>

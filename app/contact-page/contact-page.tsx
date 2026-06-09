@@ -10,9 +10,8 @@ import Footer from "@/components/footer";
 import Stage16x9 from "@/components/Stage16x9";
 import PhotoSocialContainer from "@/components/contact/photo-social-container";
 import EmailForm from "@/components/contact/email-form";
+import { useAccentRgb, useAccentHex } from "@/src/hooks/useAccentRgb";
 
-const BRAND = "#18a1fd";
-const RGB = "24,161,253";
 const PARTICLES_DESKTOP = 220;
 const PARTICLES_MOBILE = 120;
 const SPEED_MULT = 1.6;
@@ -25,6 +24,10 @@ const ContactPage: NextPage = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
+
+  // DB-driven accent, live with the theme toggle.
+  const RGB = useAccentRgb();
+  const BRAND = useAccentHex();
 
   const handleSend = useCallback(async ({ name, email, message, files }: {
     name: string; email: string; message: string; files: File[];
@@ -165,7 +168,7 @@ const ContactPage: NextPage = () => {
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisChange);
     };
-  }, []);
+  }, [RGB]);
 
   const prefersReducedMotion = useReducedMotion();
   const springy: Transition = { type: "spring", stiffness: 260, damping: 26, mass: 0.9 };
@@ -180,7 +183,7 @@ const ContactPage: NextPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen relative [background:linear-gradient(128deg,_rgba(0,_0,_0,_0),_rgba(24,_161,_253,_0.15)),_linear-gradient(74.23deg,_rgba(24,_161,_253,_0.05),_rgba(0,_0,_0,_0)),_#000] overflow-hidden flex flex-col">
+    <div className="w-full min-h-screen relative [background:linear-gradient(128deg,_rgba(0,_0,_0,_0),_rgba(24,_161,_253,_0.15)),_linear-gradient(74.23deg,_rgba(24,_161,_253,_0.05),_rgba(0,_0,_0,_0)),_var(--bg)] overflow-hidden flex flex-col">
       {/* Fog gradients */}
       <div 
         className="pointer-events-none fixed top-[-10%] left-[-5%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full opacity-20 blur-[80px] z-0"
@@ -266,7 +269,7 @@ const ContactPage: NextPage = () => {
         </div>
       </main>
 
-      <Footer year={2025} owner="Adam Abdullah" logoSrc="/logo1.svg" />
+      <Footer year={2026} owner="Mouaz Naji" logoSrc="/logo.svg" />
     </div>
   );
 };

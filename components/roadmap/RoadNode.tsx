@@ -14,7 +14,7 @@ export type RoadPos = "top" | "bottom" | "left" | "right";
 export default function RoadNode({
   item,
   pos,
-  accentColor = "#18a1fd",
+  accentColor = "#19e3c2",
   iconSize = 88,
   width = 420,
   appearDelayMs = 0,
@@ -55,7 +55,7 @@ export default function RoadNode({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={item.icon} alt="" className="object-contain select-none" style={{ height: iconSize, width: iconSize }} />
       ) : (
-        <span className="grid place-items-center text-sm font-semibold text-sky-50" style={{ height: iconSize, width: iconSize }}>
+        <span className="grid place-items-center text-sm font-semibold text-white" style={{ height: iconSize, width: iconSize }}>
           {item.title.slice(0, 1)}
         </span>
       )}
@@ -90,13 +90,13 @@ export default function RoadNode({
 
   const Text = (
     <div className="text-center opacity-0 animate-nodeIn" style={{ width, animationDelay: `${appearDelayMs + 320}ms` }}>
-      <div className="text-sky-50 font-semibold leading-tight" style={{ fontSize: isMobile ? '15px' : '18px' }}>
+      <div className="text-white font-semibold leading-tight" style={{ fontSize: isMobile ? '15px' : '18px' }}>
         {item.title}
       </div>
       <div className="mt-0.5 italic" style={{ fontSize: isMobile ? '10px' : '12px', color: accentColor }}>
         {fmtRange(item.from, item.to)}
       </div>
-      <p className="mt-1.5 leading-snug text-sky-100/85" style={{ 
+      <p className="mt-1.5 leading-snug text-gray-100" style={{
         fontSize: isMobile ? '12px' : '14px', 
         maxWidth: descMax, 
         margin: "0 auto" 

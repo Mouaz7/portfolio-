@@ -10,7 +10,7 @@ import RoadNode, { type RoadmapItem } from "./RoadNode";
  */
 export default function StreetTimeline({
   items,
-  accentColor = "#18a1fd",
+  accentColor = "#19e3c2",
   laneHeight = 420,
   iconSize = 88,
   autoScale = true,
@@ -119,7 +119,7 @@ export default function StreetTimeline({
             {[...items].reverse().map((it, i) => (
               <div key={it.id} className="relative z-10 opacity-0 pl-10 pr-2 flex items-center" style={{ animation: `slideIn 600ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards ${roadAnimMs + i * perItemStagger}ms`, minHeight: 0 }}>
                 {/* Timeline dot */}
-                <div className="absolute left-[18px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full border-2 z-20" style={{ borderColor: accentColor, background: "rgba(15, 23, 42, 0.9)", boxShadow: `0 0 8px ${accentColor}60` }} />
+                <div className="absolute left-[18px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full border-2 z-20" style={{ borderColor: accentColor, background: "var(--surface)", boxShadow: `0 0 8px ${accentColor}60` }} />
 
                 {/* Compact card - constrained height */}
                 <div className="relative bg-white/[0.02] backdrop-blur-sm rounded-lg border border-white/10 p-2.5 hover:bg-white/[0.04] transition-all duration-300 w-full">
@@ -143,7 +143,7 @@ export default function StreetTimeline({
                       )}
 
                       {/* Compact description */}
-                      <p className="text-sky-100/75 text-[10px] leading-snug line-clamp-2">{it.description}</p>
+                      <p className="text-gray-100 text-[10px] leading-snug line-clamp-2">{it.description}</p>
                     </div>
                   </div>
                 </div>

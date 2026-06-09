@@ -42,9 +42,9 @@ type Props = {
  */
 export default function Footer({
   className = "",
-  year = 2025,
-  owner = "Adam Abdullah",
-  logoSrc = "/logo1.svg",
+  year = 2026,
+  owner = "Mouaz Naji",
+  logoSrc = "/logo.svg",
   logoAlt = "Logo",
   logoW = 28,
   logoH = 30,

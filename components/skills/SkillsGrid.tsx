@@ -1,4 +1,3 @@
-// components/skills/SkillsGrid.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -7,9 +6,7 @@ import { SkillCard } from "./SkillCard";
 import LoadingAnimation from "@/components/LoadingAnimation";
 
 const BASE = { cardW: 360, gap: 24, cardRatio: 4 / 3, padY: 40 };
-type Spec = { cols: number; rows: number };
 
-// Minimal skill shape used by our UI
 export type UISkill = {
   id: string;
   name: string;
@@ -24,48 +21,46 @@ export default function SkillsGrid() {
   const [allSkills, setAllSkills] = useState<UISkill[]>([]);
   const [cats, setCats] = useState<{ key: string; title: string; blurb: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  // Fetch categories (DB: skill_category with title/blurb)
+  // Fixed 3-col desktop / 2-col mobile layout
+  const [cols, setCols] = useState(3);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const apply = () => setCols(mq.matches ? 3 : 2);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
+  // ALL hooks must be called unconditionally before any early return
+  const rows = Math.ceil(cats.length / cols) || 2;
+  const STAGE = { ...BASE, cols, rows };
+  const { stageStyle, wrapperStyle } = useViewportStage(STAGE);
+
   useEffect(() => {
     let off = false;
     (async () => {
       try {
-        const r = await fetch("/api/skill-categories", { cache: "no-store" });
-        if (!r.ok) throw new Error(String(r.status));
-        const items = await r.json();
-        if (!off) setCats(items);
-      } catch (e) {
-        console.error("[SkillsGrid] fetch /api/skill-categories failed:", e);
-        if (!off) setCats([]);
+        const [catRes, skillRes] = await Promise.all([
+          fetch("/api/skill-categories", { cache: "no-store" }),
+          fetch("/api/skills", { cache: "no-store" }),
+        ]);
+        if (!catRes.ok || !skillRes.ok) throw new Error("api error");
+        const [catData, skillData] = await Promise.all([catRes.json(), skillRes.json()]);
+        if (!off) {
+          setCats(Array.isArray(catData) ? catData : []);
+          setAllSkills(Array.isArray(skillData) ? skillData : []);
+        }
+      } catch {
+        if (!off) setError(true);
+      } finally {
+        if (!off) setLoading(false);
       }
     })();
     return () => { off = true; };
   }, []);
 
-  // ✅ Fetch skills (Supabase-backed)
-  useEffect(() => {
-    let off = false;
-    (async () => {
-      try {
-        const r = await fetch("/api/skills", { cache: "no-store" });
-        if (!r.ok) throw new Error(String(r.status));
-        const items: UISkill[] = await r.json();
-        if (!off) {
-          setAllSkills(items);
-          setLoading(false);
-        }
-      } catch (e) {
-        console.error("[SkillsGrid] fetch /api/skills failed:", e);
-        if (!off) {
-          setAllSkills([]);
-          setLoading(false);
-        }
-      }
-    })();
-    return () => { off = true; };
-  }, []);
-
-  // Bucket skills by fetched categories
   const byCat = useMemo(() => {
     const map: Record<string, UISkill[]> = {};
     for (const c of cats) map[c.key] = [];
@@ -76,24 +71,24 @@ export default function SkillsGrid() {
     return map;
   }, [cats, allSkills]);
 
-  // 3x2 vs 2x3 layout
-  const [spec, setSpec] = useState<Spec>({ cols: 2, rows: 3 });
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 640px)");
-    const apply = () => setSpec(mq.matches ? { cols: 3, rows: 2 } : { cols: 2, rows: 3 });
-    apply();
-    mq.addEventListener?.("change", apply);
-    return () => mq.removeEventListener?.("change", apply);
-  }, []);
-
-  const STAGE = { ...BASE, cols: spec.cols, rows: spec.rows };
-  const { stageStyle, wrapperStyle } = useViewportStage(STAGE);
-
-  // Loading state with animated icons
+  // Early returns AFTER all hooks
   if (loading) {
     return (
       <main className="flex items-center justify-center min-h-screen bg-black">
         <LoadingAnimation text="Loading skills..." />
+      </main>
+    );
+  }
+
+  if (error || cats.length === 0) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen bg-black gap-4 text-center px-6">
+        <p className="text-white/40 text-sm">
+          {error ? "Kunde inte hämta skills från databasen." : "Inga skills hittades i databasen."}
+        </p>
+        <p className="text-white/25 text-xs">
+          Konfigurera SUPABASE_ANON_KEY i .env.local och kör setup.sql i Supabase SQL Editor.
+        </p>
       </main>
     );
   }
@@ -104,20 +99,20 @@ export default function SkillsGrid() {
         <ul
           className="grid"
           style={{
-            gridTemplateColumns: `repeat(${STAGE.cols}, ${STAGE.cardW}px)`,
-            gridAutoRows: `${STAGE.cardW / STAGE.cardRatio}px`,
-            gap: STAGE.gap,
+            gridTemplateColumns: `repeat(${cols}, ${BASE.cardW}px)`,
+            gridAutoRows: `${BASE.cardW / BASE.cardRatio}px`,
+            gap: BASE.gap,
           }}
         >
-          {cats.slice(0, STAGE.cols * STAGE.rows).map((c, i) => (
+          {cats.map((c, i) => (
             <li key={c.key}>
               <SkillCard
                 categoryKey={c.key}
                 title={c.title}
                 blurb={c.blurb}
                 items={byCat[c.key] ?? []}
-                cardW={STAGE.cardW}
-                cardRatio={STAGE.cardRatio}
+                cardW={BASE.cardW}
+                cardRatio={BASE.cardRatio}
                 cardIndex={i}
               />
             </li>
@@ -125,7 +120,6 @@ export default function SkillsGrid() {
         </ul>
       </div>
 
-      {/* Animations (unchanged) */}
       <style>{`
         @keyframes cardBounceFadeIn {
           0%   { opacity: 0; transform: translateY(22px) scale(0.965); filter: blur(2px); }

@@ -28,19 +28,10 @@ export function SkillCard({
   cardRatio: number; // width / height
   cardIndex: number;
 }) {
-  // Determine grid layout based on item count
-  const itemCount = items.length;
-  let cols = 3;
-  let rows = 2;
-  let maxItems = 6;
-
-  if (itemCount > 6) {
-    cols = 4;
-    rows = Math.ceil(itemCount / 4);
-    maxItems = cols * rows;
-  }
-
-  const displayedItems = items.slice(0, maxItems);
+  // Always 3×2 grid — max 6 items, uniform across all cards
+  const COLS = 3;
+  const ROWS = 2;
+  const displayedItems = items.slice(0, COLS * ROWS);
 
   return (
     <div
@@ -60,7 +51,7 @@ export function SkillCard({
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{
           background:
-            "radial-gradient(80% 80% at 70% 20%, rgba(56,189,248,0.12) 0%, rgba(56,189,248,0.04) 42%, transparent 72%)",
+            "radial-gradient(80% 80% at 70% 20%, rgba(var(--accent-rgb),0.12) 0%, rgba(var(--accent-rgb),0.04) 42%, transparent 72%)",
         }}
       />
 
@@ -82,9 +73,9 @@ export function SkillCard({
       <div className="px-4 pb-5 h-full min-h-0">
         <div
           className="grid gap-3 h-full min-h-0"
-          style={{ 
-            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` 
+          style={{
+            gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${ROWS}, minmax(0, 1fr))`
           }}
         >
           {displayedItems.map((s, i) => (

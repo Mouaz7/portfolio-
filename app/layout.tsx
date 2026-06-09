@@ -1,10 +1,11 @@
 import "./global.css";
 import { urbanist } from "./fonts";
+import { getSiteTheme, themeToCss } from "@/lib/theme";
 
 export const metadata = {
-  title: "Adam Abdullah - Software Engineer Portfolio",
+  title: "Mouaz Naji - Software Engineer Portfolio",
   description:
-    "Portfolio showcasing expertise in Next.js, React, TypeScript, Tailwind CSS, and modern web development. Explore my projects, skills, and professional journey.",
+    "Portfolio of Mouaz Naji, Software Engineer in Karlskrona, Sweden. Full-stack and systems development with React, Next.js, TypeScript, Kotlin, C++ and more. Explore my projects, skills, and professional journey.",
   keywords: [
     "portfolio",
     "software engineer",
@@ -12,26 +13,28 @@ export const metadata = {
     "React",
     "Next.js",
     "TypeScript",
+    "Kotlin",
+    "C++",
     "Tailwind CSS",
     "web development",
-    "Adam Abdullah",
+    "Mouaz Naji",
   ],
-  authors: [{ name: "Adam Abdullah" }],
-  creator: "Adam Abdullah",
+  authors: [{ name: "Mouaz Naji" }],
+  creator: "Mouaz Naji",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://your-project.vercel.app", // Update this with your actual Vercel URL after deployment
-    title: "Adam Abdullah - Software Engineer Portfolio",
+    title: "Mouaz Naji - Software Engineer Portfolio",
     description:
-      "Portfolio showcasing expertise in Next.js, React, TypeScript, and modern web development.",
-    siteName: "Adam Abdullah Portfolio",
+      "Portfolio of Mouaz Naji, Software Engineer. Full-stack and systems development with React, Next.js, TypeScript, Kotlin and C++.",
+    siteName: "Mouaz Naji Portfolio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Adam Abdullah - Software Engineer Portfolio",
+    title: "Mouaz Naji - Software Engineer Portfolio",
     description:
-      "Portfolio showcasing expertise in Next.js, React, TypeScript, and modern web development.",
+      "Portfolio of Mouaz Naji, Software Engineer. Full-stack and systems development with React, Next.js, TypeScript, Kotlin and C++.",
   },
   robots: {
     index: true,
@@ -46,17 +49,37 @@ export const metadata = {
   },
   icons: {
     icon: [
-      { url: "/logo1.svg", type: "image/svg+xml" },
+      { url: "/logo.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "any" }, // Fallback for browsers that don't support SVG favicons
     ],
-    apple: "/logo1.svg",
+    apple: "/logo.svg",
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Runs before first paint to apply the saved (or system) theme and avoid a
+// flash of the wrong colors. Adds `light` class to <html> when appropriate.
+const themeInitScript = `
+(function() {
+  try {
+    var t = localStorage.getItem('theme');
+    if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    if (t === 'light') document.documentElement.classList.add('light');
+  } catch (e) {}
+})();
+`;
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // DB-driven accent theme, injected server-side as CSS variables (no flash).
+  const theme = await getSiteTheme();
+  const themeCss = themeToCss(theme);
+
   return (
     // Make the root viewport-height and non-scrollable
     <html lang="en" className={`${urbanist.variable} h-dvh`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+      </head>
       <body className="antialiased h-full overflow-hidden bg-black text-white">
         {children}
       </body>

@@ -1,21 +1,24 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        white: "#fff",
+        // Mapped to CSS variables so the whole site flips with the theme.
+        // Defaults (dark) and the .light overrides live in app/global.css.
+        white: "var(--fg)",
         cornflowerblue: {
-          100: "#18a1fd",
-          200: "#0087e3",
-          300: "rgba(0, 135, 227, 0.1)",
-          400: "rgba(24, 161, 253, 0.1)",
+          100: "var(--accent)",
+          200: "var(--accent-strong)",
+          300: "var(--accent-faint)",
+          400: "var(--accent-faint-2)",
         },
-        black: "#000",
+        black: "var(--bg)",
         gray: {
-          100: "rgba(255, 255, 255, 0.7)",
-          200: "rgba(255, 255, 255, 0.5)",
-          300: "rgba(255, 255, 255, 0.1)",
+          100: "var(--fg-70)",
+          200: "var(--fg-50)",
+          300: "var(--fg-10)",
         },
         lightgray: "#d0d5dd",
         silver: "#b5bdc4",

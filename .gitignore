@@ -42,3 +42,6 @@ coverage/
 .nyc_output
 
 .vercel
+
+# local agent (MCP) config
+.mcp.json

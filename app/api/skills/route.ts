@@ -8,7 +8,8 @@ export async function GET() {
   // Pull all skills; categories are fixed in your UI model
   const { data, error } = await supabase
     .from("skill")
-    .select("id,name,category,icon_bucket,icon_path,icon_alt,created_at")
+    .select("id,name,category,icon_bucket,icon_path,icon_alt,sort_order,created_at")
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
   if (error) {
@@ -54,8 +55,8 @@ export async function GET() {
       category: r.category,      // e.g., "Frontend", "Languages", etc.
       src,                       // public icon URL (Supabase Storage), optionally versioned
       alt: r.icon_alt ?? r.name, // a11y fallback
-      // Optional fields expected by UI (safe defaults to preserve design/order)
-      weight: 0,
+      // UI sorts each category by `weight`; drive it from the DB sort_order
+      weight: r.sort_order ?? 0,
       xOffset: 0,
       yOffset: 0,
     };

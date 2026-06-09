@@ -3,11 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import Header from "@/components/header";
 import StreetTimeline, { type RoadmapItem } from "@/components/roadmap/StreetTimeline";
 import LoadingAnimation from "@/components/LoadingAnimation";
+import { useAccentRgb, useAccentHex } from "@/src/hooks/useAccentRgb";
 
 type ApiItem = { id: string; title: string; description: string; icon?: string; from: string; to?: string | null };
 
-const BRAND = "#18a1fd";
-const RGB = "24,161,253";            
 const PARTICLES_DESKTOP = 220;
 const PARTICLES_MOBILE  = 120;
 const SPEED_MULT        = 1.6;        // >1 = faster float
@@ -22,6 +21,10 @@ export default function RoadmapPage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
+
+  // DB-driven accent, live with the theme toggle.
+  const RGB = useAccentRgb();
+  const BRAND = useAccentHex();
 
   useEffect(() => {
     let off = false;
@@ -170,7 +173,7 @@ export default function RoadmapPage() {
       ro.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [RGB]);
 
   return (
     <div className="bg-black flex flex-col overflow-hidden" style={{ minHeight: "100dvh" }}>
@@ -186,7 +189,7 @@ export default function RoadmapPage() {
             radial-gradient(95% 90% at 90% 100%, rgba(${RGB},0.38) 0%, rgba(${RGB},0.22) 32%, rgba(${RGB},0.10) 58%, rgba(0,0,0,0) 82%),
             radial-gradient(70% 65% at 18% 100%, rgba(${RGB},0.18) 0%, rgba(${RGB},0.10) 45%, rgba(0,0,0,0) 78%),
             radial-gradient(70% 65% at 82% 100%, rgba(${RGB},0.18) 0%, rgba(${RGB},0.10) 45%, rgba(0,0,0,0) 78%),
-            linear-gradient(#000, #000)
+            linear-gradient(var(--bg), var(--bg))
           `,
           backgroundRepeat: "no-repeat, no-repeat, no-repeat, no-repeat, no-repeat",
           backgroundSize: "110vw 90vh, 110vw 90vh, 80vw 65vh, 80vw 65vh, 100% 100%",

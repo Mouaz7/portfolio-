@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useAccentRgb } from "@/src/hooks/useAccentRgb";
 
 type Props = {
   className?: string;
@@ -23,6 +24,9 @@ export default function BgBlur({
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // DB-driven accent (cyan/teal), live with the theme toggle.
+  const GLOW_RGB = useAccentRgb();
 
   // ---- Mask: top fade + optional bottom fade/cut ----
   const keepPct = Math.max(0, Math.min(100, 100 - cropPct));
@@ -108,7 +112,7 @@ export default function BgBlur({
 
       ctx.clearRect(0, 0, w, h);
       ctx.globalCompositeOperation = "lighter";
-      ctx.fillStyle = `rgba(24,161,253,${COLOR_BASE_ALPHA})`;
+      ctx.fillStyle = `rgba(${GLOW_RGB},${COLOR_BASE_ALPHA})`;
 
       for (const p of particles) {
         p.x += p.vx * dt;
@@ -151,7 +155,7 @@ export default function BgBlur({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [height, cropPct, position]);
+  }, [height, cropPct, position, GLOW_RGB]);
 
   return (
     <div
@@ -177,13 +181,12 @@ export default function BgBlur({
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(circle at 50% 100%, \
-              rgba(24,161,253,0.55) 0%, \
-              rgba(24,161,253,0.36) 28%, \
-              rgba(24,161,253,0.18) 52%, \
-              rgba(24,161,253,0.08) 68%, \
-              transparent 100%)",
+          background: `radial-gradient(circle at 50% 100%, \
+              rgba(${GLOW_RGB},0.55) 0%, \
+              rgba(${GLOW_RGB},0.36) 28%, \
+              rgba(${GLOW_RGB},0.18) 52%, \
+              rgba(${GLOW_RGB},0.08) 68%, \
+              transparent 100%)`,
           filter: "blur(2px)",
         }}
       />
