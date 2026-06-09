@@ -57,7 +57,7 @@ export default function SkillsGrid() {
 
   if (loading) {
     return (
-      <main className="flex items-center justify-center min-h-[80vh]">
+      <main className="flex items-center justify-center h-full">
         <LoadingAnimation text="Loading skills..." />
       </main>
     );
@@ -65,7 +65,7 @@ export default function SkillsGrid() {
 
   if (error || cats.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-[80vh] gap-4 text-center px-6">
+      <main className="flex flex-col items-center justify-center h-full gap-4 text-center px-6">
         <p className="text-white/40 text-sm">
           {error ? "Kunde inte hämta skills från databasen." : "Inga skills hittades i databasen."}
         </p>
@@ -77,27 +77,26 @@ export default function SkillsGrid() {
   }
 
   const rows = cats.filter((c) => (byCat[c.key]?.length ?? 0) > 0);
+  // Shared column count = the largest category, so icons align across all rows.
+  const columns = Math.max(1, ...rows.map((c) => byCat[c.key]?.length ?? 0));
 
   return (
-    <main className="mx-auto w-full max-w-[1080px] px-6 pb-24 pt-10 md:px-10">
-      {/* Editorial header */}
-      <header className="animate-row mb-4" style={{ animationFillMode: "both" }}>
+    <main className="mx-auto flex h-full w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.5rem,2vh,1.25rem)]">
+      {/* Editorial header — compact so all rows fit on one screen */}
+      <header className="animate-row shrink-0 pb-[clamp(0.5rem,1.6vh,1rem)]" style={{ animationFillMode: "both" }}>
         <p
-          className="text-[12px] font-medium uppercase tracking-[0.32em]"
+          className="text-[clamp(0.6rem,1.4vh,0.72rem)] font-medium uppercase tracking-[0.32em]"
           style={{ color: "rgba(var(--accent-rgb),0.95)" }}
         >
           Toolbox
         </p>
-        <h1 className="mt-2 text-[40px] font-bold leading-[1.05] tracking-tight md:text-[56px]">
+        <h1 className="mt-1 text-[clamp(1.5rem,4.5vh,2.75rem)] font-bold leading-[1.05] tracking-tight">
           Skills &amp; Technologies
         </h1>
-        <p className="mt-3 max-w-[54ch] text-[14px] leading-relaxed text-white/50">
-          The languages, frameworks and tools I reach for — grouped by where they
-          live in the stack.
-        </p>
       </header>
 
-      <div>
+      {/* Rows share the remaining viewport height equally — no scrolling */}
+      <div className="flex min-h-0 flex-1 flex-col">
         {rows.map((c, i) => (
           <SkillRow
             key={c.key}
@@ -105,6 +104,7 @@ export default function SkillsGrid() {
             blurb={c.blurb}
             accentRgb={c.accentRgb}
             items={byCat[c.key] ?? []}
+            columns={columns}
             index={i + 1}
             isLast={i === rows.length - 1}
           />

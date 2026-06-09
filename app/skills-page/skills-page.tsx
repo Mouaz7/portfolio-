@@ -145,7 +145,7 @@ export default function Page() {
 
   return (
     <div 
-      className="w-full min-h-[100svh] bg-black text-white overflow-x-hidden relative"
+      className="flex w-full h-dvh flex-col overflow-hidden bg-black text-white relative"
       style={{
         backgroundImage: `
           radial-gradient(95% 90% at 10% 100%, rgba(${RGB},0.38) 0%, rgba(${RGB},0.22) 32%, rgba(${RGB},0.10) 58%, rgba(0,0,0,0) 82%),
@@ -170,7 +170,7 @@ export default function Page() {
         aria-hidden="true" 
       />
       
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1 min-h-0">
         <SkillsGrid />
       </div>
     </div>

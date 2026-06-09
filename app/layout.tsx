@@ -75,7 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     // Make the root viewport-height and non-scrollable
-    <html lang="en" className={`${urbanist.variable} h-dvh`}>
+    <html lang="en" className={`${urbanist.variable} h-dvh`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <style dangerouslySetInnerHTML={{ __html: themeCss }} />
