@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useViewportStage } from "./useViewportStage";
-import { SkillCard } from "./SkillCard";
+import { SkillRow } from "./SkillRow";
 import LoadingAnimation from "@/components/LoadingAnimation";
-
-const BASE = { cardW: 360, gap: 24, cardRatio: 4 / 3, padY: 40 };
 
 export type UISkill = {
   id: string;
@@ -17,26 +14,13 @@ export type UISkill = {
   weight?: number;
 };
 
+type Category = { key: string; title: string; blurb: string; accentRgb?: string | null };
+
 export default function SkillsGrid() {
   const [allSkills, setAllSkills] = useState<UISkill[]>([]);
-  const [cats, setCats] = useState<{ key: string; title: string; blurb: string }[]>([]);
+  const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
-  // Fixed 3-col desktop / 2-col mobile layout
-  const [cols, setCols] = useState(3);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const apply = () => setCols(mq.matches ? 3 : 2);
-    apply();
-    mq.addEventListener?.("change", apply);
-    return () => mq.removeEventListener?.("change", apply);
-  }, []);
-
-  // ALL hooks must be called unconditionally before any early return
-  const rows = Math.ceil(cats.length / cols) || 2;
-  const STAGE = { ...BASE, cols, rows };
-  const { stageStyle, wrapperStyle } = useViewportStage(STAGE);
 
   useEffect(() => {
     let off = false;
@@ -67,14 +51,13 @@ export default function SkillsGrid() {
     for (const s of allSkills) {
       if (s.category && map[s.category]) map[s.category].push(s);
     }
-    Object.keys(map).forEach(k => map[k].sort((a, b) => (a.weight ?? 0) - (b.weight ?? 0)));
+    Object.keys(map).forEach((k) => map[k].sort((a, b) => (a.weight ?? 0) - (b.weight ?? 0)));
     return map;
   }, [cats, allSkills]);
 
-  // Early returns AFTER all hooks
   if (loading) {
     return (
-      <main className="flex items-center justify-center min-h-screen bg-black">
+      <main className="flex items-center justify-center min-h-[80vh]">
         <LoadingAnimation text="Loading skills..." />
       </main>
     );
@@ -82,7 +65,7 @@ export default function SkillsGrid() {
 
   if (error || cats.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen bg-black gap-4 text-center px-6">
+      <main className="flex flex-col items-center justify-center min-h-[80vh] gap-4 text-center px-6">
         <p className="text-white/40 text-sm">
           {error ? "Kunde inte hämta skills från databasen." : "Inga skills hittades i databasen."}
         </p>
@@ -93,50 +76,49 @@ export default function SkillsGrid() {
     );
   }
 
+  const rows = cats.filter((c) => (byCat[c.key]?.length ?? 0) > 0);
+
   return (
-    <main className="flex items-center justify-center" style={wrapperStyle(STAGE.padY)}>
-      <div style={stageStyle}>
-        <ul
-          className="grid"
-          style={{
-            gridTemplateColumns: `repeat(${cols}, ${BASE.cardW}px)`,
-            gridAutoRows: `${BASE.cardW / BASE.cardRatio}px`,
-            gap: BASE.gap,
-          }}
+    <main className="mx-auto w-full max-w-[1080px] px-6 pb-24 pt-10 md:px-10">
+      {/* Editorial header */}
+      <header className="animate-row mb-4" style={{ animationFillMode: "both" }}>
+        <p
+          className="text-[12px] font-medium uppercase tracking-[0.32em]"
+          style={{ color: "rgba(var(--accent-rgb),0.95)" }}
         >
-          {cats.map((c, i) => (
-            <li key={c.key}>
-              <SkillCard
-                categoryKey={c.key}
-                title={c.title}
-                blurb={c.blurb}
-                items={byCat[c.key] ?? []}
-                cardW={BASE.cardW}
-                cardRatio={BASE.cardRatio}
-                cardIndex={i}
-              />
-            </li>
-          ))}
-        </ul>
+          Toolbox
+        </p>
+        <h1 className="mt-2 text-[40px] font-bold leading-[1.05] tracking-tight md:text-[56px]">
+          Skills &amp; Technologies
+        </h1>
+        <p className="mt-3 max-w-[54ch] text-[14px] leading-relaxed text-white/50">
+          The languages, frameworks and tools I reach for — grouped by where they
+          live in the stack.
+        </p>
+      </header>
+
+      <div>
+        {rows.map((c, i) => (
+          <SkillRow
+            key={c.key}
+            title={c.title}
+            blurb={c.blurb}
+            accentRgb={c.accentRgb}
+            items={byCat[c.key] ?? []}
+            index={i + 1}
+            isLast={i === rows.length - 1}
+          />
+        ))}
       </div>
 
       <style>{`
-        @keyframes cardBounceFadeIn {
-          0%   { opacity: 0; transform: translateY(22px) scale(0.965); filter: blur(2px); }
-          55%  { opacity: 1; transform: translateY(-4px) scale(1.02);  filter: blur(0.4px); }
-          82%  {            transform: translateY(1px)  scale(0.998);   filter: blur(0); }
-          100% {            transform: translateY(0)    scale(1);       filter: none; }
+        @keyframes rowFadeUp {
+          0%   { opacity: 0; transform: translateY(18px); filter: blur(2px); }
+          100% { opacity: 1; transform: translateY(0);    filter: none; }
         }
-        @keyframes iconBounceFadeIn {
-          0%   { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(1.5px); }
-          60%  { opacity: 1; transform: translateY(-2px) scale(1.01);  filter: blur(0.2px); }
-          88%  {            transform: translateY(1px)   scale(0.999); filter: blur(0); }
-          100% {            transform: translateY(0)     scale(1);     filter: none; }
-        }
-        .animate-card { animation: cardBounceFadeIn 900ms cubic-bezier(.2,.7,.2,1) both; will-change: transform, opacity, filter; }
-        .animate-icon { animation: iconBounceFadeIn 1000ms cubic-bezier(.2,.7,.2,1) both; will-change: transform, opacity, filter; }
+        .animate-row { animation: rowFadeUp 700ms cubic-bezier(.2,.7,.2,1) both; will-change: transform, opacity, filter; }
         @media (prefers-reduced-motion: reduce) {
-          .animate-card, .animate-icon { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+          .animate-row { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
         }
       `}</style>
     </main>

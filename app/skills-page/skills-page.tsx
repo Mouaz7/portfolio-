@@ -145,7 +145,7 @@ export default function Page() {
 
   return (
     <div 
-      className="w-full min-h-[100svh] bg-black text-white overflow-hidden relative"
+      className="w-full min-h-[100svh] bg-black text-white overflow-x-hidden relative"
       style={{
         backgroundImage: `
           radial-gradient(95% 90% at 10% 100%, rgba(${RGB},0.38) 0%, rgba(${RGB},0.22) 32%, rgba(${RGB},0.10) 58%, rgba(0,0,0,0) 82%),

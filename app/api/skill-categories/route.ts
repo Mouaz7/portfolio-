@@ -7,7 +7,7 @@ export const revalidate = 3600;
 export async function GET() {
   const { data, error } = await supabase
     .from("skill_category")
-    .select("name,title,blurb,sort_order")
+    .select("name,title,blurb,accent_rgb,sort_order")
     .order("sort_order", { ascending: true });
 
   if (error) {
@@ -19,6 +19,7 @@ export async function GET() {
     key: c.name,
     title: c.title ?? c.name,
     blurb: c.blurb ?? "",
+    accentRgb: c.accent_rgb ?? null,
   }));
 
   return NextResponse.json(mapped);
