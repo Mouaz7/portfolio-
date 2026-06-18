@@ -1,6 +1,7 @@
 import "./global.css";
 import { urbanist } from "./fonts";
 import { getSiteTheme, themeToCss } from "@/lib/theme";
+import ConstellationField from "@/components/home/ConstellationField";
 
 export const metadata = {
   title: "Mouaz Naji - Software Engineer Portfolio",
@@ -81,6 +82,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <style dangerouslySetInnerHTML={{ __html: themeCss }} />
       </head>
       <body className="antialiased h-full overflow-hidden bg-black text-white">
+        {/* Shared living-constellation backdrop behind every page (theme-aware) */}
+        <ConstellationField />
         {children}
       </body>
     </html>

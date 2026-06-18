@@ -1,204 +1,216 @@
 "use client";
 
 import type { NextPage } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import Header from "@/components/header";
-import NexbotRobot from "@/components/home/NexbotRobot";
-import WordBubble from "@/components/home/WordBubble";
-import HelloBadge from "@/components/home/HelloBadge";
-import BgBlur from "@/components/home/BgBlur";
-import TypeText from "@/components/home/TypeText";
+import SocialLinks from "@/components/SocialLinks";
 import RoleCycler from "@/components/home/RoleCycler";
+import ScrollHint from "@/components/home/ScrollHint";
+import CursorGlow from "@/components/home/CursorGlow";
+import FloatingStats from "@/components/home/FloatingStats";
+import TechMarquee from "@/components/home/TechMarquee";
+import MagneticButton from "@/components/home/MagneticButton";
 
-import { useViewport } from "@/src/hooks/useViewport";
-import { useElementRect } from "@/src/hooks/useElementRect";
-import { useSlideScale } from "@/src/hooks/useSlideScale";
-import { usePortraitHeight } from "@/src/hooks/usePortraitHeight";
-import { useMounted } from "@/src/hooks/useMounted";
+/** Small staged fade/rise used to choreograph the hero entrance. */
+function Reveal({
+  show,
+  delay = 0,
+  className = "",
+  children,
+}: {
+  show: boolean;
+  delay?: number;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={[
+        "transition-all duration-[700ms] ease-[cubic-bezier(.22,1,.36,1)] will-change-transform",
+        show ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-4 blur-[6px]",
+        className,
+      ].join(" ")}
+      style={{ transitionDelay: `${show ? delay : 0}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
 
-const MIN_SLIDE_H = 560;
-const MIN_W = 320;
-const MIN_H = 380;
-const TEXT_OVERLAP = 100;
+const ArrowIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+    className="transition-transform duration-300 ease-out group-hover:translate-x-1"
+  >
+    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+    className="transition-transform duration-300 ease-out group-hover:translate-y-0.5"
+  >
+    <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const HomePage: NextPage = () => {
-  // Sequence flags (just orchestration)
-  const [goHello, setGoHello] = useState(false);
-  const [goIm, setGoIm] = useState(false);
-  const [goAdam, setGoAdam] = useState(false);
-  const [goSoftwareType, setGoSoftwareType] = useState(false);
-  const [goRoles, setGoRoles] = useState(false);
-  const [showPortrait, setShowPortrait] = useState(false);
-  const [showSoftwareVector, setShowSoftwareVector] = useState(false);
-  const [showGlow, setShowGlow] = useState(false);
+  const [show, setShow] = useState(false);
 
-  // Kick off the hello badge shortly after mount
   useEffect(() => {
-    const t = setTimeout(() => setGoHello(true), 80);
+    const t = setTimeout(() => setShow(true), 70);
     return () => clearTimeout(t);
   }, []);
 
-  // Roles are just for visual effect now, no need to trigger anything
-  const onRolesDone = () => {
-    // Portrait, cards, and CV button are now triggered after "Software" types
-  };
-
-  // Layout helpers (unchanged)
-  const mounted = useMounted();
-  const seRef = useRef<HTMLSpanElement>(null);
-  const artBoxRef = useRef<HTMLDivElement>(null);
-
-  const { vh } = useViewport();
-  const { slideScale, style: computedSlideStyle } = useSlideScale(vh, MIN_SLIDE_H);
-  const seRect = useElementRect(seRef);
-
-  const artHeight = usePortraitHeight({
-    vh,
-    seBottom: seRect?.bottom ?? null,
-    textOverlap: TEXT_OVERLAP,
-    slideScale,
-    minH: MIN_H,
-  });
-
-  const slideStyle = mounted ? computedSlideStyle : { height: "100dvh" };
-
   return (
-    <div className={`relative w-full h-dvh min-w-[${MIN_W}px] overflow-hidden bg-black text-white`}>
-      {/* Hidden Link to prefetch contact page */}
+    <div className="relative h-dvh w-full min-w-[320px] overflow-hidden text-white">
+      {/* Prefetch the contact route (kept from before) */}
       <Link href="/contact-page" prefetch={true} className="hidden" aria-hidden="true" tabIndex={-1} />
-      
-      <div style={slideStyle}>
+
+      {/* Accent spotlight trailing the cursor (constellation backdrop is global) */}
+      <CursorGlow />
+
+      <div className="relative z-10 flex h-full flex-col">
         <Header />
 
-        <main className="relative">
-          {/* Your gradient/particles background (enters on its own) */}
-          {showGlow && (
-            <BgBlur
-              position="fixed"
-              height={`${artHeight}px`}
-              cropPct={0}
-              topFade="30%"
-              enterDelayMs={0}
-              enterDurationMs={800}
-            />
-          )}
+        <main className="relative flex flex-1 items-center justify-center px-6 sm:px-10">
+          {/* Theme-aware scrim so the type reads cleanly over the field */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[78vmin] w-[88vmin] -translate-x-1/2 -translate-y-1/2"
+            style={{
+              background:
+                "radial-gradient(closest-side, rgba(var(--bg-rgb),0.6), rgba(var(--bg-rgb),0) 76%)",
+            }}
+          />
 
-          {/* HERO TEXT */}
-          <section className="relative z-10 font-urbanist">
-            <div
-              className="relative mx-auto w-full max-w-[913px] px-5 text-center flex flex-col items-center"
-              style={{ paddingTop: "clamp(48px, 10vh, 180px)" }}
-            >
-              {/* 1) Hello → triggers typing */}
-              <HelloBadge
-                className="mx-auto -mb-[6px]"
-                vectorScale={0.78}
-                offsetTopPx={24}
-                offsetRightPx={26}
-                show={goHello}
-                onDone={() => setGoIm(true)}
-              />
+          {/* Floating, DB-driven stat cards in the side gutters (xl+ only) */}
+          <FloatingStats show={show} />
 
-              {/* 2) "I'm " + "Mouaz" (typed inside WordBubble) + "Software " */}
-              <h1 className="mt-4 leading-[1] tracking-[-0.01em] font-semibold text-[clamp(2rem,7vw,96px)] whitespace-nowrap">
-                <TypeText
-                  text={"I’m "}
-                  start={goIm}
-                  speedMs={42}
-                  onDone={() => setGoAdam(true)}
-                  className="inline"
-                />
-
-                <WordBubble
-                  text="Mouaz"
-                  svgSrc="/home/Vector-22.svg"
-                  padRatio={0.18}
-                  yNudge={-8}
-                  className="text-cornflowerblue-100"
-                  typeIn
-                  startTyping={goAdam}
-                  typeSpeedMs={70}
-                  onTypedDone={() => setGoSoftwareType(true)}
-                />
-
-                <br />
-
-              {/* inside the title where Software types */}
-              <span ref={seRef} className="relative inline-block leading-[1] whitespace-nowrap">
-                {/* wrap TypeText in a relatively positioned span so the vector can anchor */}
-                <span className="relative inline-block">
-                  <TypeText
-                    text={"Software "}
-                    start={goSoftwareType}
-                    speedMs={48}
-                    onDone={() => {
-                      setShowSoftwareVector(true);   // show the swoosh
-                      setGoRoles(true);              // then fade the roles
-                      setShowPortrait(true);         // show portrait immediately
-                      // let the portrait animation breathe, then bring in the glow
-                      setTimeout(() => setShowGlow(true), 520 + 600);
-                    }}
-                    className="inline"
-                  />
-
-                  {/* the vector pinned to 'Software' baseline */}
-                  <span
-                    aria-hidden
-                    className={[
-                      "absolute pointer-events-none origin-bottom-left",
-                      showSoftwareVector ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-95",
-                      "transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-                    ].join(" ")}
-                    style={{
-                      width: "1.1em",
-                      height: "1.1em",
-                      left: 0,
-                      bottom: 0,
-                      transform: "translate(-0.83em, 0.70em)",
-                    }}
-                  >
-                    <Image src="/home/Vector-2.svg" alt="" fill className="object-contain" />
-                  </span>
+          <div className="relative flex w-full max-w-[940px] flex-col items-center text-center font-urbanist">
+            {/* Availability chip */}
+            <Reveal show={show} delay={0}>
+              <span className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-[rgba(var(--bg-rgb),0.4)] px-3.5 py-1.5 text-[clamp(0.76rem,1.2vw,0.92rem)] font-medium text-gray-100 backdrop-blur-md">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cornflowerblue-100 opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-cornflowerblue-100" />
                 </span>
-                
-                {' '}
-
-                {goRoles && (
-                  <RoleCycler
-                    start={goRoles}
-                    words={["Designer", "Developer", "Engineer"]}
-                    initialDelayMs={180}
-                    firstDwellMs={500}
-                    dwellMs={500}
-                    transitionMs={300}
-                    effect="fade"
-                    onDone={onRolesDone}     // ← use this instead of the inline callback
-                    className="inline font-semibold"
-                  />
-                )}
+                Karlskrona, Sweden · Open to opportunities
               </span>
+            </Reveal>
 
+            {/* Greeting */}
+            <Reveal show={show} delay={90} className="mt-[clamp(18px,3.4vh,30px)]">
+              <p className="text-[clamp(1rem,2vw,1.35rem)] font-medium tracking-[0.02em] text-gray-100">
+                Hi, I&apos;m
+              </p>
+            </Reveal>
+
+            {/* Name — kinetic accent gradient */}
+            <Reveal show={show} delay={170}>
+              <h1 className="hero-name mt-1 font-extrabold leading-[0.98] tracking-[-0.02em] text-[clamp(2.6rem,8.6vw,6.6rem)]">
+                Mouaz Naji
               </h1>
-            </div>
-          </section>
+            </Reveal>
 
-          {/* 4) Portrait mounts AFTER RoleCycler finishes, so its own entrance plays */}
-          <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
-            <div
-              ref={artBoxRef}
-              className="relative w-screen max-w-[1100px]"
-              style={{ height: `min(82vh, ${Math.max(artHeight, 560)}px)` }}
+            {/* Role line — loops forever */}
+            <Reveal show={show} delay={250}>
+              <p className="mt-[clamp(8px,1.6vh,16px)] text-[clamp(1.1rem,3.2vw,2rem)] font-semibold leading-tight">
+                Software{" "}
+                <RoleCycler
+                  start={show}
+                  loop
+                  words={["Engineer", "Developer", "Designer"]}
+                  initialDelayMs={400}
+                  firstDwellMs={1600}
+                  dwellMs={1600}
+                  transitionMs={360}
+                  effect="fadeSlide"
+                  className="inline text-cornflowerblue-100"
+                />
+              </p>
+            </Reveal>
+
+            {/* Tagline */}
+            <Reveal show={show} delay={340} className="mt-[clamp(14px,2.6vh,24px)]">
+              <p className="mx-auto max-w-[52ch] text-[clamp(0.95rem,1.6vw,1.18rem)] leading-relaxed text-gray-100">
+                I craft fast, accessible web &amp; systems software — turning ideas into
+                clean interfaces backed by reliable, well-tested code.
+              </p>
+            </Reveal>
+
+            {/* CTAs */}
+            <Reveal
+              show={show}
+              delay={430}
+              className="mt-[clamp(22px,3.6vh,34px)] flex flex-wrap items-center justify-center gap-3 sm:gap-4"
             >
-              {showPortrait && (
-                <NexbotRobot className="h-full w-full" />
-              )}
-            </div>
+              <MagneticButton href="/projects-page" variant="primary">
+                View Projects
+                <ArrowIcon />
+              </MagneticButton>
+              <MagneticButton href="/api/cv" variant="ghost" download>
+                Download CV
+                <DownloadIcon />
+              </MagneticButton>
+            </Reveal>
+
+            {/* Social links */}
+            <Reveal show={show} delay={520} className="mt-[clamp(20px,3vh,30px)]">
+              <SocialLinks />
+            </Reveal>
           </div>
         </main>
       </div>
+
+      {/* Live tech-stack marquee (pulled from /api/skills) */}
+      <TechMarquee show={show} />
+
+      {/* Hint that wheel / swipe navigates onward */}
+      <ScrollHint show={show} />
+
+      <style jsx>{`
+        .hero-name {
+          background-image: linear-gradient(
+            100deg,
+            var(--fg) 0%,
+            var(--accent) 48%,
+            var(--fg) 100%
+          );
+          background-size: 220% 100%;
+          background-position: 0% 50%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          -webkit-text-fill-color: transparent;
+          animation: heroSheen 7s ease-in-out infinite;
+        }
+        @keyframes heroSheen {
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-name {
+            animation: none;
+          }
+        }
+      `}</style>
     </div>
   );
 };

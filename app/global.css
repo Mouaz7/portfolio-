@@ -21,6 +21,7 @@
   color-scheme: dark;
 
   --bg: #000000;
+  --bg-rgb: 0, 0, 0;
   --fg: #ffffff;
   --fg-70: rgba(255, 255, 255, 0.7);
   --fg-50: rgba(255, 255, 255, 0.5);
@@ -44,6 +45,7 @@ html.light {
   color-scheme: light;
 
   --bg: #f6f7fb;
+  --bg-rgb: 246, 247, 251;
   --fg: #0c0d14;
   --fg-70: rgba(12, 13, 20, 0.72);
   --fg-50: rgba(12, 13, 20, 0.55);

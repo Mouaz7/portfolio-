@@ -14,7 +14,9 @@ type Props = {
   transitionMs?: number;
   /** "fade" (no slide) or "fadeSlide" (tiny rise) */
   effect?: "fade" | "fadeSlide";
-  /** Fire when the last word settles (no loop) */
+  /** Keep cycling forever instead of stopping on the last word */
+  loop?: boolean;
+  /** Fire when the last word settles (fires each pass when looping) */
   onDone?: () => void;
   className?: string;
 };
@@ -27,6 +29,7 @@ export default function RoleCycler({
   firstDwellMs = 1000,   // ← Designer holds longer
   transitionMs = 300,
   effect = "fade",
+  loop = false,
   onDone,
   className = "",
 }: Props) {
@@ -45,12 +48,14 @@ export default function RoleCycler({
     const last = words.length - 1;
     if (i >= last) {
       onDone?.();
-      return;
+      if (!loop) return;
+      const t = setTimeout(() => setI(0), dwellMs);
+      return () => clearTimeout(t);
     }
     const delay = i === 0 ? firstDwellMs : dwellMs;
     const t = setTimeout(() => setI((v) => (v === null ? 0 : v + 1)), delay);
     return () => clearTimeout(t);
-  }, [i, words.length, dwellMs, firstDwellMs, onDone]);
+  }, [i, words.length, dwellMs, firstDwellMs, loop, onDone]);
 
   // Nothing to show yet
   if (i === null) return null;
