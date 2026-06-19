@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/backend/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,10 +16,6 @@ export async function GET() {
   try {
     const bucketName = "cv-icons"; // Your Supabase storage bucket name
     const filePath = "cv/CV.pdf"; // Path to CV file in the bucket
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log("[/api/cv] Attempting to download from:", bucketName, filePath);
-    }
 
     // Get the file from Supabase Storage
     const { data, error } = await supabase.storage
@@ -40,10 +36,6 @@ export async function GET() {
         { error: "CV file not found" },
         { status: 404 }
       );
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log("[/api/cv] File downloaded successfully, size:", data.size, "type:", data.type);
     }
 
     // Check if the downloaded file is actually a PDF

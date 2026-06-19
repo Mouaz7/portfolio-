@@ -24,7 +24,7 @@ type Props = {
  *
  * @param className - Optional additional Tailwind / custom class names appended to the root <footer>.
  * @param year - The copyright year displayed in the notice. Defaults to 2025.
- * @param owner - The name or entity owning the site/content. Defaults to "Adam Abdullah".
+ * @param owner - The name or entity owning the site/content. Defaults to "Mouaz Naji".
  * @param logoSrc - The image source (path or URL) for the logo. Defaults to "/logo1.svg".
  * @param logoAlt - Accessible alt text describing the logo. Defaults to "Logo".
  * @param logoW - The intrinsic width (in pixels) passed to the Next.js Image component. Defaults to 28.
@@ -53,11 +53,9 @@ export default function Footer({
     <footer
       className={[
         "w-full flex items-center justify-between",
-        "py-4",                               
-        "px-[120px]",                         
-        "mq750:pl-[60px] mq750:pr-[60px]",    
-        "mq450:pl-5 mq450:pr-5",              
-        "max-[675px]:px-3",                   
+        "py-4",
+        "px-[120px]",
+        "max-[675px]:px-3",
         className,
       ].join(" ")}
     >

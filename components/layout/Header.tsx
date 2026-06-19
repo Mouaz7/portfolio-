@@ -8,7 +8,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export type HeaderType = { className?: string };
 
-const ROUTES = ["/", "/skills-page", "/roadmap-page", "/projects-page", "/contact-page"];
+const ROUTES = ["/", "/skills", "/roadmap", "/projects", "/contact"];
 
 type NavItemProps = {
   label: string;
@@ -27,7 +27,7 @@ function NavItem({ label, onClick, active = false, size = "md" }: NavItemProps) 
         "relative inline-flex items-center justify-center",
         size === "md" ? "px-2.5 pt-2 pb-3" : "px-2 pt-1.5 pb-2.5",
         "appearance-none bg-transparent border-0",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70",
         active ? "cursor-default" : "cursor-pointer group",
       ].join(" ")}
     >
@@ -38,13 +38,13 @@ function NavItem({ label, onClick, active = false, size = "md" }: NavItemProps) 
           "transition-colors duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
           active
             ? "text-white"
-            : "text-white group-hover:text-cornflowerblue-100 group-focus-visible:text-cornflowerblue-100",
+            : "text-white group-hover:text-accent group-focus-visible:text-accent",
         ].join(" ")}
       >
         {label}
       </span>
       {active && (
-        <span aria-hidden className="absolute left-0 right-0 bottom-0 h-[2px] bg-cornflowerblue-100 rounded-full" />
+        <span aria-hidden className="absolute left-0 right-0 bottom-0 h-[2px] bg-accent rounded-full" />
       )}
     </button>
   );
@@ -110,10 +110,10 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
   const pathname = usePathname();
 
   const goHome = useCallback(() => router.push("/"), [router]);
-  const goSkills = useCallback(() => router.push("/skills-page"), [router]);
-  const goRoadmap = useCallback(() => router.push("/roadmap-page"), [router]);
-  const goProjects = useCallback(() => router.push("/projects-page"), [router]);
-  const goContact = useCallback(() => router.push("/contact-page"), [router]);
+  const goSkills = useCallback(() => router.push("/skills"), [router]);
+  const goRoadmap = useCallback(() => router.push("/roadmap"), [router]);
+  const goProjects = useCallback(() => router.push("/projects"), [router]);
+  const goContact = useCallback(() => router.push("/contact"), [router]);
 
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -139,11 +139,8 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
       className={[
         "relative z-[90]",
         "self-stretch flex flex-row items-center justify-between",
-        // Desktop/tablet padding preserved...
+        // Desktop/tablet padding; smaller on true mobile (≤675px)
         "pt-2.5 px-[120px] pb-0",
-        "mq750:pl-[60px] mq750:pr-[60px]",
-        "mq450:pl-5 mq450:pr-5",
-        // ...but make it smaller on true mobile (≤675px)
         "max-[675px]:pt-1.5 max-[675px]:px-3",
         className,
       ].join(" ")}
@@ -162,10 +159,10 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
 
       <nav className="m-0 flex flex-row items-center justify-start gap-5 text-center text-xl text-white font-urbanist max-[675px]:hidden">
         <NavItem label="Home" active={pathname === "/"} onClick={goHome} />
-        <NavItem label="Skills" active={pathname === "/skills-page"} onClick={goSkills} />
-        <NavItem label="Roadmap" active={pathname === "/roadmap-page"} onClick={goRoadmap} />
-        <NavItem label="Projects" active={pathname === "/projects-page"} onClick={goProjects} />
-        <NavItem label="Contact" active={pathname === "/contact-page"} onClick={goContact} />
+        <NavItem label="Skills" active={pathname === "/skills"} onClick={goSkills} />
+        <NavItem label="Roadmap" active={pathname === "/roadmap"} onClick={goRoadmap} />
+        <NavItem label="Projects" active={pathname === "/projects"} onClick={goProjects} />
+        <NavItem label="Contact" active={pathname === "/contact"} onClick={goContact} />
         <ThemeToggle className="ml-1" />
       </nav>
 
@@ -174,7 +171,7 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         <ThemeToggle />
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70"
+          className="inline-flex items-center justify-center rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           aria-label="Open menu"
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -223,7 +220,7 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
           <button
             type="button"
             aria-label="Close menu"
-            className="rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70"
+            className="rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             onClick={() => setOpen(false)}
           >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
@@ -235,10 +232,10 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         <nav className="mt-2 px-2 text-white font-urbanist">
           <ul className="flex flex-col">
             <li><NavItem label="Home" size="sm" active={pathname === "/"} onClick={goHome} /></li>
-            <li><NavItem label="Skills" size="sm" active={pathname === "/skills-page"} onClick={goSkills} /></li>
-            <li><NavItem label="Roadmap" size="sm" active={pathname === "/roadmap-page"} onClick={goRoadmap} /></li>
-            <li><NavItem label="Projects" size="sm" active={pathname === "/projects-page"} onClick={goProjects} /></li>
-            <li><NavItem label="Contact" size="sm" active={pathname === "/contact-page"} onClick={goContact} /></li>
+            <li><NavItem label="Skills" size="sm" active={pathname === "/skills"} onClick={goSkills} /></li>
+            <li><NavItem label="Roadmap" size="sm" active={pathname === "/roadmap"} onClick={goRoadmap} /></li>
+            <li><NavItem label="Projects" size="sm" active={pathname === "/projects"} onClick={goProjects} /></li>
+            <li><NavItem label="Contact" size="sm" active={pathname === "/contact"} onClick={goContact} /></li>
           </ul>
         </nav>
 

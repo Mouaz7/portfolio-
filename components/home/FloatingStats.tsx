@@ -54,7 +54,7 @@ function StatCard({
     <div ref={innerRef} className="absolute will-change-transform" style={position}>
       <div className="fs-float" style={{ animationDelay: floatDelay }}>
         <div className="rounded-2xl border border-gray-300 bg-[rgba(var(--bg-rgb),0.55)] px-[clamp(14px,1.1vw,20px)] py-[clamp(11px,0.9vw,15px)] backdrop-blur-md shadow-[0_10px_34px_rgba(var(--accent-rgb),0.12)]">
-          <div className="text-[clamp(1.5rem,2.3vw,2.1rem)] font-extrabold leading-none text-cornflowerblue-100">
+          <div className="text-[clamp(1.5rem,2.3vw,2.1rem)] font-extrabold leading-none text-accent">
             {n}
             {stat.suffix}
           </div>

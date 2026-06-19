@@ -122,11 +122,11 @@ const NameContainer: NextPage<Props> = ({
           {...inputProps}
           required={required}
           className={[
-            "relative border-[2px] border-cornflowerblue-100/30 bg-[var(--field)]",
+            "relative border-[2px] border-accent/30 bg-[var(--field)]",
             "w-full [outline:none]",
             "shadow-[0_4px_20px_rgba(var(--accent-rgb),0.15),inset_0_1px_0_rgba(255,255,255,0.1)]",
-            "hover:border-cornflowerblue-100/50 hover:shadow-[0_4px_30px_rgba(var(--accent-rgb),0.25),inset_0_1px_0_rgba(255,255,255,0.15)]",
-            "focus:border-cornflowerblue-100/70 focus:shadow-[0_4px_40px_rgba(var(--accent-rgb),0.35),inset_0_1px_0_rgba(255,255,255,0.2)]",
+            "hover:border-accent/50 hover:shadow-[0_4px_30px_rgba(var(--accent-rgb),0.25),inset_0_1px_0_rgba(255,255,255,0.15)]",
+            "focus:border-accent/70 focus:shadow-[0_4px_40px_rgba(var(--accent-rgb),0.35),inset_0_1px_0_rgba(255,255,255,0.2)]",
             "transition-all duration-300",
             "before:absolute before:inset-0 before:rounded-[inherit] before:p-[2px]",
             "before:bg-gradient-to-br before:from-white/20 before:to-transparent",

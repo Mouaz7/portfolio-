@@ -1,15 +1,14 @@
-// app/contact-page/page.tsx
 "use client";
 import type { NextPage } from "next";
 import { useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Variants, Transition } from "framer-motion";
 
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import Stage16x9 from "@/components/Stage16x9";
-import PhotoSocialContainer from "@/components/contact/photo-social-container";
-import EmailForm from "@/components/contact/email-form";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Stage16x9 from "@/components/ui/Stage16x9";
+import PhotoSocialContainer from "@/components/contact/PhotoSocialContainer";
+import EmailForm from "@/components/contact/EmailForm";
 
 const ContactPage: NextPage = () => {
   const handleSend = useCallback(async ({ name, email, message, files }: {

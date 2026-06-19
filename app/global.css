@@ -13,8 +13,8 @@
 
 /* ------------------------------------------------------------------ *
  * Theme tokens. These feed the Tailwind color tokens in
- * tailwind.config.js (black→--bg, white→--fg, cornflowerblue→--accent),
- * so every existing bg-black / text-white / text-cornflowerblue utility
+ * tailwind.config.js (black→--bg, white→--fg, accent→--accent),
+ * so every existing bg-black / text-white / text-accent utility
  * flips automatically between dark and light.
  * ------------------------------------------------------------------ */
 :root {
@@ -31,8 +31,6 @@
   --accent: #19e3c2;
   --accent-strong: #0fc9ac;
   --accent-rgb: 25, 227, 194;
-  --accent-faint: rgba(25, 227, 194, 0.12);
-  --accent-faint-2: rgba(25, 227, 194, 0.1);
 
   /* Semantic surfaces (flip per theme so cards/fields work in both modes) */
   --surface: #26262c;
@@ -54,8 +52,6 @@ html.light {
   --accent: #0bb89e;
   --accent-strong: #0aa890;
   --accent-rgb: 11, 184, 158;
-  --accent-faint: rgba(11, 184, 158, 0.12);
-  --accent-faint-2: rgba(11, 184, 158, 0.1);
 
   /* Light-mode surfaces */
   --surface: #ffffff;

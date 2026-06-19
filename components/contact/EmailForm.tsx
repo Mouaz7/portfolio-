@@ -2,7 +2,7 @@
 import type { NextPage } from "next";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import NameContainer from "@/components/contact/name-container";
+import NameContainer from "@/components/contact/NameContainer";
 import SendButton from "@/components/contact/SendButton";
 import { isValidEmail, NAME_MAX, EMAIL_MAX, MESSAGE_MAX } from "@/lib/contact/validate";
 
@@ -306,7 +306,7 @@ const EmailForm: NextPage<Props> = ({
             )}
           </label>
 
-          <div className="relative border-[2px] border-cornflowerblue-100/30 bg-[var(--field)] rounded-2xl w-full box-border flex flex-col shadow-[0_4px_20px_rgba(var(--accent-rgb),0.15),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-cornflowerblue-100/50 hover:shadow-[0_4px_30px_rgba(var(--accent-rgb),0.25),inset_0_1px_0_rgba(255,255,255,0.15)] focus-within:border-cornflowerblue-100/70 focus-within:shadow-[0_4px_40px_rgba(var(--accent-rgb),0.35),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 overflow-hidden">
+          <div className="relative border-[2px] border-accent/30 bg-[var(--field)] rounded-2xl w-full box-border flex flex-col shadow-[0_4px_20px_rgba(var(--accent-rgb),0.15),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-accent/50 hover:shadow-[0_4px_30px_rgba(var(--accent-rgb),0.25),inset_0_1px_0_rgba(255,255,255,0.15)] focus-within:border-accent/70 focus-within:shadow-[0_4px_40px_rgba(var(--accent-rgb),0.35),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 overflow-hidden">
             {/* Glossy top edge effect */}
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
             

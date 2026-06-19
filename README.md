@@ -81,10 +81,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | Route | Description |
 |-------|-------------|
 | `/` | Home — constellation hero with kinetic name, looping role cycler, CTAs, live stat cards and tech-stack marquee. |
-| `/skills-page` | Skills grouped by category, icons served from Supabase. |
-| `/roadmap-page` | Career/education timeline (`StreetTimeline`). |
-| `/projects-page` | Projects with category filtering, tech tags and GitHub links. |
-| `/contact-page` | Contact form with attachments, validation and rate limiting. |
+| `/skills` | Skills grouped by category, icons served from Supabase. |
+| `/roadmap` | Career/education timeline (`StreetTimeline`). |
+| `/projects` | Projects with category filtering, tech tags and GitHub links. |
+| `/contact` | Contact form with attachments, validation and rate limiting. |
 
 All pages share the global header (wheel/swipe route navigation), theme toggle and constellation backdrop.
 
@@ -93,23 +93,23 @@ All pages share the global header (wheel/swipe route navigation), theme toggle a
 ```text
 portofolio/
 ├── app/
+│   ├── skills/ projects/ roadmap/ contact/   # one page.tsx per route (clean URLs)
 │   ├── api/                # Route handlers: contact, cv, skills, skill-categories,
 │   │                       #   project, roadmap, theme, health
-│   ├── contact-page/ | projects-page/ | roadmap-page/ | skills-page/
 │   ├── layout.tsx          # Root layout + global ConstellationField backdrop + DB theme
-│   ├── page.tsx            # Home entry → home-page.tsx
+│   ├── page.tsx            # Home (client) — constellation hero
 │   ├── fonts.ts | global.css | robots.ts | sitemap.ts | error.tsx | global-error.tsx
 ├── components/
+│   ├── layout/             # Header, Footer, ThemeToggle, SocialLinks, RouteScrollNavigator
+│   ├── ui/                 # LoadingAnimation, Stage16x9
 │   ├── home/               # ConstellationField, CursorGlow, FloatingStats, TechMarquee,
 │   │                       #   MagneticButton, RoleCycler, ScrollHint
-│   ├── contact/ | project/ | roadmap/ | skills/
-│   ├── header.tsx | footer.tsx | ThemeToggle.tsx | SocialLinks.tsx
-│   ├── RouteScrollNavigator.tsx | Stage16x9.tsx | LoadingAnimation.tsx
+│   └── contact/ | projects/ | roadmap/ | skills/
 ├── lib/
-│   ├── backend/supabaseClient.ts
-│   ├── contact/            # mailer.ts, validate.ts
-│   └── theme.ts            # DB-driven theme → CSS variables
-├── src/hooks/useAccentRgb.ts   # live accent colour for canvas animations
+│   ├── hooks/useAccentRgb.ts   # live accent colour for canvas animations
+│   ├── supabase/client.ts      # Supabase client
+│   ├── contact/                # mailer.ts, validate.ts
+│   └── theme.ts                # DB-driven theme → CSS variables
 ├── public/                 # logo.svg, logo1.svg, contact/*
 ├── supabase/               # setup.sql + seed/update scripts
 ├── __tests__/              # Jest + React Testing Library

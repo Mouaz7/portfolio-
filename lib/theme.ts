@@ -3,7 +3,7 @@
 // fetches this server-side and injects it as CSS variables, so every page —
 // and every canvas animation via useAccentRgb() — reads the same color.
 
-import { supabase } from "@/lib/backend/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 
 export type SiteTheme = {
   accent: string;
@@ -50,5 +50,5 @@ export async function getSiteTheme(): Promise<SiteTheme> {
 // Builds the CSS that overrides the static defaults in global.css with the
 // DB-driven values, for both dark (:root) and light (html.light).
 export function themeToCss(t: SiteTheme): string {
-  return `:root{--accent:${t.accent};--accent-strong:${t.accentStrong};--accent-rgb:${t.accentRgb};--accent-faint:rgba(${t.accentRgb},0.12);--accent-faint-2:rgba(${t.accentRgb},0.1);}html.light{--accent:${t.accentLight};--accent-strong:${t.accentLightStrong};--accent-rgb:${t.accentLightRgb};--accent-faint:rgba(${t.accentLightRgb},0.12);--accent-faint-2:rgba(${t.accentLightRgb},0.1);}`;
+  return `:root{--accent:${t.accent};--accent-strong:${t.accentStrong};--accent-rgb:${t.accentRgb};}html.light{--accent:${t.accentLight};--accent-strong:${t.accentLightStrong};--accent-rgb:${t.accentLightRgb};}`;
 }

@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import Header from "@/components/header";
+import Header from "@/components/layout/Header";
 import StreetTimeline, { type RoadmapItem } from "@/components/roadmap/StreetTimeline";
-import LoadingAnimation from "@/components/LoadingAnimation";
-import { useAccentHex } from "@/src/hooks/useAccentRgb";
+import LoadingAnimation from "@/components/ui/LoadingAnimation";
+import { useAccentHex } from "@/lib/hooks/useAccentRgb";
 
 type ApiItem = { id: string; title: string; description: string; icon?: string; from: string; to?: string | null };
 
@@ -40,7 +40,7 @@ export default function RoadmapPage() {
       <Header />
 
       {/* Slide area (constellation backdrop is global in app/layout.tsx) */}
-      <main className="relative flex-1 min-h-0 overflow-hidden px-[120px] pb-8 mq750:px-[60px] mq450:px-5 mq450:pb-6 grid place-items-center">
+      <main className="relative flex-1 min-h-0 overflow-hidden px-[120px] pb-8 max-[675px]:px-5 max-[675px]:pb-6 grid place-items-center">
         {/* Loading state */}
         {loading && (
           <div className="absolute inset-0 z-20 bg-black/50 backdrop-blur-sm">

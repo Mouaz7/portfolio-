@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import LoadingAnimation from '@/components/LoadingAnimation'
+import LoadingAnimation from '@/components/ui/LoadingAnimation'
 
 describe('LoadingAnimation Component', () => {
   it('renders loading state with text', () => {

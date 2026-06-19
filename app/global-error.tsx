@@ -19,7 +19,7 @@ export default function GlobalError({
       <body className="antialiased h-full overflow-hidden bg-black text-white">
         <div className="flex min-h-screen flex-col items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <h1 className="text-6xl font-bold mb-4 text-cornflowerblue-100">
+            <h1 className="text-6xl font-bold mb-4 text-accent">
               500
             </h1>
             <h2 className="text-2xl font-semibold mb-4">
@@ -30,7 +30,7 @@ export default function GlobalError({
             </p>
             <button
               onClick={reset}
-              className="px-6 py-3 bg-cornflowerblue-100 hover:bg-cornflowerblue-200 text-white font-medium rounded-full transition-colors"
+              className="px-6 py-3 bg-accent hover:bg-accent-strong text-white font-medium rounded-full transition-colors"
             >
               Refresh page
             </button>

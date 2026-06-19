@@ -4,8 +4,8 @@ import type { NextPage } from "next";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 
-import Header from "@/components/header";
-import SocialLinks from "@/components/SocialLinks";
+import Header from "@/components/layout/Header";
+import SocialLinks from "@/components/layout/SocialLinks";
 import RoleCycler from "@/components/home/RoleCycler";
 import ScrollHint from "@/components/home/ScrollHint";
 import CursorGlow from "@/components/home/CursorGlow";
@@ -76,7 +76,7 @@ const HomePage: NextPage = () => {
   return (
     <div className="relative h-dvh w-full min-w-[320px] overflow-hidden text-white">
       {/* Prefetch the contact route (kept from before) */}
-      <Link href="/contact-page" prefetch={true} className="hidden" aria-hidden="true" tabIndex={-1} />
+      <Link href="/contact" prefetch={true} className="hidden" aria-hidden="true" tabIndex={-1} />
 
       {/* Accent spotlight trailing the cursor (constellation backdrop is global) */}
       <CursorGlow />
@@ -103,8 +103,8 @@ const HomePage: NextPage = () => {
             <Reveal show={show} delay={0}>
               <span className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-[rgba(var(--bg-rgb),0.4)] px-3.5 py-1.5 text-[clamp(0.76rem,1.2vw,0.92rem)] font-medium text-gray-100 backdrop-blur-md">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cornflowerblue-100 opacity-70" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-cornflowerblue-100" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
                 </span>
                 Karlskrona, Sweden · Open to opportunities
               </span>
@@ -137,7 +137,7 @@ const HomePage: NextPage = () => {
                   dwellMs={1600}
                   transitionMs={360}
                   effect="fadeSlide"
-                  className="inline text-cornflowerblue-100"
+                  className="inline text-accent"
                 />
               </p>
             </Reveal>
@@ -156,7 +156,7 @@ const HomePage: NextPage = () => {
               delay={430}
               className="mt-[clamp(22px,3.6vh,34px)] flex flex-wrap items-center justify-center gap-3 sm:gap-4"
             >
-              <MagneticButton href="/projects-page" variant="primary">
+              <MagneticButton href="/projects" variant="primary">
                 View Projects
                 <ArrowIcon />
               </MagneticButton>

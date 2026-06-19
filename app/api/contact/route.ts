@@ -1,6 +1,6 @@
 // app/api/contact/route.ts
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/backend/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 export const revalidate = 0;
 
 export async function GET() {

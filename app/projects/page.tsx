@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Header from "@/components/header";
-import { type Project } from "@/components/project/ProjectCard";
-import { CATEGORY_COLORS } from "@/components/project/CategoryFolder";
-import LoadingAnimation from "@/components/LoadingAnimation";
+import Header from "@/components/layout/Header";
+import { type Project } from "@/components/projects/ProjectCard";
+import { CATEGORY_COLORS } from "@/components/projects/CategoryFolder";
+import LoadingAnimation from "@/components/ui/LoadingAnimation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAccentHex } from "@/src/hooks/useAccentRgb";
+import { useAccentHex } from "@/lib/hooks/useAccentRgb";
 
 const ProjectsPageClient: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -73,7 +73,7 @@ const ProjectsPageClient: React.FC = () => {
               <p className="text-red-400 text-lg mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-cornflowerblue-100 hover:bg-cornflowerblue-200 text-white font-medium rounded-full transition-colors"
+                className="px-6 py-3 bg-accent hover:bg-accent-strong text-white font-medium rounded-full transition-colors"
               >
                 Retry
               </button>
@@ -85,7 +85,7 @@ const ProjectsPageClient: React.FC = () => {
         {!loading && !error && projects.length === 0 && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-cornflowerblue-100 mb-2">
+              <h3 className="text-2xl font-bold text-accent mb-2">
                 No projects found
               </h3>
               <p className="text-white/70">
@@ -138,7 +138,7 @@ const ProjectsPageClient: React.FC = () => {
             </div>
 
             {/* Horizontal List Layout */}
-            <div className="flex-1 min-h-0 overflow-auto scrollbar-thin scrollbar-thumb-cornflowerblue-100/30 scrollbar-track-transparent">
+            <div className="flex-1 min-h-0 overflow-auto scrollbar-thin scrollbar-thumb-accent/30 scrollbar-track-transparent">
               <AnimatePresence mode="wait">
                 {openCategory && projectsByCategory[openCategory] && (
                   <motion.div

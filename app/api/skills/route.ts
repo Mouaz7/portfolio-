@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/backend/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 
 // Cache skills data for 1 hour (skills don't change frequently)
 export const revalidate = 3600;

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SkillRow } from "./SkillRow";
-import LoadingAnimation from "@/components/LoadingAnimation";
+import LoadingAnimation from "@/components/ui/LoadingAnimation";
 
 export type UISkill = {
   id: string;

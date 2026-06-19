@@ -57,12 +57,12 @@ export default function MagneticButton({
     "group relative inline-flex items-center justify-center gap-2 rounded-full font-semibold " +
     "px-[clamp(20px,3.2vw,30px)] py-[clamp(11px,1.7vh,15px)] text-[clamp(0.95rem,1.5vw,1.08rem)] " +
     "transition-[transform,box-shadow,background-color,border-color,color] duration-300 ease-[cubic-bezier(.22,1,.36,1)] " +
-    "will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70";
+    "will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70";
 
   const look =
     variant === "primary"
-      ? "bg-cornflowerblue-100 text-[#03201b] shadow-[0_10px_34px_rgba(var(--accent-rgb),0.4)] hover:shadow-[0_16px_46px_rgba(var(--accent-rgb),0.55)]"
-      : "border border-gray-300 bg-[rgba(var(--bg-rgb),0.35)] text-white backdrop-blur-md hover:border-cornflowerblue-100/60 hover:text-cornflowerblue-100";
+      ? "bg-accent text-[#03201b] shadow-[0_10px_34px_rgba(var(--accent-rgb),0.4)] hover:shadow-[0_16px_46px_rgba(var(--accent-rgb),0.55)]"
+      : "border border-gray-300 bg-[rgba(var(--bg-rgb),0.35)] text-white backdrop-blur-md hover:border-accent/60 hover:text-accent";
 
   const cls = `${base} ${look} ${className}`;
   const internal = href.startsWith("/") && !download;

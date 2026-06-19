@@ -43,8 +43,8 @@ export default function SocialLinks({ className = "" }: { className?: string }) 
               "inline-flex h-9 w-9 items-center justify-center rounded-xl",
               "border border-gray-300 text-white",
               "transition-colors duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-              "hover:text-cornflowerblue-100 hover:border-cornflowerblue-100/50",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70",
+              "hover:text-accent hover:border-accent/50",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70",
             ].join(" ")}
           >
             <Icon />

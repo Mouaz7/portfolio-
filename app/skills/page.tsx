@@ -1,5 +1,5 @@
 "use client";
-import Header from "@/components/header";
+import Header from "@/components/layout/Header";
 import SkillsGrid from "@/components/skills/SkillsGrid";
 
 export default function Page() {

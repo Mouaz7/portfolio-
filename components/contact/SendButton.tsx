@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { useAccentHex } from "@/src/hooks/useAccentRgb";
+import { useAccentHex } from "@/lib/hooks/useAccentRgb";
 
 type Props = {
   label?: string;
@@ -98,7 +98,7 @@ function MaskIcon({
  * @param className       Extra class names appended to the root wrapper.
  * @param onClick         Callback invoked when the button is clicked (fires before internal state change).
  * @param type            Native button type attribute (default: "button").
- * @param color           Base hex color used to derive gradients, shadows, and highlight effects (default: "#18a1fd").
+ * @param color           Base hex color used to derive gradients, shadows, and highlight effects (defaults to the live theme accent).
  * @param gapPx           Pixel padding forming the outer gap / halo around the pill (default: 12).
  * @param ringPx          Width in pixels of the outer ring border (default: 2).
  * @param sentMs          Duration in milliseconds before reverting from sent to idle in uncontrolled mode (default: 5000).

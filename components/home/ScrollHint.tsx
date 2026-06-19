@@ -22,7 +22,7 @@ export default function ScrollHint({ show = false }: { show?: boolean }) {
         Scroll to explore
       </span>
       <svg
-        className="sh-chevron text-cornflowerblue-100"
+        className="sh-chevron text-accent"
         width="18"
         height="18"
         viewBox="0 0 24 24"

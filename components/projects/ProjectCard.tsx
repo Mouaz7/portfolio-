@@ -2,7 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useAccentHex } from "@/src/hooks/useAccentRgb";
+import { useAccentHex } from "@/lib/hooks/useAccentRgb";
 
 export interface Project {
   id: string;

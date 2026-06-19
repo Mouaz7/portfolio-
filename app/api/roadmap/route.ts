@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/backend/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 
 // Cache roadmap data for 2 hours (rarely changes)
 export const revalidate = 7200;

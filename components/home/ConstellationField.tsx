@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAccentRgb } from "@/src/hooks/useAccentRgb";
+import { useAccentRgb } from "@/lib/hooks/useAccentRgb";
 
 /**
  * Living constellation backdrop: a canvas field of accent-coloured nodes that

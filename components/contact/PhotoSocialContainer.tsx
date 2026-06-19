@@ -137,7 +137,6 @@ const PhotoSocialContainer: NextPage<PhotoSocialContainerType> = ({
         "overflow-hidden flex flex-col items-center justify-center",
         "pt-0 px-[22px] pb-[30px] box-border relative gap-5 max-w-full",
         "text-left text-xl text-[#0c0d14] font-urbanist",
-        "mq450:min-w-full mq825:flex-1 mq825:pr-0 mq825:box-border",
         className,
       ].join(" ")}
     >
@@ -184,7 +183,7 @@ const PhotoSocialContainer: NextPage<PhotoSocialContainerType> = ({
                 style={{ left: 19, right: 19, top: 450, paddingTop: 14 }}
               >
                 <div className="space-y-5">
-                  <p className="m-0 font-semibold text-cornflowerblue-100">
+                  <p className="m-0 font-semibold text-accent">
                     #Thanks for stopping by!
                   </p>
                   <p className="m-0 text-base">
@@ -192,7 +191,7 @@ const PhotoSocialContainer: NextPage<PhotoSocialContainerType> = ({
                     about tech and design. Feel free to drop me a message through
                     the form — I’ll get back to you as soon as I can.
                   </p>
-                  <div className="text-[15px] font-medium text-cornflowerblue-100">
+                  <div className="text-[15px] font-medium text-accent">
                     You can also find me here:
                   </div>
                 </div>

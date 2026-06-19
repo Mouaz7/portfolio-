@@ -1,6 +1,6 @@
 // app/api/project/route.ts
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/backend/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 
 // Cache projects for 30 minutes (updated less frequently)
 export const revalidate = 1800;
