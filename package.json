@@ -1,15 +1,11 @@
 {
   "dependencies": {
-    "@splinetool/react-spline": "^4.1.0",
-    "@splinetool/runtime": "^1.12.97",
     "@supabase/supabase-js": "^2.57.4",
-    "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",
     "next": "^15.5.9",
     "nodemailer": "^7.0.7",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "react-router-dom": "^7.5.0"
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.3",

@@ -1,204 +1,148 @@
-# Portfolio Website
+# Mouaz Naji — Portfolio
 
-> A modern, full-stack portfolio website built with Next.js 15, TypeScript, Tailwind CSS, and Supabase.
+> A modern, full-stack developer portfolio built with Next.js 15, React 19, TypeScript, Tailwind CSS v4 and Supabase. Every page sits on a shared, interactive "living constellation" backdrop and a database-driven dark/light theme.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.5.3-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1.3-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?logo=supabase)](https://supabase.com/)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?logo=github-actions)](https://github.com/features/actions)
-[![Tests](https://img.shields.io/badge/Tests-17_passing-success?logo=jest)](https://jestjs.io/)
 
-##  Features
+## Features
 
--  **Modern Design** - Glass-morphism effects, smooth animations, particle backgrounds
--  **Fully Responsive** - Mobile-first design, works on all devices
--  **Performance Optimized** - 90+ Lighthouse scores, code splitting, lazy loading
--  **Dynamic Content** - All content managed via Supabase (no redeployment needed)
--  **Contact Form** - Email integration with Nodemailer, rate limiting, validation
--  **CV Download** - Download resume directly from Supabase Storage with state feedback
--  **SEO Friendly** - Meta tags, sitemap, robots.txt
--  **Accessible** - WCAG AA compliant, keyboard navigation, screen reader support
--  **Dark Theme** - Elegant dark mode design with cornflowerblue accents
--  **Automated Testing** - Jest + React Testing Library with 17 tests
--  **CI/CD Pipeline** - GitHub Actions with automated deployment to Vercel
+- **Living constellation backdrop** — a single interactive `<canvas>` field of accent-coloured nodes that drift, link up when close and react to the pointer / touch. Rendered once globally so every page shares the exact same motif.
+- **Database-driven theme** — dark & light modes with a cyan/teal accent stored in Supabase (`site_theme`) and injected as CSS variables at request time (no flash, no redeploy to recolour).
+- **Fully dynamic content** — skills, projects, roadmap, the tech-stack marquee and the home stat cards are all pulled live from Supabase; nothing is hardcoded.
+- **Interactive home hero** — kinetic gradient name, looping role cycler, magnetic CTA buttons, floating live-stat cards and an infinite tech-stack marquee.
+- **Contact form** — email delivery via Nodemailer with file attachments, validation and rate limiting.
+- **CV download** — streamed from Supabase Storage (`/api/cv`); swap the file in storage, no redeploy.
+- **Responsive & accessible** — fluid `clamp()` sizing from phones to ultrawide, keyboard focus states, and full `prefers-reduced-motion` support (animations fall back to static frames).
+- **SEO** — metadata, `sitemap.xml`, `robots.txt`.
+- **Tested & CI/CD** — Jest + React Testing Library, with GitHub Actions for checks, Lighthouse and deployment.
 
-##  Documentation
+## Tech Stack
 
-Comprehensive documentation is available in the `/docs` folder:
+| Area      | Tech |
+|-----------|------|
+| Framework | Next.js 15 (App Router), React 19 |
+| Language  | TypeScript 5 |
+| Styling   | Tailwind CSS v4, CSS variables |
+| Animation | Framer Motion + custom canvas / CSS |
+| Backend   | Supabase (PostgreSQL + Storage), Next.js Route Handlers |
+| Email     | Nodemailer |
+| Tooling   | ESLint, Jest, React Testing Library, GitHub Actions |
 
-- **[Architecture](./docs/ARCHITECTURE.md)** - Technical architecture, design patterns, project structure
-- **[Database](./docs/DATABASE.md)** - Database schema, tables, Supabase Storage setup
-- **[Features](./docs/FEATURES.md)** - Detailed features guide, API routes, components
-- **[Styling](./docs/STYLING.md)** - Design system, styling patterns, animations
-- **[Deployment](./docs/DEPLOYMENT.md)** - Deployment guide for Vercel, Netlify, self-hosted
-- **[CV Setup](./docs/CV_SETUP.md)** - How to configure CV download from Supabase
-- **[CI/CD Pipeline](./docs/CI_CD.md)** - GitHub Actions workflows, pipeline configuration
-- **[Testing Guide](./docs/TESTING.md)** - How to write and run tests
-- **[Setup Summary](./docs/SETUP_SUMMARY.md)** - CI/CD and testing setup overview
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - Node.js 20+
-- npm or yarn
-- Supabase account
-- SMTP credentials (Gmail, SendGrid, etc.)
+- A Supabase project (PostgreSQL + Storage)
+- SMTP credentials for the contact form (Gmail app password, SendGrid, etc.)
 
 ### Installation
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/Adamo-97/portofolio.git
-   cd portofolio
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   Create `.env.local` in the root directory:
-
-   ```bash
-   # Supabase
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_ANON_KEY=your-anon-key
-   
-   # Email Configuration
-   CONTACT_TO=your-email@example.com
-   SMTP_HOST=smtp.gmail.com
-   SMTP_PORT=587
-   SMTP_USER=your-email@gmail.com
-   SMTP_PASS=your-app-password
-   ```
-
-4. **Set up Supabase**
-
-   - Create tables using schemas in [`docs/DATABASE.md`](./docs/DATABASE.md)
-   - Create storage bucket `cv-icons` (public)
-   - Upload your CV to `cv-icons/cv/CV.pdf`
-   - Populate initial data (skills, projects, roadmap)
-
-5. **Run development server**
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000)
-
-## 📁 Project Structure
-
-``` bash
-portofolio/
-├── app/                      # Next.js App Router
-│   ├── api/                 # API routes (serverless functions)
-│   ├── [page-name]/         # Feature pages
-│   ├── fonts.ts             # Font configuration
-│   ├── global.css           # Global styles
-│   ├── layout.tsx           # Root layout
-│   └── page.tsx             # Home page
-├── components/              # React components
-│   ├── contact/            # Contact page components
-│   ├── home/               # Home page components
-│   ├── project/            # Projects components
-│   ├── roadmap/            # Roadmap components
-│   └── skills/             # Skills components
-├── lib/                    # Utilities
-│   ├── backend/           # Supabase client
-│   └── contact/           # Email utilities
-├── docs/                   # Documentation
-├── public/                 # Static assets
-└── src/                    # Source utilities
-    └── hooks/             # Custom React hooks
+```bash
+git clone https://github.com/Mouaz7/portfolio-.git
+cd portfolio-
+npm install
 ```
 
-##  Pages
+Create `.env.local` in the project root (see [`.env.example`](.env.example)):
 
-### Home (`/`)
+```bash
+# Supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-or-publishable-key
 
-Landing page with introduction, animated greetings, and CV download button.
+# Contact form (SMTP)
+CONTACT_TO=you@example.com
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=you@gmail.com
+SMTP_PASS=your-app-password
+```
 
-### Skills (`/skills-page`)
+Set up the database and storage:
 
-Technical skills organized by categories with proficiency indicators.
+- Run [`supabase/setup.sql`](supabase/setup.sql) (and the `update_*.sql` seed scripts) in the Supabase SQL editor to create the `skill`, `skill_category`, `project`, `roadmap_item` and `site_theme` tables.
+- Create a public Storage bucket `cv-icons` and upload your CV to `cv-icons/cv/CV.pdf`.
 
-### Projects (`/projects-page`)
+Run the dev server:
 
-Portfolio projects with filtering, GitHub links, and technology tags.
+```bash
+npm run dev
+```
 
-- **Desktop:** Folder-style categories, dynamic scaling
-- **Mobile:** 3×2 grid, horizontal category scroll
+Open [http://localhost:3000](http://localhost:3000).
 
-### Roadmap (`/roadmap-page`)
+## Pages
 
-Career timeline with education, experience, and achievements.
+| Route | Description |
+|-------|-------------|
+| `/` | Home — constellation hero with kinetic name, looping role cycler, CTAs, live stat cards and tech-stack marquee. |
+| `/skills-page` | Skills grouped by category, icons served from Supabase. |
+| `/roadmap-page` | Career/education timeline (`StreetTimeline`). |
+| `/projects-page` | Projects with category filtering, tech tags and GitHub links. |
+| `/contact-page` | Contact form with attachments, validation and rate limiting. |
 
-### Contact (`/contact-page`)
+All pages share the global header (wheel/swipe route navigation), theme toggle and constellation backdrop.
 
-Contact form with email integration, validation, and rate limiting.
+## Project Structure
 
-## 🔧 Tech Stack
+```text
+portofolio/
+├── app/
+│   ├── api/                # Route handlers: contact, cv, skills, skill-categories,
+│   │                       #   project, roadmap, theme, health
+│   ├── contact-page/ | projects-page/ | roadmap-page/ | skills-page/
+│   ├── layout.tsx          # Root layout + global ConstellationField backdrop + DB theme
+│   ├── page.tsx            # Home entry → home-page.tsx
+│   ├── fonts.ts | global.css | robots.ts | sitemap.ts | error.tsx | global-error.tsx
+├── components/
+│   ├── home/               # ConstellationField, CursorGlow, FloatingStats, TechMarquee,
+│   │                       #   MagneticButton, RoleCycler, ScrollHint
+│   ├── contact/ | project/ | roadmap/ | skills/
+│   ├── header.tsx | footer.tsx | ThemeToggle.tsx | SocialLinks.tsx
+│   ├── RouteScrollNavigator.tsx | Stage16x9.tsx | LoadingAnimation.tsx
+├── lib/
+│   ├── backend/supabaseClient.ts
+│   ├── contact/            # mailer.ts, validate.ts
+│   └── theme.ts            # DB-driven theme → CSS variables
+├── src/hooks/useAccentRgb.ts   # live accent colour for canvas animations
+├── public/                 # logo.svg, logo1.svg, contact/*
+├── supabase/               # setup.sql + seed/update scripts
+├── __tests__/              # Jest + React Testing Library
+└── .github/workflows/      # CI/CD, Lighthouse, PR checks
+```
 
-### Frontend
-
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Animations
-
-### Backend
-
-- **Supabase** - PostgreSQL database + Storage
-- **Nodemailer** - Email sending
-- **Next.js API Routes** - Serverless endpoints
-
-### Development
-
-- **ESLint** - Code linting
-- **VS Code** - Recommended editor
-
-##  Environment Variables
+## Environment Variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `SUPABASE_URL` | Supabase project URL | Yes |
-| `SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
-| `CONTACT_TO` | Email to receive contact form submissions | Yes |
+| `SUPABASE_ANON_KEY` | Supabase anon / publishable key | Yes |
+| `CONTACT_TO` | Address that receives contact submissions | Yes |
 | `SMTP_HOST` | SMTP server host | Yes |
-| `SMTP_PORT` | SMTP server port (usually 587) | Yes |
-| `SMTP_USER` | SMTP username/email | Yes |
-| `SMTP_PASS` | SMTP password/app password | Yes |
+| `SMTP_PORT` | SMTP port (usually 587) | Yes |
+| `SMTP_USER` | SMTP username / email | Yes |
+| `SMTP_PASS` | SMTP password / app password | Yes |
 
-##  Available Scripts
+## Scripts
 
 ```bash
-npm run dev          # Start development server (port 3000/3001)
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
+npm run dev       # Start the dev server (http://localhost:3000)
+npm run build     # Production build
+npm run start     # Start the production server
+npm run lint      # ESLint
+npm run test      # Jest (watch mode)
+npm run test:ci   # Jest once, with coverage
 ```
 
-## 🚢 Deployment
+## Deployment
 
-### Vercel (Recommended)
+Deploy to [Vercel](https://vercel.com): import the repo, add the environment variables above, and deploy. Pushes to `main` deploy automatically via GitHub Actions.
 
-1. Push to GitHub
-2. Import project to [Vercel](https://vercel.com)
-3. Add environment variables
-4. Deploy
+## License
 
-Automatic deployments on every push to `main`.
-
-See [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) for detailed instructions.
-
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
+Released under the MIT License.
