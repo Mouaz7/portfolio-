@@ -64,8 +64,8 @@ void main(){
 
   // Pointer glow — gentle, softer in light mode so it never darkens.
   float md = distance(uv, u_mouse);
-  float glow = u_mouseAmt * smoothstep(0.45, 0.0, md) * mix(0.32, 0.26, u_light);
-  f += glow * mix(0.7, 0.5, u_light);
+  float glow = u_mouseAmt * smoothstep(0.45, 0.0, md) * mix(0.16, 0.26, u_light);
+  f += glow * mix(0.35, 0.5, u_light);
 
   // Tone the brand colors per mode:
   //  - DARK: pull toward the bg so it's a DEEP, muted nebula (never neon).
@@ -73,18 +73,18 @@ void main(){
   vec3 acc  = mix(u_accent,  u_bg, 0.42);
   acc  = mix(acc,  vec3(1.0), u_light * 0.22);
   vec3 acc2 = mix(u_accent2, u_bg, 0.40);
-  acc2 = mix(acc2, vec3(1.0), u_light * 0.34);
+  acc2 = mix(acc2, vec3(1.0), u_light * 0.18);
 
   // Higher thresholds + capped coverage = mostly background, accents as glows.
   float s1 = mix(0.46, 0.30, u_light);
-  float s2 = mix(0.72, 0.56, u_light);
+  float s2 = mix(0.72, 0.45, u_light);
   float cov = mix(0.7, 0.95, u_light);
-  float acc2Amt = mix(0.65, 0.62, u_light);
+  float acc2Amt = mix(0.65, 0.85, u_light);
 
   vec3 col = u_bg;
   col = mix(col, acc, smoothstep(s1, s1 + 0.42, f) * cov);
   col = mix(col, acc2, smoothstep(s2, s2 + 0.42, f + 0.25 * r.x) * acc2Amt);
-  col += acc * glow * mix(0.35, 0.3, u_light);
+  col += acc * glow * mix(0.18, 0.3, u_light);
 
   // Vignette toward bg — keeps it grounded & dark at the edges.
   float vig = smoothstep(1.2, 0.25, distance(uv, vec2(0.5)));
