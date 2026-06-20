@@ -73,13 +73,14 @@ void main(){
   vec3 acc  = mix(u_accent,  u_bg, 0.42);
   acc  = mix(acc,  vec3(1.0), u_light * 0.22);
   vec3 acc2 = mix(u_accent2, u_bg, 0.40);
-  acc2 = mix(acc2, vec3(1.0), u_light * 0.12);
+  acc2 = mix(acc2, vec3(1.0), u_light * 0.30);
 
   // Higher thresholds + capped coverage = mostly background, accents as glows.
+  // Light mode leans on the teal accent; indigo stays a subtle hint (no purple).
   float s1 = mix(0.46, 0.30, u_light);
-  float s2 = mix(0.72, 0.40, u_light);
+  float s2 = mix(0.72, 0.62, u_light);
   float cov = mix(0.7, 0.95, u_light);
-  float acc2Amt = mix(0.65, 0.95, u_light);
+  float acc2Amt = mix(0.65, 0.45, u_light);
 
   vec3 col = u_bg;
   col = mix(col, acc, smoothstep(s1, s1 + 0.42, f) * cov);
