@@ -95,7 +95,7 @@ const CategoryFolder: React.FC<CategoryFolderProps> = ({ category, projects, ind
               <h3 
                 className="text-[13px] sm:text-[15px] lg:text-[17px] font-semibold tracking-tight text-center transition-colors duration-300"
                 style={{
-                  color: isOpen ? colors.accent : '#fff',
+                  color: isOpen ? colors.accent : 'var(--fg)',
                 }}
               >
                 {category}

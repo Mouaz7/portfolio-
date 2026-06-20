@@ -20,23 +20,42 @@
 :root {
   color-scheme: dark;
 
-  --bg: #000000;
-  --bg-rgb: 0, 0, 0;
-  --fg: #ffffff;
-  --fg-70: rgba(255, 255, 255, 0.7);
-  --fg-50: rgba(255, 255, 255, 0.5);
-  --fg-10: rgba(255, 255, 255, 0.1);
+  /* Layered darkness (not pure #000 — avoids halation / eye-strain, 2026 best practice) */
+  --bg: #0a0b10;
+  --bg-rgb: 10, 11, 16;
+  --fg: #f4f6fb;
+  --fg-70: rgba(244, 246, 251, 0.72);
+  --fg-50: rgba(244, 246, 251, 0.54);
+  --fg-10: rgba(244, 246, 251, 0.1);
 
   /* Modern cyan / teal accent (DB-driven via site_theme; these are fallbacks) */
   --accent: #19e3c2;
   --accent-strong: #0fc9ac;
   --accent-rgb: 25, 227, 194;
 
-  /* Semantic surfaces (flip per theme so cards/fields work in both modes) */
-  --surface: #26262c;
-  --surface-2: #1b1c22;
-  --surface-border: rgba(255, 255, 255, 0.14);
-  --field: #0f1729;
+  /* Secondary aurora hue (home page only) — teal harmonizes toward indigo */
+  --accent-2: #6d8bff;
+  --accent-2-rgb: 109, 139, 255;
+
+  /* Home depth / glass tokens */
+  --hero-aura: radial-gradient(
+    closest-side,
+    rgba(var(--accent-rgb), 0.28),
+    rgba(var(--accent-2-rgb), 0.12) 55%,
+    rgba(var(--accent-rgb), 0) 78%
+  );
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(var(--accent-rgb), 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Semantic surfaces — layered elevation (each step lighter than the bg) */
+  --surface: #181a22;
+  --surface-2: #111219;
+  --surface-border: rgba(244, 246, 251, 0.12);
+  --field: #14161f;
 }
 
 html.light {
@@ -53,6 +72,17 @@ html.light {
   --accent-strong: #0aa890;
   --accent-rgb: 11, 184, 158;
 
+  --accent-2: #5b73e8;
+  --accent-2-rgb: 91, 115, 232;
+
+  /* Home depth / glass tokens (light) */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(12, 13, 20, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 30px 80px -24px rgba(12, 13, 20, 0.22),
+    0 0 0 1px rgba(var(--accent-rgb), 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
   /* Light-mode surfaces */
   --surface: #ffffff;
   --surface-2: #eef0f6;
@@ -63,7 +93,27 @@ html.light {
 /* Smooth the flip without animating layout */
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+/* Cohesive site-wide accents */
+::selection {
+  background: rgba(var(--accent-rgb), 0.28);
+  color: var(--fg);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-rgb), 0.35) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-rgb), 0.35);
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb), 0.55); }
+*::-webkit-scrollbar-track { background: transparent; }
 body {
   @apply leading-[normal] m-0;
 }

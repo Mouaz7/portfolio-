@@ -136,7 +136,7 @@ const PhotoSocialContainer: NextPage<PhotoSocialContainerType> = ({
       className={[
         "overflow-hidden flex flex-col items-center justify-center",
         "pt-0 px-[22px] pb-[30px] box-border relative gap-5 max-w-full",
-        "text-left text-xl text-[#0c0d14] font-urbanist",
+        "text-left text-xl text-[var(--fg)] font-urbanist",
         className,
       ].join(" ")}
     >
@@ -151,31 +151,21 @@ const PhotoSocialContainer: NextPage<PhotoSocialContainerType> = ({
           }}
         >
           <div className="absolute inset-0">
-            <div className="relative w-[460px] h-[660px] overflow-hidden">
-              <Image
-                className="absolute inset-0 z-[2] pointer-events-none"
-                width={460}
-                height={660}
-                sizes="100vw"
-                alt=""
-                src="/contact/card-container.svg"
-              />
-
+            <div className="relative w-[460px] h-[660px] overflow-hidden rounded-[28px] border border-[var(--surface-border)] bg-[var(--surface)] shadow-[0_30px_80px_-24px_rgba(0,0,0,0.55)]">
+              {/* Photo in a clean rounded inner frame */}
               <div
-                className="absolute z-[1] overflow-hidden w-[422px] h-[432px]"
+                className="absolute z-[1] overflow-hidden rounded-[20px] bg-[var(--surface-2)] w-[422px] h-[432px]"
                 style={{ left: 19, top: 18 }}
               >
-                <div className="w-full h-full pt-3 px-3">
-                  <Image
-                    src="/contact/photo-thumbsup@2x.png"
-                    alt=""
-                    width={416}
-                    height={426}
-                    className="w-full h-full object-contain object-top"
-                    sizes="100vw"
-                    loading="lazy"
-                  />
-                </div>
+                <Image
+                  src="/contact/photo-thumbsup@2x.png"
+                  alt=""
+                  width={416}
+                  height={426}
+                  className="w-full h-full object-cover object-top"
+                  sizes="100vw"
+                  loading="lazy"
+                />
               </div>
 
               <div

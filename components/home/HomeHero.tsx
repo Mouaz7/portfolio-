@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Header from "@/components/layout/Header";
 import SocialLinks from "@/components/layout/SocialLinks";
 import RoleCycler from "@/components/home/RoleCycler";
-import ScrollHint from "@/components/home/ScrollHint";
+import ScrambleText from "@/components/home/ScrambleText";
 import CursorGlow from "@/components/home/CursorGlow";
 import MagneticButton from "@/components/home/MagneticButton";
 import type { SiteProfile } from "@/lib/profile";
@@ -100,13 +100,13 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
         <Header />
 
         <main className="relative grid flex-1 place-items-center px-6 sm:px-10">
-          {/* Theme-aware scrim so the type reads cleanly over the field */}
+          {/* Soft legibility scrim so the type reads over the shader */}
           <div
             aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[82vmin] w-[92vmin] -translate-x-1/2 -translate-y-1/2"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[88vmin] w-[110vmin] -translate-x-1/2 -translate-y-1/2"
             style={{
               background:
-                "radial-gradient(closest-side, rgba(var(--bg-rgb),0.6), rgba(var(--bg-rgb),0) 76%)",
+                "radial-gradient(closest-side, rgba(var(--bg-rgb),0.72), rgba(var(--bg-rgb),0.32) 55%, rgba(var(--bg-rgb),0) 80%)",
             }}
           />
 
@@ -114,36 +114,30 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
             ref={tiltRef}
             className="relative flex w-full max-w-[920px] flex-col items-center text-center font-urbanist [transform-style:preserve-3d] will-change-transform"
           >
-            {/* Availability / location chip */}
+            {/* Monospace status line — engineer meta */}
             <Reveal show={show} delay={0}>
-              <span className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-[rgba(var(--bg-rgb),0.5)] px-4 py-1.5 text-[clamp(0.76rem,1.2vw,0.92rem)] font-medium text-gray-100 shadow-[0_8px_30px_rgba(var(--accent-rgb),0.08)] backdrop-blur-md">
+              <span className="hero-meta inline-flex items-center gap-2.5 rounded-full border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.35)] px-3.5 py-1.5 font-mono text-[clamp(0.68rem,1.1vw,0.82rem)] tracking-tight text-gray-100 backdrop-blur-md">
                 {profile.available && (
-                  <span className="relative flex h-2 w-2">
+                  <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
                   </span>
                 )}
-                {profile.location} · {profile.availability}
+                <span className="text-accent">~/</span>
+                <span>{profile.greeting.toLowerCase().replace(/[^a-z ]/g, "").trim() || "hello"}</span>
               </span>
             </Reveal>
 
-            {/* Greeting */}
-            <Reveal show={show} delay={110} className="mt-[clamp(20px,3.8vh,38px)]">
-              <p className="text-[clamp(1rem,2vw,1.4rem)] font-medium uppercase tracking-[0.22em] text-gray-100">
-                {profile.greeting}
-              </p>
-            </Reveal>
-
-            {/* Name — kinetic accent gradient with soft glow */}
-            <Reveal show={show} delay={200}>
-              <h1 className="hero-name mt-2 font-extrabold leading-[0.92] tracking-[-0.03em] text-[clamp(3rem,10vw,8rem)]">
-                {profile.name}
+            {/* Name — kinetic gradient + scramble decode */}
+            <Reveal show={show} delay={120}>
+              <h1 className="hero-name mt-[clamp(14px,2.6vh,28px)] font-extrabold leading-[0.9] tracking-[-0.035em] text-[clamp(3rem,11vw,9rem)]">
+                <ScrambleText text={profile.name} start={show} durationMs={1000} />
               </h1>
             </Reveal>
 
-            {/* Role + accent flourish */}
-            <Reveal show={show} delay={300} className="mt-[clamp(10px,1.8vh,20px)] flex flex-col items-center gap-[clamp(10px,1.6vh,18px)]">
-              <p className="text-[clamp(1.15rem,3.4vw,2.2rem)] font-semibold leading-tight">
+            {/* Role */}
+            <Reveal show={show} delay={300} className="mt-[clamp(12px,2vh,24px)] flex flex-col items-center gap-[clamp(10px,1.6vh,18px)]">
+              <p className="text-[clamp(1.2rem,3.4vw,2.4rem)] font-semibold leading-tight tracking-[-0.01em]">
                 {profile.rolePrefix}{" "}
                 <RoleCycler
                   start={show}
@@ -157,12 +151,12 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
                   className="inline text-accent"
                 />
               </p>
-              <span aria-hidden className="h-[3px] w-[clamp(48px,7vw,84px)] rounded-full bg-gradient-to-r from-accent to-accent-strong" />
+              <span className="hero-underline h-[3px] w-[clamp(64px,10vw,130px)] rounded-full" />
             </Reveal>
 
             {/* Tagline */}
             <Reveal show={show} delay={400} className="mt-[clamp(16px,2.8vh,28px)]">
-              <p className="mx-auto max-w-[50ch] text-[clamp(0.98rem,1.6vw,1.2rem)] leading-relaxed text-gray-100">
+              <p className="mx-auto max-w-[52ch] text-[clamp(0.98rem,1.6vw,1.25rem)] leading-relaxed text-gray-100">
                 {profile.tagline}
               </p>
             </Reveal>
@@ -171,7 +165,7 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
             <Reveal
               show={show}
               delay={500}
-              className="mt-[clamp(26px,4vh,40px)] flex flex-wrap items-center justify-center gap-3 sm:gap-4"
+              className="mt-[clamp(26px,4vh,42px)] flex flex-wrap items-center justify-center gap-3 sm:gap-4"
             >
               <MagneticButton href="/projects" variant="primary">
                 View Projects
@@ -183,28 +177,37 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
               </MagneticButton>
             </Reveal>
 
-            {/* Social links */}
-            <Reveal show={show} delay={590} className="mt-[clamp(22px,3.4vh,34px)]">
+            {/* Socials */}
+            <Reveal show={show} delay={600} className="mt-[clamp(22px,3.4vh,36px)]">
               <SocialLinks />
             </Reveal>
           </div>
         </main>
       </div>
 
-      <ScrollHint show={show} />
-
       <style jsx>{`
         .hero-name {
-          background-image: linear-gradient(100deg, var(--fg) 0%, var(--accent) 48%, var(--fg) 100%);
-          background-size: 220% 100%;
+          background-image: linear-gradient(
+            100deg,
+            var(--fg) 0%,
+            var(--accent) 38%,
+            var(--accent-2) 58%,
+            var(--fg) 100%
+          );
+          background-size: 240% 100%;
           background-position: 0% 50%;
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
           -webkit-text-fill-color: transparent;
-          filter: drop-shadow(0 16px 48px rgba(var(--accent-rgb), 0.2));
+          filter: drop-shadow(0 18px 56px rgba(var(--accent-rgb), 0.28));
           animation: heroSheen 7s ease-in-out infinite;
         }
+        .hero-underline {
+          background-image: linear-gradient(90deg, var(--accent), var(--accent-2));
+          box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.5);
+        }
+        .hero-meta { box-shadow: 0 8px 30px rgba(var(--accent-rgb), 0.08); }
         @keyframes heroSheen {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

@@ -116,7 +116,7 @@ const ProjectsPageClient: React.FC = () => {
                       style={{
                         backgroundColor: isActive ? `${colors?.accent || ACCENT}25` : 'var(--fg-10)',
                         borderColor: isActive ? `${colors?.accent || ACCENT}` : 'var(--surface-border)',
-                        color: isActive ? '#fff' : 'var(--fg-70)',
+                        color: isActive ? 'var(--fg)' : 'var(--fg-70)',
                         boxShadow: isActive ? `0 0 20px ${colors?.glow || 'rgba(var(--accent-rgb),0.5)'}` : 'none',
                       }}
                     >
