@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Header from "@/components/layout/Header";
 import SocialLinks from "@/components/layout/SocialLinks";
 import RoleCycler from "@/components/home/RoleCycler";
-import ScrambleText from "@/components/home/ScrambleText";
+import Magnetic from "@/components/home/Magnetic";
 import CursorGlow from "@/components/home/CursorGlow";
 import MagneticButton from "@/components/home/MagneticButton";
 import type { SiteProfile } from "@/lib/profile";
@@ -114,24 +114,10 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
             ref={tiltRef}
             className="relative flex w-full max-w-[920px] flex-col items-center text-center font-urbanist [transform-style:preserve-3d] will-change-transform"
           >
-            {/* Monospace status line — engineer meta */}
-            <Reveal show={show} delay={0}>
-              <span className="hero-meta inline-flex items-center gap-2.5 rounded-full border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.35)] px-3.5 py-1.5 font-mono text-[clamp(0.68rem,1.1vw,0.82rem)] tracking-tight text-gray-100 backdrop-blur-md">
-                {profile.available && (
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
-                  </span>
-                )}
-                <span className="text-accent">~/</span>
-                <span>{profile.greeting.toLowerCase().replace(/[^a-z ]/g, "").trim() || "hello"}</span>
-              </span>
-            </Reveal>
-
-            {/* Name — kinetic gradient + scramble decode */}
-            <Reveal show={show} delay={120}>
-              <h1 className="hero-name mt-[clamp(14px,2.6vh,28px)] font-extrabold leading-[0.9] tracking-[-0.035em] text-[clamp(3rem,11vw,9rem)]">
-                <ScrambleText text={profile.name} start={show} durationMs={1000} />
+            {/* Name — kinetic gradient, clean rise-in entrance */}
+            <Reveal show={show} delay={100}>
+              <h1 className="hero-name mt-[clamp(14px,2.6vh,30px)] font-extrabold leading-[0.88] tracking-[-0.045em] text-[clamp(3.2rem,12vw,9.5rem)]">
+                {profile.name}
               </h1>
             </Reveal>
 
@@ -155,27 +141,26 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
             </Reveal>
 
             {/* Tagline */}
-            <Reveal show={show} delay={400} className="mt-[clamp(16px,2.8vh,28px)]">
-              <p className="mx-auto max-w-[52ch] text-[clamp(0.98rem,1.6vw,1.25rem)] leading-relaxed text-gray-100">
+            <Reveal show={show} delay={400} className="mt-[clamp(18px,3vh,30px)]">
+              <p className="mx-auto max-w-[50ch] text-[clamp(0.94rem,1.45vw,1.15rem)] leading-relaxed text-gray-200">
                 {profile.tagline}
               </p>
             </Reveal>
 
-            {/* Focus / specialty chips */}
+            {/* Focus / specialty chips (magnetic) */}
             {profile.focusAreas.length > 0 && (
               <Reveal
                 show={show}
                 delay={470}
-                className="mt-[clamp(16px,2.6vh,26px)] flex flex-wrap items-center justify-center gap-2 sm:gap-2.5"
+                className="mt-[clamp(18px,2.8vh,28px)] flex flex-wrap items-center justify-center gap-2 sm:gap-2.5"
               >
                 {profile.focusAreas.map((area) => (
-                  <span
-                    key={area}
-                    className="hero-chip inline-flex items-center gap-1.5 rounded-full border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.35)] px-3.5 py-1.5 text-[clamp(0.74rem,1.1vw,0.9rem)] font-medium text-gray-100 backdrop-blur-md transition-colors duration-300 hover:border-accent/60 hover:text-[var(--fg)]"
-                  >
-                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    {area}
-                  </span>
+                  <Magnetic key={area} strength={0.35}>
+                    <span className="hero-chip inline-flex items-center gap-1.5 rounded-full border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.35)] px-3.5 py-1.5 text-[clamp(0.74rem,1.1vw,0.9rem)] font-medium text-gray-100 backdrop-blur-md transition-colors duration-300 hover:border-accent/60 hover:text-[var(--fg)]">
+                      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
+                      {area}
+                    </span>
+                  </Magnetic>
                 ))}
               </Reveal>
             )}
