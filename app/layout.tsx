@@ -49,10 +49,7 @@ export const metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/logo.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" }, // Fallback for browsers that don't support SVG favicons
-    ],
+    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
     apple: "/logo.svg",
   },
 };

@@ -7,7 +7,6 @@
 import { supabase } from "@/lib/supabase/client";
 
 export type SiteProfile = {
-  greeting: string;
   name: string;
   rolePrefix: string;
   roles: string[];
@@ -21,7 +20,6 @@ export type SiteProfile = {
 
 // Used when the DB is unreachable so the server render never breaks.
 export const DEFAULT_PROFILE: SiteProfile = {
-  greeting: "Hi, I'm",
   name: "Mouaz Naji",
   rolePrefix: "Software",
   roles: ["Engineer", "Developer"],
@@ -39,7 +37,7 @@ export async function getSiteProfile(): Promise<SiteProfile> {
     const { data, error } = await supabase
       .from("site_profile")
       .select(
-        "greeting,name,role_prefix,roles,tagline,location,availability,available,cv_url"
+        "name,role_prefix,roles,tagline,location,availability,available,cv_url"
       )
       .eq("id", 1)
       .single();
@@ -63,7 +61,6 @@ export async function getSiteProfile(): Promise<SiteProfile> {
     }
 
     return {
-      greeting: data.greeting ?? DEFAULT_PROFILE.greeting,
       name: data.name ?? DEFAULT_PROFILE.name,
       rolePrefix: data.role_prefix ?? DEFAULT_PROFILE.rolePrefix,
       roles:

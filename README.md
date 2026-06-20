@@ -95,22 +95,21 @@ portofolio/
 ├── app/
 │   ├── skills/ projects/ roadmap/ contact/   # one page.tsx per route (clean URLs)
 │   ├── api/                # Route handlers: contact, cv, skills, skill-categories,
-│   │                       #   project, roadmap, theme, health
-│   ├── layout.tsx          # Root layout + global ConstellationField backdrop + DB theme
-│   ├── page.tsx            # Home (client) — constellation hero
+│   │                       #   project, roadmap, health
+│   ├── layout.tsx          # Root layout + global SiteBackground (WebGL) backdrop + DB theme
+│   ├── page.tsx            # Home (server) — fetches profile, renders HomeHero
 │   ├── fonts.ts | global.css | robots.ts | sitemap.ts | error.tsx | global-error.tsx
 ├── components/
-│   ├── layout/             # Header, Footer, ThemeToggle, SocialLinks, RouteScrollNavigator
+│   ├── layout/             # Header, Footer, ThemeToggle, SocialLinks, RouteScrollNavigator, SiteBackground
 │   ├── ui/                 # LoadingAnimation, Stage16x9
-│   ├── home/               # ConstellationField, CursorGlow, FloatingStats, TechMarquee,
-│   │                       #   MagneticButton, RoleCycler, ScrollHint
+│   ├── home/               # HomeHero, CursorGlow, Magnetic, MagneticButton, RoleCycler
 │   └── contact/ | projects/ | roadmap/ | skills/
 ├── lib/
 │   ├── hooks/useAccentRgb.ts   # live accent colour for canvas animations
 │   ├── supabase/client.ts      # Supabase client
 │   ├── contact/                # mailer.ts, validate.ts
 │   └── theme.ts                # DB-driven theme → CSS variables
-├── public/                 # logo.svg, logo1.svg, contact/*
+├── public/                 # logo.svg, contact/*
 ├── supabase/               # setup.sql + seed/update scripts
 ├── __tests__/              # Jest + React Testing Library
 └── .github/workflows/      # CI/CD, Lighthouse, PR checks

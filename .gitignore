@@ -45,3 +45,6 @@ coverage/
 
 # local agent (MCP) config
 .mcp.json
+
+# python venv (local, avatar tooling)
+/.venv

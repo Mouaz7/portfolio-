@@ -25,7 +25,7 @@ type Props = {
  * @param className - Optional additional Tailwind / custom class names appended to the root <footer>.
  * @param year - The copyright year displayed in the notice. Defaults to 2025.
  * @param owner - The name or entity owning the site/content. Defaults to "Mouaz Naji".
- * @param logoSrc - The image source (path or URL) for the logo. Defaults to "/logo1.svg".
+ * @param logoSrc - The image source (path or URL) for the logo. Defaults to "/logo.svg".
  * @param logoAlt - Accessible alt text describing the logo. Defaults to "Logo".
  * @param logoW - The intrinsic width (in pixels) passed to the Next.js Image component. Defaults to 28.
  * @param logoH - The intrinsic height (in pixels) passed to the Next.js Image component. Defaults to 30.

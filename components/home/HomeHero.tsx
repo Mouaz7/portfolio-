@@ -211,7 +211,6 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
           background-image: linear-gradient(90deg, var(--accent), var(--accent-2));
           box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.5);
         }
-        .hero-meta { box-shadow: 0 8px 30px rgba(var(--accent-rgb), 0.08); }
         .hero-chip:hover { box-shadow: 0 6px 22px rgba(var(--accent-rgb), 0.14); }
         @keyframes heroSheen {
           0%, 100% { background-position: 0% 50%; }
