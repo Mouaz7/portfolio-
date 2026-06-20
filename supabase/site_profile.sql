@@ -15,9 +15,15 @@ CREATE TABLE IF NOT EXISTS public.site_profile (
   availability text        NOT NULL DEFAULT 'Open to opportunities',
   available    boolean     NOT NULL DEFAULT true,
   cv_url       text        NOT NULL DEFAULT '/api/cv',
+  focus_areas  text[]      NOT NULL DEFAULT ARRAY['AI Engineering','Security','Full-Stack','Systems','DevOps'],
   updated_at   timestamptz DEFAULT now(),
   CONSTRAINT site_profile_singleton CHECK (id = 1)
 );
+
+-- Add the column on existing installs (safe to re-run).
+ALTER TABLE public.site_profile
+  ADD COLUMN IF NOT EXISTS focus_areas text[]
+  NOT NULL DEFAULT ARRAY['AI Engineering','Security','Full-Stack','Systems','DevOps'];
 
 ALTER TABLE public.site_profile ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read site_profile" ON public.site_profile;

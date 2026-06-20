@@ -161,10 +161,29 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
               </p>
             </Reveal>
 
+            {/* Focus / specialty chips */}
+            {profile.focusAreas.length > 0 && (
+              <Reveal
+                show={show}
+                delay={470}
+                className="mt-[clamp(16px,2.6vh,26px)] flex flex-wrap items-center justify-center gap-2 sm:gap-2.5"
+              >
+                {profile.focusAreas.map((area) => (
+                  <span
+                    key={area}
+                    className="hero-chip inline-flex items-center gap-1.5 rounded-full border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.35)] px-3.5 py-1.5 text-[clamp(0.74rem,1.1vw,0.9rem)] font-medium text-gray-100 backdrop-blur-md transition-colors duration-300 hover:border-accent/60 hover:text-[var(--fg)]"
+                  >
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    {area}
+                  </span>
+                ))}
+              </Reveal>
+            )}
+
             {/* CTAs */}
             <Reveal
               show={show}
-              delay={500}
+              delay={560}
               className="mt-[clamp(26px,4vh,42px)] flex flex-wrap items-center justify-center gap-3 sm:gap-4"
             >
               <MagneticButton href="/projects" variant="primary">
@@ -178,7 +197,7 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
             </Reveal>
 
             {/* Socials */}
-            <Reveal show={show} delay={600} className="mt-[clamp(22px,3.4vh,36px)]">
+            <Reveal show={show} delay={660} className="mt-[clamp(22px,3.4vh,36px)]">
               <SocialLinks />
             </Reveal>
           </div>
@@ -208,6 +227,7 @@ export default function HomeHero({ profile }: { profile: SiteProfile }) {
           box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.5);
         }
         .hero-meta { box-shadow: 0 8px 30px rgba(var(--accent-rgb), 0.08); }
+        .hero-chip:hover { box-shadow: 0 6px 22px rgba(var(--accent-rgb), 0.14); }
         @keyframes heroSheen {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

@@ -16,6 +16,7 @@ export type SiteProfile = {
   availability: string;
   available: boolean;
   cvUrl: string;
+  focusAreas: string[];
 };
 
 // Used when the DB is unreachable so the server render never breaks.
@@ -30,6 +31,7 @@ export const DEFAULT_PROFILE: SiteProfile = {
   availability: "Open to opportunities",
   available: true,
   cvUrl: "/api/cv",
+  focusAreas: ["AI Engineering", "Security", "Full-Stack", "Systems", "DevOps"],
 };
 
 export async function getSiteProfile(): Promise<SiteProfile> {
@@ -44,6 +46,22 @@ export async function getSiteProfile(): Promise<SiteProfile> {
 
     if (error || !data) return DEFAULT_PROFILE;
 
+    // Fetched separately so a missing `focus_areas` column never breaks the
+    // whole profile fetch (falls back to the defaults).
+    let focusAreas = DEFAULT_PROFILE.focusAreas;
+    try {
+      const { data: fa } = await supabase
+        .from("site_profile")
+        .select("focus_areas")
+        .eq("id", 1)
+        .single();
+      if (fa && Array.isArray((fa as { focus_areas?: unknown }).focus_areas) && (fa as { focus_areas: string[] }).focus_areas.length) {
+        focusAreas = (fa as { focus_areas: string[] }).focus_areas;
+      }
+    } catch {
+      /* keep default focus areas */
+    }
+
     return {
       greeting: data.greeting ?? DEFAULT_PROFILE.greeting,
       name: data.name ?? DEFAULT_PROFILE.name,
@@ -57,6 +75,7 @@ export async function getSiteProfile(): Promise<SiteProfile> {
       availability: data.availability ?? DEFAULT_PROFILE.availability,
       available: data.available ?? DEFAULT_PROFILE.available,
       cvUrl: data.cv_url ?? DEFAULT_PROFILE.cvUrl,
+      focusAreas,
     };
   } catch {
     return DEFAULT_PROFILE;
