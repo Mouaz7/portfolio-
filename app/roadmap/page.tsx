@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
-import StreetTimeline, { type RoadmapItem } from "@/components/roadmap/StreetTimeline";
+import GitGraphTimeline, { type RoadmapItem } from "@/components/roadmap/GitGraphTimeline";
 import LoadingAnimation from "@/components/ui/LoadingAnimation";
 import { useAccentHex } from "@/lib/hooks/useAccentRgb";
 
@@ -40,7 +40,7 @@ export default function RoadmapPage() {
       <Header />
 
       {/* Slide area (constellation backdrop is global in app/layout.tsx) */}
-      <main className="relative flex-1 min-h-0 overflow-hidden px-[120px] pb-8 max-[675px]:px-5 max-[675px]:pb-6 grid place-items-center">
+      <main className="relative flex-1 min-h-0 overflow-y-auto px-6 py-10 max-[675px]:px-4 max-[675px]:py-6">
         {/* Loading state */}
         {loading && (
           <div className="absolute inset-0 z-20 bg-black/50 backdrop-blur-sm">
@@ -49,16 +49,8 @@ export default function RoadmapPage() {
         )}
 
         {/* Content above the global backdrop */}
-        <div className="relative z-10 w-full max-w-[1600px] max-h-full place-self-center">
-          <StreetTimeline
-            items={items}
-            accentColor={BRAND}
-            laneHeight={460}
-            iconSize={96}
-            autoScale
-            // @ts-expect-error - style prop is not in type definition but works fine
-            style={{ width: "100%", height: "auto", maxHeight: "100%", overflow: "visible" }}
-          />
+        <div className="relative z-10 mx-auto w-full max-w-[820px]">
+          <GitGraphTimeline items={items} accentColor={BRAND} />
         </div>
       </main>
     </div>
