@@ -39,23 +39,17 @@ export default function RoadNode({
       className="relative grid place-items-center opacity-0 animate-iconIn"
       style={{ height: iconSize, width: iconSize, animationDelay: `${appearDelayMs + 200}ms` }}
     >
-      <span
-        aria-hidden
-        className="absolute rounded-full pointer-events-none animate-pulseGlow"
-        style={{
-          width: Math.round(iconSize * 1.6),
-          height: Math.round(iconSize * 1.6),
-          background: accentColor,
-          opacity: 0.22,
-          filter: "blur(26px)",
-          zIndex: -1,
-        }}
-      />
+      {/* just the logo — no box, no glow */}
       {item.icon ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={item.icon} alt="" className="object-contain select-none" style={{ height: iconSize, width: iconSize }} />
+        <img
+          src={item.icon}
+          alt=""
+          className="object-contain select-none"
+          style={{ height: iconSize, width: iconSize }}
+        />
       ) : (
-        <span className="grid place-items-center text-sm font-semibold text-white" style={{ height: iconSize, width: iconSize }}>
+        <span className="grid place-items-center text-base font-semibold" style={{ height: iconSize, width: iconSize, color: "var(--fg)" }}>
           {item.title.slice(0, 1)}
         </span>
       )}
@@ -90,17 +84,25 @@ export default function RoadNode({
 
   const Text = (
     <div className="text-center opacity-0 animate-nodeIn" style={{ width, animationDelay: `${appearDelayMs + 320}ms` }}>
-      <div className="text-white font-semibold leading-tight" style={{ fontSize: isMobile ? '15px' : '18px' }}>
+      <div
+        className="font-bold leading-tight"
+        style={{ fontSize: isMobile ? '15px' : '19px', color: "var(--fg)", textWrap: "balance" }}
+      >
         {item.title}
       </div>
-      <div className="mt-0.5 italic" style={{ fontSize: isMobile ? '10px' : '12px', color: accentColor }}>
+      <div className="mt-1 italic font-medium" style={{ fontSize: isMobile ? '10px' : '12.5px', color: accentColor }}>
         {fmtRange(item.from, item.to)}
       </div>
-      <p className="mt-1.5 leading-snug text-gray-100" style={{
-        fontSize: isMobile ? '12px' : '14px', 
-        maxWidth: descMax, 
-        margin: "0 auto" 
-      }}>
+      <p
+        className="mt-1.5 leading-snug font-medium"
+        style={{
+          fontSize: isMobile ? '12px' : '14px',
+          maxWidth: descMax,
+          margin: "0 auto",
+          color: "var(--fg-70)",
+          textWrap: "balance",
+        }}
+      >
         {item.description}
       </p>
     </div>

@@ -26,6 +26,8 @@ export async function GET() {
     let icon: string | undefined;
     if (/^https?:\/\//i.test(path)) {
       icon = path;
+    } else if (path.startsWith("/")) {
+      icon = path;
     } else if (path) {
       const publicUrl = supabase.storage.from(r.icon_bucket).getPublicUrl(path).data.publicUrl;
 
@@ -45,6 +47,10 @@ export async function GET() {
         icon = publicUrl;
       }
     }
+
+    // Override with local org logos based on title
+    if (r.title?.includes("BTH")) icon = "/roadmap/bth-logo.svg";
+    else if (r.title?.includes("Softhouse")) icon = "/roadmap/softhouse.png";
 
     return {
       id: r.id,

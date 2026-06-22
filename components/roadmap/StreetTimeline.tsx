@@ -126,24 +126,24 @@ export default function StreetTimeline({
                   <div className="flex items-start gap-2">
                     {/* Compact icon */}
                     {it.icon && (
-                      <div className="relative flex-shrink-0 w-9 h-9 rounded-lg p-1">
-                        <Image src={it.icon} alt="" width={36} height={36} className="w-full h-full object-contain" unoptimized />
+                      <div className="relative flex-shrink-0 w-9 h-9 grid place-items-center">
+                        <Image src={it.icon} alt="" width={36} height={36} className="object-contain" style={{ width: 36, height: 36 }} unoptimized />
                       </div>
                     )}
 
                     {/* Compact text content */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-semibold text-[13px] leading-tight mb-0.5">{it.title}</h3>
-                      
+                      <h3 className="font-bold text-[13px] leading-tight mb-0.5" style={{ color: "var(--fg)" }}>{it.title}</h3>
+
                       {/* Date range */}
                       {(it.from || it.to) && (
-                        <div className="text-[9px] font-medium mb-0.5 opacity-90" style={{ color: accentColor }}>
+                        <div className="text-[9px] font-medium mb-0.5" style={{ color: accentColor }}>
                           {formatRange(it.from, it.to)}
                         </div>
                       )}
 
                       {/* Compact description */}
-                      <p className="text-gray-100 text-[10px] leading-snug line-clamp-2">{it.description}</p>
+                      <p className="text-[10px] leading-snug line-clamp-2 font-medium" style={{ color: "var(--fg-70)" }}>{it.description}</p>
                     </div>
                   </div>
                 </div>
