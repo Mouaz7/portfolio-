@@ -9,11 +9,11 @@ describe('LoadingAnimation Component', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
-  it('displays the folder icon', () => {
+  it('renders the git terminal prompt', () => {
     const { container } = render(<LoadingAnimation text="Please wait" />)
-    
-    // Check for the emoji icon
-    expect(container.textContent).toContain('📁')
+
+    // Terminal-style loader shows a git command prompt
+    expect(container.textContent).toContain('git pull origin')
   })
 
   it('renders with custom text', () => {
