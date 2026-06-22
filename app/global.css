@@ -56,6 +56,12 @@
   --surface-2: #111219;
   --surface-border: rgba(244, 246, 251, 0.12);
   --field: #14161f;
+
+  /* GitHub-authentic tokens (dark) */
+  --gh-link: #58a6ff;
+  --gh-topic-bg: rgba(56, 139, 253, 0.15);
+  --gh-topic-fg: #58a6ff;
+  --gh-row-hover: rgba(177, 186, 196, 0.08);
 }
 
 html.light {
@@ -88,6 +94,12 @@ html.light {
   --surface-2: #eef0f6;
   --surface-border: rgba(12, 13, 20, 0.12);
   --field: #ffffff;
+
+  /* GitHub-authentic tokens (light) */
+  --gh-link: #0969da;
+  --gh-topic-bg: #ddf4ff;
+  --gh-topic-fg: #0969da;
+  --gh-row-hover: rgba(208, 215, 222, 0.32);
 }
 
 /* Smooth the flip without animating layout */
