@@ -69,7 +69,7 @@ export default function GitGraphTimeline({
   const X_MAIN = isMobile ? 12 : 22;
   const laneX = (lane: number) => (lane === 0 ? X_MAIN : lane === 2 ? (isMobile ? 40 : 76) : isMobile ? 26 : 49);
   const nodeR = isMobile ? 5.5 : 7;
-  const logoPx = isMobile ? 56 : 76; // large org logos — easy to read in light & dark
+  const logoPx = isMobile ? 44 : 76; // large org logos — easy to read in light & dark
 
   const laneSpans = useMemo(() => {
     const m = new Map<number, { first: number; last: number }>();
@@ -248,7 +248,7 @@ export default function GitGraphTimeline({
                     boxShadow: `0 10px 30px rgba(0,0,0,0.16), 0 0 18px ${myColor}14`,
                   }}
                 >
-                  <div className="flex items-start gap-3.5">
+                  <div className="flex items-start" style={{ gap: isMobile ? 10 : 14 }}>
                     {/* BIG org logo — clean, no box */}
                     {it.icon && (
                       // eslint-disable-next-line @next/next/no-img-element

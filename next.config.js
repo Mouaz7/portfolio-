@@ -1,5 +1,9 @@
 const nextConfig = {
   reactStrictMode: true,
+
+  // Hide the Next.js dev indicator ("N" badge in the corner)
+  devIndicators: false,
+
   images: {
     remotePatterns: [
       {
