@@ -84,7 +84,7 @@ export default function GithubRepoRow({
 
   return (
     <div
-      className="gh-repo-row gh-row-in group relative px-4 py-4 transition-colors sm:px-5"
+      className="gh-repo-row gh-row-in group relative px-4 py-3.5 transition-colors sm:px-5 sm:py-4"
       style={{ borderBottom: last ? "none" : "1px solid var(--surface-border)", animationDelay: `${index * 55}ms` }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -115,13 +115,13 @@ export default function GithubRepoRow({
           </div>
 
           {/* description */}
-          <p className="mt-1.5 leading-relaxed" style={{ fontSize: isMobile ? 13 : 14, color: "var(--fg-70)", maxWidth: "60ch" }}>
+          <p className={`mt-1.5 leading-relaxed ${isMobile ? "line-clamp-2" : ""}`} style={{ fontSize: isMobile ? 13 : 14, color: "var(--fg-70)", maxWidth: "60ch" }}>
             {project.description}
           </p>
 
           {/* topics (GitHub blue pills) */}
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {project.languages.slice(0, isMobile ? 4 : 6).map((l) => (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {project.languages.slice(0, isMobile ? 3 : 6).map((l) => (
               <span
                 key={l}
                 className="rounded-full px-2.5 py-0.5 font-medium"
@@ -133,7 +133,7 @@ export default function GithubRepoRow({
           </div>
 
           {/* meta footer */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1" style={{ fontSize: 12, color: "var(--fg-50)" }}>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1" style={{ fontSize: isMobile ? 11.5 : 12, color: "var(--fg-50)" }}>
             {primary && (
               <span className="flex items-center gap-1.5">
                 <span className="inline-block rounded-full" style={{ width: 12, height: 12, background: dot }} />
