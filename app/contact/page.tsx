@@ -1,111 +1,47 @@
 "use client";
 import type { NextPage } from "next";
 import { useCallback } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import type { Variants, Transition } from "framer-motion";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import Stage16x9 from "@/components/ui/Stage16x9";
-import PhotoSocialContainer from "@/components/contact/PhotoSocialContainer";
-import EmailForm from "@/components/contact/EmailForm";
+import ContactIssueForm from "@/components/contact/ContactIssueForm";
 
 const ContactPage: NextPage = () => {
-  const handleSend = useCallback(async ({ name, email, message, files }: {
-    name: string; email: string; message: string; files: File[];
-  }) => {
-    const fd = new FormData();
-    fd.append("name", name);
-    fd.append("email", email);
-    fd.append("message", message);
-    for (const f of files) fd.append("files", f, f.name);
+  const handleSend = useCallback(
+    async ({ name, email, message, files }: { name: string; email: string; message: string; files: File[] }) => {
+      const fd = new FormData();
+      fd.append("name", name);
+      fd.append("email", email);
+      fd.append("message", message);
+      for (const f of files) fd.append("files", f, f.name);
 
-    try {
-      const res = await fetch("/api/contact/send", { method: "POST", body: fd });
-      const data = await res.json().catch(() => ({}));
-      return Boolean(res.ok && data?.ok); // <-- return success boolean
-    } catch {
-      return false;
-    }
-  }, []);
-
-  const prefersReducedMotion = useReducedMotion();
-  const springy: Transition = { type: "spring", stiffness: 260, damping: 26, mass: 0.9 };
-  const parent: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.15, delayChildren: 0.05 } } };
-  const leftCol: Variants = {
-    hidden: { opacity: 0, x: prefersReducedMotion ? 0 : -32, scale: prefersReducedMotion ? 1 : 0.98 },
-    show:   { opacity: 1, x: 0, scale: 1, transition: springy },
-  };
-  const rightCol: Variants = {
-    hidden: { opacity: 0, x: prefersReducedMotion ? 0 : 32, scale: prefersReducedMotion ? 1 : 0.98 },
-    show:   { opacity: 1, x: 0, scale: 1, transition: springy },
-  };
+      try {
+        const res = await fetch("/api/contact/send", { method: "POST", body: fd });
+        const data = await res.json().catch(() => ({}));
+        return Boolean(res.ok && data?.ok);
+      } catch {
+        return false;
+      }
+    },
+    []
+  );
 
   return (
-    <div className="w-full min-h-screen relative overflow-hidden flex flex-col">
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       {/* Constellation backdrop is rendered globally in app/layout.tsx */}
       <Header />
 
-      <main className="flex-1 min-h-0 px-4 sm:px-6 lg:grid lg:place-items-center relative z-10">
-        {/* Mobile block */}
-        <div className="lg:hidden py-6 grid place-items-center">
-          <div className="w-full">
-            <EmailForm
-              onSend={handleSend}
-              showMobileIcons
-              className="w-full mx-auto max-w-[520px] sm:max-w-[560px] p-3 sm:p-4"
-            />
+      <main className="relative z-10 flex-1 overflow-y-auto px-4 py-8 sm:px-6 md:py-10">
+        <div className="mx-auto w-full max-w-[940px]">
+          {/* intro */}
+          <div className="mb-5 px-1">
+            <h1 className="font-bold tracking-tight" style={{ fontSize: 26, color: "var(--fg)" }}>Get in touch</h1>
+            <p className="mt-1 font-mono" style={{ fontSize: 13, color: "var(--fg-50)" }}>
+              <span style={{ color: "var(--accent)" }}>$</span> open an issue — collaborations, opportunities, or just a chat. I&apos;ll reply soon.
+            </p>
           </div>
-        </div>
 
-        {/* DESKTOP/TABLET */}
-        <div className="hidden lg:flex h-full w-full items-center justify-center px-4 lg:px-12">
-          <div className="w-full h-full min-h-[560px] min-w-0">
-            <Stage16x9 baseW={1400} baseH={788} className="w-full h-full overflow-visible">
-              <div className="w-full h-full p-8 lg:p-10">
-                <motion.section
-                  variants={parent}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="grid h-full grid-cols-12 items-stretch gap-12 xl:gap-16 2xl:gap-20 overflow-visible"
-                >
-                  <motion.div
-                    variants={leftCol}
-                    className="col-span-12 lg:col-span-5 2xl:col-span-5 h-full grid place-items-center overflow-visible z-10"
-                  >
-                    <PhotoSocialContainer
-                      className="
-                          w-full h-full max-w-none
-                          transform-gpu origin-center
-                          scale-[0.92] xl:scale-100 2xl:scale-100
-                          transition-transform
-                        "
-                      />
-                  </motion.div>
-
-                {/* Right: form — 80% of column (photo stays 100%) */}
-                  <motion.div
-                    variants={rightCol}
-                    className="
-                      col-span-12 lg:col-span-7 2xl:col-span-7
-                      h-full grid place-items-center
-                      overflow-visible z-0
-                    "
-                  >
-                    {/* this wrapper sets the height ratio */}
-                    <div className="w-full h-[80%] min-h-[420px] max-h-full">
-                      <EmailForm
-                        onSend={handleSend}
-                        className="w-full h-full max-w-[980px] xl:max-w-[1040px] 2xl:max-w-[1120px]"
-                      />
-                    </div>
-                  </motion.div>
-
-                </motion.section>
-              </div>
-            </Stage16x9>
-          </div>
+          <ContactIssueForm onSend={handleSend} />
         </div>
       </main>
 

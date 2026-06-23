@@ -3,20 +3,27 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 export const revalidate = 0;
 
+// Social links + selectable labels for the Contact page — fully database driven.
 export async function GET() {
-  const { data, error } = await supabase
-    .from("contact_social")
-    .select("id,name,href,svg_path,viewbox,is_active,sort_order")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true })
-    .order("id", { ascending: true });
+  const [socialRes, labelRes] = await Promise.all([
+    supabase
+      .from("contact_social")
+      .select("id,name,href,svg_path,viewbox,is_active,sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("id", { ascending: true }),
+    supabase
+      .from("contact_label")
+      .select("id,text,color,is_active,sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("id", { ascending: true }),
+  ]);
 
-  if (error) {
-    console.error("[/api/contact] db error:", error);
-    return NextResponse.json({ error: "db" }, { status: 500 });
-  }
+  if (socialRes.error) console.error("[/api/contact] social db error:", socialRes.error.message);
+  if (labelRes.error) console.error("[/api/contact] label db error:", labelRes.error.message);
 
-  const mapped = (data ?? []).map((r) => ({
+  const socials = (socialRes.data ?? []).map((r) => ({
     id: r.id,
     title: r.name,
     href: r.href,
@@ -24,5 +31,12 @@ export async function GET() {
     viewBox: r.viewbox ?? "0 0 24 24",
   }));
 
-  return NextResponse.json(mapped);
+  const labels = (labelRes.data ?? []).map((r) => ({
+    id: r.id,
+    text: r.text,
+    color: r.color,
+  }));
+
+  // Always 200 with a stable shape, even if a table is missing — the page degrades gracefully.
+  return NextResponse.json({ socials, labels });
 }
