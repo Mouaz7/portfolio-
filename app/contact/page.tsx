@@ -34,10 +34,10 @@ const ContactPage: NextPage = () => {
       <main className="relative z-10 flex-1 overflow-y-auto px-4 py-8 sm:px-6 md:py-10">
         <div className="mx-auto w-full max-w-[940px]">
           {/* intro */}
-          <div className="mb-5 px-1">
-            <h1 className="font-bold tracking-tight" style={{ fontSize: 26, color: "var(--fg)" }}>Get in touch</h1>
-            <p className="mt-1 font-mono" style={{ fontSize: 13, color: "var(--fg-50)" }}>
-              <span style={{ color: "var(--accent)" }}>$</span> open an issue — collaborations, opportunities, or just a chat. I&apos;ll reply soon.
+          <div className="mb-6 px-1">
+            <h1 className="font-bold tracking-tight" style={{ fontSize: 28, color: "var(--fg)" }}>Get in touch</h1>
+            <p className="mt-2 max-w-xl" style={{ fontSize: 15, lineHeight: 1.55, color: "var(--fg-70)" }}>
+              Whether it&apos;s a collaboration, an opportunity, or just a friendly hello, I&apos;d love to hear from you. I&apos;ll get back to you soon.
             </p>
           </div>
 

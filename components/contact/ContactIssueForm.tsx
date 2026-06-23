@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { isValidEmail, NAME_MAX, EMAIL_MAX, MESSAGE_MAX } from "@/lib/contact/validate";
 
-type LinkItem = { id: number; title: string; href: string; svgPath: string; viewBox?: string };
+type LinkItem = { id: number; title: string; href: string; svgPath: string; viewBox?: string; color?: string | null };
 type LabelItem = { id: number; text: string; color: string };
 type SendFn = (p: { name: string; email: string; message: string; files: File[] }) => Promise<boolean> | boolean;
 
@@ -192,7 +192,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               <div className="grid h-14 w-14 place-items-center rounded-full" style={{ background: `${GREEN}22`, border: `1px solid ${GREEN}66` }}>
                 <Ico s={28} d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.78 6.28-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06L6.75 9.19l3.97-3.97a.75.75 0 1 1 1.06 1.06Z" />
               </div>
-              <h3 className="mt-3 font-bold" style={{ color: "var(--fg)", fontSize: 18 }}>Issue opened — thanks!</h3>
+              <h3 className="mt-3 font-bold" style={{ color: "var(--fg)", fontSize: 18 }}>Message sent, thank you!</h3>
               <p className="mt-1 font-medium" style={{ color: "var(--fg-70)", fontSize: 14 }}>I&apos;ll get back to you as soon as I can.</p>
               <button onClick={() => setStatus("idle")} className="mt-4 rounded-md px-4 py-1.5 font-mono font-semibold" style={{ fontSize: 13, color: "var(--gh-link)", border: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 50%, transparent)" }}>
                 Open another
@@ -263,7 +263,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                     {/* attach */}
                     <button type="button" onClick={() => fileRef.current?.click()} className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 12.5, color: "var(--fg-50)", borderTop: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 45%, transparent)" }}>
                       <Ico s={15} d="M3.5 6.5v3.25a4.25 4.25 0 0 0 8.5 0V4.5a2.75 2.75 0 1 0-5.5 0v5.25a1.25 1.25 0 1 0 2.5 0V6.5a.75.75 0 0 1 1.5 0v3.25a2.75 2.75 0 1 1-5.5 0V4.5a4.25 4.25 0 0 1 8.5 0v5.25a5.75 5.75 0 1 1-11.5 0V6.5a.75.75 0 0 1 1.5 0Z" />
-                      Attach files — or drag &amp; drop them here
+                      Attach files, or drag &amp; drop them here
                       <span className="ml-auto font-mono" style={{ fontSize: 11 }}>max {MAX_TOTAL_MB} MB</span>
                     </button>
                     <input ref={fileRef} type="file" accept={ACCEPT} multiple hidden onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }} />
@@ -287,7 +287,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                 )}
 
                 <p className="mt-2 sm:pl-[46px]" style={{ fontSize: 11.5, color: "var(--fg-50)" }}>
-                  <Ico s={13} d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 7.5a.75.75 0 0 1 1.5 0v4a.75.75 0 0 1-1.5 0v-4ZM8 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" /> Select text, then click a button to format it — just like a doc.
+                  <Ico s={13} d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 7.5a.75.75 0 0 1 1.5 0v4a.75.75 0 0 1-1.5 0v-4ZM8 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" /> Select any text, then click a button to format it, just like a document.
                 </p>
               </div>
 
@@ -321,7 +321,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         <aside className="px-4 py-4 sm:px-5">
           <div className="pb-4" style={{ borderBottom: "1px solid var(--surface-border)" }}>
             <div className="mb-2 flex items-center justify-between text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>
-              Assignees <span style={{ color: "var(--fg-50)" }}><Ico d={I.gear} s={14} /></span>
+              Assignees <span style={{ color: "var(--fg-70)" }}><Ico d={I.gear} s={17} /></span>
             </div>
             <a href={links.find((l) => /github/i.test(l.title))?.href || "https://github.com/Mouaz7"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ fontSize: 13.5, color: "var(--fg)" }}>
               <span className="grid h-6 w-6 place-items-center rounded-full font-bold" style={{ background: "var(--accent)", color: "#04201b", fontSize: 12 }}>M</span>
@@ -332,7 +332,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
           {labels.length > 0 && (
           <div className="py-4" style={{ borderBottom: "1px solid var(--surface-border)" }}>
             <div className="mb-2 flex items-center justify-between text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>
-              Labels <span style={{ color: "var(--fg-50)" }}><Ico d={I.gear} s={14} /></span>
+              Labels <span style={{ color: "var(--fg-70)" }}><Ico d={I.gear} s={17} /></span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {labels.map((l) => {
@@ -360,19 +360,31 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               })}
             </div>
             <p className="mt-2 leading-snug" style={{ fontSize: 11, color: "var(--fg-50)" }}>
-              {picked.length ? `${picked.length} selected — added to your message.` : "Tap any that fit your message."}
+              {picked.length ? `${picked.length} selected and added to your message.` : "Tap any that fit your message."}
             </p>
           </div>
           )}
 
           {links.length > 0 && (
           <div className="pt-4">
-            <div className="mb-2 text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>Connect</div>
-            <div className="flex flex-col gap-0.5">
+            <div className="mb-2.5 text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>Connect</div>
+            <div className="flex flex-col gap-1.5">
               {links.map((l) => (
-                <a key={l.id} href={l.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 13.5, color: "var(--gh-link)" }}>
-                  <svg width="16" height="16" viewBox={l.viewBox || "0 0 24 24"} fill="currentColor" aria-hidden><path d={l.svgPath} /></svg>
-                  <span className="font-medium">{l.title}</span>
+                <a
+                  key={l.id}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="connect-link group flex items-center gap-2.5 rounded-md px-1 py-1.5 transition-all"
+                  style={{ fontSize: 13.5, color: "var(--fg)" }}
+                >
+                  <svg className="shrink-0" width="18" height="18" viewBox={l.viewBox || "0 0 24 24"} fill="currentColor" style={{ color: l.color || "var(--gh-link)" }} aria-hidden>
+                    <path d={l.svgPath} />
+                  </svg>
+                  <span className="font-semibold">{l.title}</span>
+                  <svg className="ml-auto shrink-0 opacity-0 transition-opacity group-hover:opacity-100" width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style={{ color: "var(--fg-50)" }} aria-hidden>
+                    <path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z" />
+                  </svg>
                 </a>
               ))}
             </div>
@@ -385,6 +397,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         @keyframes issueIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: none; } }
         .contact-issue { animation: issueIn .5s cubic-bezier(.2,.7,.2,1) both; }
         .issue-submit:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 20px ${GREEN}66; }
+        .connect-link:hover { background: var(--gh-row-hover); transform: translateX(2px); }
         .ce { outline: none; overflow-y: auto; max-height: 360px; }
         .ce:empty:before { content: attr(data-ph); color: var(--fg-50); pointer-events: none; }
         .ce code { padding: .12em .35em; border-radius: 4px; background: color-mix(in srgb, var(--surface) 50%, transparent); border: 1px solid var(--surface-border); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
