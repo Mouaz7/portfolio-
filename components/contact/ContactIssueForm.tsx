@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { isValidEmail, NAME_MAX, EMAIL_MAX, MESSAGE_MAX } from "@/lib/contact/validate";
 
 type LinkItem = { id: number; title: string; href: string; svgPath: string; viewBox?: string; color?: string | null };
@@ -163,26 +164,32 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
     }
   };
 
+  // soft, always-on neon glow (like the reference design) and a stronger focus glow
+  const glowIdle = "0 0 0 1px color-mix(in srgb, var(--gh-link) 16%, transparent), 0 3px 16px color-mix(in srgb, var(--gh-link) 12%, transparent)";
+  const glowFocus = "0 0 0 3px color-mix(in srgb, var(--gh-link) 26%, transparent), 0 4px 22px color-mix(in srgb, var(--gh-link) 22%, transparent)";
   const field: React.CSSProperties = {
-    width: "100%", borderRadius: 6, padding: "8px 12px", fontSize: 14, color: "var(--fg)",
-    background: "color-mix(in srgb, var(--surface) 50%, transparent)", border: "1px solid var(--surface-border)", outline: "none",
+    width: "100%", borderRadius: 10, padding: "11px 13px", fontSize: 16, color: "var(--fg)",
+    background: "color-mix(in srgb, var(--surface) 50%, transparent)",
+    border: "1px solid color-mix(in srgb, var(--gh-link) 35%, var(--surface-border))", outline: "none",
+    boxShadow: glowIdle, transition: "border-color .15s, box-shadow .15s",
   };
-  const label = "mb-1 block text-[12.5px] font-semibold";
+  const label = "mb-1.5 block text-[13px] font-semibold";
   const over = textLen > MESSAGE_MAX;
 
   return (
     <div
-      className="contact-issue mx-auto w-full max-w-[940px] overflow-hidden rounded-xl opacity-0"
+      className="contact-issue mx-auto w-full max-w-[940px] overflow-hidden rounded-2xl opacity-0"
       style={{
-        background: "color-mix(in srgb, var(--surface) 72%, transparent)",
-        backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+        background: "color-mix(in srgb, var(--surface) 92%, transparent)",
+        backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
         border: "1px solid var(--surface-border)", boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
       }}
     >
       {/* header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5" style={{ borderBottom: "1px solid var(--surface-border)" }}>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3.5 min-[380px]:px-5 sm:px-6" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
         <div className="flex min-w-0 items-center gap-2 font-mono" style={{ fontSize: 15, color: "var(--fg)" }}>
-          <Ico s={19} d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+          <Image src="/logo.svg" alt="Mouaz Naji" width={26} height={26} className="shrink-0 rounded-md" style={{ boxShadow: "0 0 0 1px var(--surface-border)" }} priority />
+          <Ico s={18} d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
           <span className="font-semibold" style={{ color: "var(--fg-70)" }}>Mouaz7</span>
           <span style={{ color: "var(--fg-50)" }}>/</span>
           <span className="font-bold" style={{ color: "var(--gh-link)" }}>contact</span>
@@ -193,9 +200,9 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_252px]">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_252px]">
         {/* MAIN */}
-        <div className="px-4 py-4 sm:px-5" style={{ borderBottom: "1px solid var(--surface-border)" }}>
+        <div className="min-w-0 px-4 py-5 min-[380px]:px-5 sm:px-6" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
           {status === "ok" ? (
             <div className="grid place-items-center py-16 text-center">
               <div className="grid h-14 w-14 place-items-center rounded-full" style={{ background: `${GREEN}22`, border: `1px solid ${GREEN}66` }}>
@@ -210,14 +217,14 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
           ) : (
             <>
               {/* name + email */}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
                 <div>
                   <label className={label} style={{ color: "var(--fg)" }} htmlFor="c-name">Your name</label>
-                  <input id="c-name" value={name} maxLength={NAME_MAX} onChange={(e) => setName(e.target.value.slice(0, NAME_MAX))} placeholder="Jane Doe" style={field} onFocus={(e) => (e.currentTarget.style.borderColor = "var(--gh-link)")} onBlur={(e) => (e.currentTarget.style.borderColor = "var(--surface-border)")} />
+                  <input id="c-name" value={name} maxLength={NAME_MAX} onChange={(e) => setName(e.target.value.slice(0, NAME_MAX))} placeholder="Jane Doe" style={field} onFocus={(e) => { e.currentTarget.style.borderColor = "var(--gh-link)"; e.currentTarget.style.boxShadow = glowFocus; }} onBlur={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--gh-link) 35%, var(--surface-border))"; e.currentTarget.style.boxShadow = glowIdle; }} />
                 </div>
                 <div>
                   <label className={label} style={{ color: "var(--fg)" }} htmlFor="c-email">Your email</label>
-                  <input id="c-email" type="email" value={email} maxLength={EMAIL_MAX} onChange={(e) => setEmail(e.target.value.slice(0, EMAIL_MAX))} placeholder="jane@example.com" style={field} onFocus={(e) => (e.currentTarget.style.borderColor = "var(--gh-link)")} onBlur={(e) => (e.currentTarget.style.borderColor = "var(--surface-border)")} />
+                  <input id="c-email" type="email" value={email} maxLength={EMAIL_MAX} onChange={(e) => setEmail(e.target.value.slice(0, EMAIL_MAX))} placeholder="jane@example.com" style={field} onFocus={(e) => { e.currentTarget.style.borderColor = "var(--gh-link)"; e.currentTarget.style.boxShadow = glowFocus; }} onBlur={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--gh-link) 35%, var(--surface-border))"; e.currentTarget.style.boxShadow = glowIdle; }} />
                 </div>
               </div>
 
@@ -225,12 +232,12 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               <div className="mt-4">
                 <label className={label} style={{ color: "var(--fg)" }}>Add a comment</label>
                 <div className="flex gap-2.5">
-                  <div className="hidden shrink-0 sm:block">
+                  <div className="hidden shrink-0 lg:block">
                     <div className="grid h-9 w-9 place-items-center rounded-full font-bold" style={{ background: "var(--accent)", color: "#04201b", fontSize: 16 }}>M</div>
                   </div>
                   <div
-                    className="relative min-w-0 flex-1 overflow-hidden rounded-md"
-                    style={{ border: `1px solid ${dragging ? "var(--gh-link)" : "var(--surface-border)"}`, boxShadow: dragging ? "0 0 0 3px color-mix(in srgb, var(--gh-link) 25%, transparent)" : "none", transition: "box-shadow .15s, border-color .15s" }}
+                    className="relative min-w-0 flex-1 overflow-hidden rounded-lg"
+                    style={{ border: `1px solid color-mix(in srgb, var(--gh-link) ${dragging ? 100 : 35}%, var(--surface-border))`, boxShadow: dragging ? glowFocus : glowIdle, transition: "box-shadow .15s, border-color .15s" }}
                     onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                     onDragLeave={(e) => { e.preventDefault(); setDragging(false); }}
                     onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files); }}
@@ -240,19 +247,19 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                         <span className="font-mono font-semibold" style={{ fontSize: 13, color: "var(--gh-link)" }}>Drop files to attach</span>
                       </div>
                     )}
-                    <span aria-hidden className="absolute hidden sm:block" style={{ left: -7, top: 13, width: 12, height: 12, transform: "rotate(45deg)", background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderLeft: "1px solid var(--surface-border)", borderBottom: "1px solid var(--surface-border)" }} />
+                    <span aria-hidden className="absolute hidden lg:block" style={{ left: -7, top: 13, width: 12, height: 12, transform: "rotate(45deg)", background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderLeft: "1px solid var(--surface-border)", borderBottom: "1px solid var(--surface-border)" }} />
 
                     {/* toolbar — formats instantly */}
                     <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5" style={{ background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderBottom: "1px solid var(--surface-border)" }}>
                       {tools.map(({ k, fn, t }, i) => (
                         <React.Fragment key={k}>
                           {(i === 2 || i === 4) && <span className="mx-1 h-4 w-px" style={{ background: "var(--surface-border)" }} />}
-                          <button type="button" title={t} onMouseDown={(e) => e.preventDefault()} onClick={fn} className="grid h-7 w-7 place-items-center rounded-md transition-colors hover:bg-[var(--gh-row-hover)]" style={{ color: "var(--fg-70)" }}>
+                          <button type="button" title={t} onMouseDown={(e) => e.preventDefault()} onClick={fn} className="toolbar-btn grid h-7 w-7 place-items-center rounded-md transition-colors hover:bg-[var(--gh-row-hover)]" style={{ color: "var(--fg-70)" }}>
                             <Ico d={I[k]} s={15} />
                           </button>
                         </React.Fragment>
                       ))}
-                      <span className="ml-auto pr-1 font-mono" style={{ fontSize: 11, color: over ? "#f85149" : "var(--fg-50)" }}>{textLen}/{MESSAGE_MAX}</span>
+                      <span className="ml-auto pr-1 font-mono" style={{ fontSize: 11.5, color: over ? "#f85149" : "var(--fg-70)" }}>{textLen}/{MESSAGE_MAX}</span>
                     </div>
 
                     {/* the editable surface */}
@@ -266,11 +273,11 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                       data-ph="Tell me about the opportunity, collaboration, or just say hi…"
                       onInput={syncLen}
                       onKeyDown={onKey}
-                      style={{ fontSize: 14, lineHeight: 1.6, color: "var(--fg)", background: "color-mix(in srgb, var(--surface) 60%, transparent)" }}
+                      style={{ fontSize: 15, lineHeight: 1.6, color: "var(--fg)", background: "color-mix(in srgb, var(--surface) 60%, transparent)" }}
                     />
 
                     {/* attach */}
-                    <button type="button" onClick={() => fileRef.current?.click()} className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 12.5, color: "var(--fg-50)", borderTop: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 45%, transparent)" }}>
+                    <button type="button" onClick={() => fileRef.current?.click()} className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 13, color: "var(--fg-70)", borderTop: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 45%, transparent)" }}>
                       <Ico s={15} d="M3.5 6.5v3.25a4.25 4.25 0 0 0 8.5 0V4.5a2.75 2.75 0 1 0-5.5 0v5.25a1.25 1.25 0 1 0 2.5 0V6.5a.75.75 0 0 1 1.5 0v3.25a2.75 2.75 0 1 1-5.5 0V4.5a4.25 4.25 0 0 1 8.5 0v5.25a5.75 5.75 0 1 1-11.5 0V6.5a.75.75 0 0 1 1.5 0Z" />
                       Attach files, or drag &amp; drop them here
                       <span className="ml-auto font-mono" style={{ fontSize: 11 }}>max {MAX_TOTAL_MB} MB</span>
@@ -281,7 +288,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
 
                 {/* attachment chips */}
                 {files.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2 sm:pl-[46px]">
+                  <div className="mt-2 flex flex-wrap gap-2 lg:pl-[46px]">
                     {files.map((f) => {
                       const key = f.name + f.size + f.lastModified;
                       return (
@@ -295,20 +302,20 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                   </div>
                 )}
 
-                <p className="mt-2 sm:pl-[46px]" style={{ fontSize: 11.5, color: "var(--fg-50)" }}>
-                  <Ico s={13} d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 7.5a.75.75 0 0 1 1.5 0v4a.75.75 0 0 1-1.5 0v-4ZM8 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" /> Select any text, then click a button to format it, just like a document.
+                <p className="mt-2 hidden items-start gap-1.5 lg:flex lg:pl-[46px]" style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--fg-70)" }}>
+                  <Ico s={14} d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 7.5a.75.75 0 0 1 1.5 0v4a.75.75 0 0 1-1.5 0v-4ZM8 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" /> <span>Select any text, then click a button to format it, just like a document.</span>
                 </p>
               </div>
 
               {(error || status === "error" || overSize || over) && (
-                <div className="mt-3 rounded-md px-3 py-2 sm:ml-[46px]" style={{ fontSize: 13, color: "#f85149", background: "rgba(248,81,73,0.1)", border: "1px solid rgba(248,81,73,0.4)" }}>
+                <div className="mt-3 rounded-md px-3 py-2 lg:ml-[46px]" style={{ fontSize: 13, color: "#f85149", background: "rgba(248,81,73,0.1)", border: "1px solid rgba(248,81,73,0.4)" }}>
                   {error || (over ? `Message is too long (${textLen}/${MESSAGE_MAX}).` : overSize ? `Attachments exceed ${MAX_TOTAL_MB} MB.` : "Something went wrong sending your message. Please try again.")}
                 </div>
               )}
 
-              <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
-                <span className="font-mono" style={{ fontSize: 11.5, color: "var(--fg-50)" }}>Name {name.length}/{NAME_MAX} · Email {email.length}/{EMAIL_MAX}</span>
-                <button onClick={submit} disabled={status === "sending"} className="issue-submit flex items-center gap-2 rounded-md px-4 py-2 font-semibold transition-all disabled:opacity-60" style={{ fontSize: 14, color: "#fff", background: GREEN, border: `1px solid ${GREEN}`, boxShadow: `0 4px 14px ${GREEN}55` }}>
+              <div className="mt-4 flex flex-col-reverse items-stretch gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
+                <span className="text-center font-mono lg:text-left" style={{ fontSize: 12, color: "var(--fg-70)" }}>Name {name.length}/{NAME_MAX} · Email {email.length}/{EMAIL_MAX}</span>
+                <button onClick={submit} disabled={status === "sending"} className="issue-submit flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-all disabled:opacity-60 lg:w-auto lg:rounded-md lg:py-2" style={{ fontSize: 15, color: "#fff", background: GREEN, border: `1px solid ${GREEN}`, boxShadow: `0 4px 14px ${GREEN}55` }}>
                   {status === "sending" ? (
                     <>
                       <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
@@ -327,9 +334,10 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         </div>
 
         {/* SIDEBAR */}
-        <aside className="px-4 py-4 sm:px-5">
-          <div className="pb-4" style={{ borderBottom: "1px solid var(--surface-border)" }}>
-            <div className="mb-2 flex items-center justify-between text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>
+        <aside className="px-4 py-5 min-[380px]:px-5 sm:px-6">
+          {/* Assignees — desktop only (cleaner, app-like mobile keeps just the form + Connect) */}
+          <div className="hidden pb-4 lg:block" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
+            <div className="mb-2 flex items-center justify-between text-[13px] font-semibold" style={{ color: "var(--fg-70)" }}>
               Assignees <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
             </div>
             <a href={links.find((l) => /github/i.test(l.title))?.href || "https://github.com/Mouaz7"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ fontSize: 13.5, color: "var(--fg)" }}>
@@ -338,9 +346,10 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
             </a>
           </div>
 
+          {/* Labels — desktop only */}
           {labels.length > 0 && (
-          <div className="py-4" style={{ borderBottom: "1px solid var(--surface-border)" }}>
-            <div className="mb-2 flex items-center justify-between text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>
+          <div className="hidden py-4 lg:block" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
+            <div className="mb-2 flex items-center justify-between text-[13px] font-semibold" style={{ color: "var(--fg-70)" }}>
               Labels <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -352,7 +361,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                     type="button"
                     aria-pressed={on}
                     onClick={() => toggleLabel(l.text)}
-                    className="flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono transition-all"
+                    className="label-pill flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono transition-all"
                     style={{
                       fontSize: 11,
                       fontWeight: on ? 700 : 500,
@@ -368,7 +377,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                 );
               })}
             </div>
-            <p className="mt-2 leading-snug" style={{ fontSize: 11, color: "var(--fg-50)" }}>
+            <p className="mt-2 leading-snug" style={{ fontSize: 12, color: "var(--fg-70)" }}>
               {picked.length ? `${picked.length} selected and added to your message.` : "Tap any that fit your message."}
             </p>
           </div>
@@ -376,22 +385,22 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
 
           {links.length > 0 && (
           <div className="pt-4">
-            <div className="mb-2.5 text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>Connect</div>
-            <div className="flex flex-col gap-1.5">
+            <div className="mb-3 text-center text-[13px] font-semibold lg:mb-2.5 lg:text-left" style={{ color: "var(--fg-70)" }}>Connect</div>
+            <div className="connect-grid flex flex-col gap-1">
               {links.map((l) => (
                 <a
                   key={l.id}
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="connect-link group flex items-center gap-2.5 rounded-md px-1 py-1.5 transition-all"
-                  style={{ fontSize: 13.5, color: "var(--fg)" }}
+                  className="connect-link group flex items-center gap-3 rounded-md px-1.5 py-2 transition-all"
+                  style={{ fontSize: 15, color: "var(--fg)", ["--brand" as string]: l.color || "var(--gh-link)" } as React.CSSProperties}
                 >
-                  <svg className="shrink-0" width="22" height="22" viewBox={l.viewBox || "0 0 24 24"} fill="currentColor" style={{ color: l.color || "var(--gh-link)" }} aria-hidden>
+                  <svg className="connect-ico shrink-0" width="26" height="26" viewBox={l.viewBox || "0 0 24 24"} fill="currentColor" style={{ color: l.color || "var(--gh-link)" }} aria-hidden>
                     <path d={l.svgPath} />
                   </svg>
-                  <span className="font-semibold">{l.title}</span>
-                  <svg className="ml-auto shrink-0 opacity-0 transition-opacity group-hover:opacity-100" width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style={{ color: "var(--fg-50)" }} aria-hidden>
+                  <span className="connect-title hidden font-semibold lg:inline">{l.title}</span>
+                  <svg className="connect-chevron ml-auto hidden shrink-0 opacity-0 transition-opacity group-hover:opacity-100 lg:block" width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style={{ color: "var(--fg-50)" }} aria-hidden>
                     <path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z" />
                   </svg>
                 </a>
@@ -404,16 +413,44 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
 
       <style>{`
         @keyframes issueIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: none; } }
+        @keyframes neonPulse {
+          0%, 100% { box-shadow: 0 0 0 0 ${GREEN}55, 0 4px 18px ${GREEN}55; }
+          50%       { box-shadow: 0 0 0 5px ${GREEN}18, 0 6px 28px ${GREEN}77; }
+        }
         .contact-issue { animation: issueIn .5s cubic-bezier(.2,.7,.2,1) both; }
-        .issue-submit:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 20px ${GREEN}66; }
+        .issue-submit { animation: neonPulse 2.4s ease-in-out infinite; }
+        .issue-submit:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); animation: none; box-shadow: 0 0 0 5px ${GREEN}30, 0 8px 28px ${GREEN}88; }
         .connect-link:hover { background: var(--gh-row-hover); transform: translateX(2px); }
-        .ce { outline: none; overflow-y: auto; max-height: 360px; }
-        .ce:empty:before { content: attr(data-ph); color: var(--fg-50); pointer-events: none; }
+        .contact-issue input::placeholder { color: var(--fg-50); opacity: 1; }
+        .ce { outline: none; overflow-y: auto; overflow-x: hidden; max-height: 360px; overflow-wrap: anywhere; word-break: break-word; }
+        .ce:empty:before { content: attr(data-ph); color: var(--fg-70); opacity: .85; pointer-events: none; }
         .ce code { padding: .12em .35em; border-radius: 4px; background: color-mix(in srgb, var(--surface) 50%, transparent); border: 1px solid var(--surface-border); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
         .ce a { color: var(--gh-link); text-decoration: underline; }
         .ce blockquote { border-left: 3px solid var(--surface-border); margin: 4px 0; padding-left: 12px; color: var(--fg-70); }
         .ce ul { padding-left: 22px; list-style: disc; margin: 4px 0; }
         .ce ol { padding-left: 22px; list-style: decimal; margin: 4px 0; }
+        /* mobile/tablet (single-column, below the lg layout breakpoint):
+           one consistent mobile experience across every phone size */
+        @media (max-width: 1023.98px) {
+          .contact-issue .ce { font-size: 16px; min-height: 150px; }
+          .contact-issue input { font-size: 16px; }
+          /* Connect becomes one row of round, brand-glowing icon buttons (always 4 across) */
+          .connect-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; justify-items: center; padding-top: 6px; }
+          .connect-grid .connect-link {
+            width: 56px; height: 56px; max-width: 100%; aspect-ratio: 1; padding: 0; justify-content: center; gap: 0;
+            border-radius: 50%;
+            border: 1.5px solid color-mix(in srgb, var(--brand) 48%, var(--surface-border));
+            background: color-mix(in srgb, var(--brand) 10%, color-mix(in srgb, var(--surface) 55%, transparent));
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--brand) 24%, transparent);
+          }
+          .connect-grid .connect-ico { width: 28px; height: 28px; }
+          .connect-grid .connect-link:active { transform: scale(.93); box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 30%, transparent); }
+          .connect-grid .connect-link:hover { transform: none; }
+          /* bigger, more tappable toolbar buttons */
+          .contact-issue .toolbar-btn { height: 34px; width: 34px; }
+          /* bigger label pills for comfortable tapping */
+          .contact-issue .label-pill { font-size: 12px !important; padding: 5px 11px; }
+        }
       `}</style>
     </div>
   );

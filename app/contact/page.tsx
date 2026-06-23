@@ -27,16 +27,17 @@ const ContactPage: NextPage = () => {
   );
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden" style={{ minHeight: "100dvh" }}>
       {/* Constellation backdrop is rendered globally in app/layout.tsx */}
       <Header />
 
-      <main className="relative z-10 flex-1 overflow-y-auto px-4 py-8 sm:px-6 md:py-10">
-        <div className="mx-auto w-full max-w-[940px]">
+      <main className="relative z-10 flex flex-1 flex-col overflow-y-auto px-4 py-8 sm:px-6 md:py-10">
+        {/* m-auto centers the block vertically when it fits, and still scrolls when it doesn't */}
+        <div className="m-auto w-full max-w-[940px]">
           {/* intro */}
           <div className="mb-6 px-1">
-            <h1 className="font-bold tracking-tight" style={{ fontSize: 28, color: "var(--fg)" }}>Get in touch</h1>
-            <p className="mt-2 max-w-xl" style={{ fontSize: 15, lineHeight: 1.55, color: "var(--fg-70)" }}>
+            <h1 className="text-[24px] font-bold tracking-tight sm:text-[28px]" style={{ color: "var(--fg)" }}>Get in touch</h1>
+            <p className="mt-2 max-w-xl text-[14px] sm:text-[15px]" style={{ lineHeight: 1.55, color: "var(--fg-70)" }}>
               Whether it&apos;s a collaboration, an opportunity, or just a friendly hello, I&apos;d love to hear from you. I&apos;ll get back to you soon.
             </p>
           </div>

@@ -24,8 +24,8 @@
   --bg: #0a0b10;
   --bg-rgb: 10, 11, 16;
   --fg: #f4f6fb;
-  --fg-70: rgba(244, 246, 251, 0.72);
-  --fg-50: rgba(244, 246, 251, 0.54);
+  --fg-70: rgba(244, 246, 251, 0.84);
+  --fg-50: rgba(244, 246, 251, 0.66);
   --fg-10: rgba(244, 246, 251, 0.1);
 
   /* Modern cyan / teal accent (DB-driven via site_theme; these are fallbacks) */
@@ -70,8 +70,8 @@ html.light {
   --bg: #f6f7fb;
   --bg-rgb: 246, 247, 251;
   --fg: #0c0d14;
-  --fg-70: rgba(12, 13, 20, 0.72);
-  --fg-50: rgba(12, 13, 20, 0.55);
+  --fg-70: rgba(12, 13, 20, 0.86);
+  --fg-50: rgba(12, 13, 20, 0.68);
   --fg-10: rgba(12, 13, 20, 0.08);
 
   --accent: #0bb89e;
