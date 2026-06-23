@@ -16,9 +16,11 @@ const BranchIcon = ({ size = 12, color = "currentColor" }: { size?: number; colo
     <path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" />
   </svg>
 );
-const VerifiedIcon = ({ size = 12 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-    <path d="M9.585.52a2.678 2.678 0 0 0-3.17 0l-.928.68a1.178 1.178 0 0 1-.518.215L3.83 1.59a2.678 2.678 0 0 0-2.24 2.24l-.175 1.14a1.178 1.178 0 0 1-.215.518l-.68.928a2.678 2.678 0 0 0 0 3.17l.68.928c.113.153.186.33.215.518l.175 1.14a2.678 2.678 0 0 0 2.24 2.24l1.14.175c.187.029.365.102.518.215l.928.68a2.678 2.678 0 0 0 3.17 0l.928-.68a1.17 1.17 0 0 1 .518-.215l1.14-.175a2.678 2.678 0 0 0 2.24-2.24l.175-1.14c.029-.187.102-.365.215-.518l.68-.928a2.678 2.678 0 0 0 0-3.17l-.68-.928a1.179 1.179 0 0 1-.215-.518L14.41 3.83a2.678 2.678 0 0 0-2.24-2.24l-1.14-.175a1.178 1.178 0 0 1-.518-.215L9.585.52ZM7.303 1.728c.234-.171.55-.171.784 0l.928.68c.27.2.583.329.912.379l1.14.175c.29.044.518.272.562.562l.175 1.14c.05.329.18.642.378.912l.68.928c.172.234.172.55 0 .784l-.68.928a2.678 2.678 0 0 0-.378.912l-.175 1.14a.678.678 0 0 1-.562.562l-1.14.175a2.678 2.678 0 0 0-.912.379l-.928.68a.678.678 0 0 1-.784 0l-.928-.68a2.678 2.678 0 0 0-.912-.379l-1.14-.175a.678.678 0 0 1-.562-.562l-.175-1.14a2.678 2.678 0 0 0-.379-.912l-.68-.928a.678.678 0 0 1 0-.784l.68-.928c.2-.27.329-.583.379-.912l.175-1.14a.678.678 0 0 1 .562-.562l1.14-.175a2.678 2.678 0 0 0 .912-.379l.928-.68ZM11.28 6.78a.75.75 0 0 0-1.06-1.06L7 8.94 5.78 7.72a.75.75 0 0 0-1.06 1.06l1.75 1.75a.75.75 0 0 0 1.06 0l3.75-3.75Z" />
+// fallback path (used until the database icon loads, or if the fetch fails)
+const VERIFIED_FALLBACK = "M9.585.52a2.678 2.678 0 0 0-3.17 0l-.928.68a1.178 1.178 0 0 1-.518.215L3.83 1.59a2.678 2.678 0 0 0-2.24 2.24l-.175 1.14a1.178 1.178 0 0 1-.215.518l-.68.928a2.678 2.678 0 0 0 0 3.17l.68.928c.113.153.186.33.215.518l.175 1.14a2.678 2.678 0 0 0 2.24 2.24l1.14.175c.187.029.365.102.518.215l.928.68a2.678 2.678 0 0 0 3.17 0l.928-.68a1.17 1.17 0 0 1 .518-.215l1.14-.175a2.678 2.678 0 0 0 2.24-2.24l.175-1.14c.029-.187.102-.365.215-.518l.68-.928a2.678 2.678 0 0 0 0-3.17l-.68-.928a1.179 1.179 0 0 1-.215-.518L14.41 3.83a2.678 2.678 0 0 0-2.24-2.24l-1.14-.175a1.178 1.178 0 0 1-.518-.215L9.585.52ZM11.28 6.78a.75.75 0 0 0-1.06-1.06L7 8.94 5.78 7.72a.75.75 0 0 0-1.06 1.06l1.75 1.75a.75.75 0 0 0 1.06 0l3.75-3.75Z";
+const VerifiedIcon = ({ size = 12, icon }: { size?: number; icon?: { svgPath: string; viewBox?: string } }) => (
+  <svg width={size} height={size} viewBox={icon?.viewBox || "0 0 16 16"} fill="currentColor" aria-hidden>
+    <path d={icon?.svgPath || VERIFIED_FALLBACK} />
   </svg>
 );
 const RepoIcon = ({ size = 15, color = "currentColor" }: { size?: number; color?: string }) => (
@@ -51,6 +53,15 @@ export default function GitGraphTimeline({
     apply();
     mq.addEventListener?.("change", apply);
     return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
+  // database-driven UI icons (e.g. the "verified" badge), with inline fallbacks
+  const [icons, setIcons] = useState<Record<string, { svgPath: string; viewBox?: string }>>({});
+  useEffect(() => {
+    fetch("/api/ui-icons")
+      .then((r) => (r.ok ? r.json() : { icons: {} }))
+      .then((d) => { if (d?.icons && typeof d.icons === "object") setIcons(d.icons); })
+      .catch(() => {});
   }, []);
 
   const sorted = useMemo(
@@ -274,9 +285,9 @@ export default function GitGraphTimeline({
                         {!isMobile && (
                           <span
                             className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-mono font-semibold"
-                            style={{ fontSize: 10.5, color: "#3fb950", background: "#3fb95018", border: "1px solid #3fb95040" }}
+                            style={{ fontSize: 10.5, color: accentColor, background: `color-mix(in srgb, ${accentColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${accentColor} 35%, transparent)` }}
                           >
-                            <VerifiedIcon size={11} /> Verified
+                            <VerifiedIcon size={12} icon={icons.verified} /> Verified
                           </span>
                         )}
                       </div>

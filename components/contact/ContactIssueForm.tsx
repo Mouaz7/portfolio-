@@ -4,6 +4,7 @@ import { isValidEmail, NAME_MAX, EMAIL_MAX, MESSAGE_MAX } from "@/lib/contact/va
 
 type LinkItem = { id: number; title: string; href: string; svgPath: string; viewBox?: string; color?: string | null };
 type LabelItem = { id: number; text: string; color: string };
+type IconDef = { svgPath: string; viewBox?: string };
 type SendFn = (p: { name: string; email: string; message: string; files: File[] }) => Promise<boolean> | boolean;
 
 const MAX_TOTAL_MB = 10;
@@ -64,6 +65,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
   const [error, setError] = useState("");
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [labels, setLabels] = useState<LabelItem[]>([]);
+  const [icons, setIcons] = useState<Record<string, IconDef>>({});
   const [dragging, setDragging] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -76,6 +78,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
       .then((d) => {
         if (Array.isArray(d?.socials)) setLinks(d.socials);
         if (Array.isArray(d?.labels)) setLabels(d.labels);
+        if (d?.icons && typeof d.icons === "object") setIcons(d.icons);
       })
       .catch(() => {});
   }, []);
@@ -130,6 +133,12 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
   };
 
   const toggleLabel = (t: string) => setPicked((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
+
+  // gear icon is database driven (ui_icon), with the inline path as a fallback
+  const Gear = ({ s = 19 }: { s?: number }) => {
+    const g = icons.gear;
+    return <Ico d={g?.svgPath || I.gear} s={s} vb={g?.viewBox || "0 0 16 16"} />;
+  };
 
   const submit = async () => {
     setError("");
@@ -321,7 +330,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         <aside className="px-4 py-4 sm:px-5">
           <div className="pb-4" style={{ borderBottom: "1px solid var(--surface-border)" }}>
             <div className="mb-2 flex items-center justify-between text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>
-              Assignees <span style={{ color: "var(--fg-70)" }}><Ico d={I.gear} s={17} /></span>
+              Assignees <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
             </div>
             <a href={links.find((l) => /github/i.test(l.title))?.href || "https://github.com/Mouaz7"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ fontSize: 13.5, color: "var(--fg)" }}>
               <span className="grid h-6 w-6 place-items-center rounded-full font-bold" style={{ background: "var(--accent)", color: "#04201b", fontSize: 12 }}>M</span>
@@ -332,7 +341,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
           {labels.length > 0 && (
           <div className="py-4" style={{ borderBottom: "1px solid var(--surface-border)" }}>
             <div className="mb-2 flex items-center justify-between text-[12.5px] font-semibold" style={{ color: "var(--fg-70)" }}>
-              Labels <span style={{ color: "var(--fg-70)" }}><Ico d={I.gear} s={17} /></span>
+              Labels <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {labels.map((l) => {
@@ -378,7 +387,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                   className="connect-link group flex items-center gap-2.5 rounded-md px-1 py-1.5 transition-all"
                   style={{ fontSize: 13.5, color: "var(--fg)" }}
                 >
-                  <svg className="shrink-0" width="18" height="18" viewBox={l.viewBox || "0 0 24 24"} fill="currentColor" style={{ color: l.color || "var(--gh-link)" }} aria-hidden>
+                  <svg className="shrink-0" width="22" height="22" viewBox={l.viewBox || "0 0 24 24"} fill="currentColor" style={{ color: l.color || "var(--gh-link)" }} aria-hidden>
                     <path d={l.svgPath} />
                   </svg>
                   <span className="font-semibold">{l.title}</span>
