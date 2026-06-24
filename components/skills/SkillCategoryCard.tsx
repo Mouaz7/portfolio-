@@ -33,7 +33,7 @@ export function SkillCategoryCard({
 
   return (
     <section
-      className={`skill-card animate-row group/card relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border p-[clamp(0.5rem,1.4vh,1rem)]${fill ? " h-full" : ""}`}
+      className={`skill-card animate-row group/card relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border p-[clamp(0.5rem,1.4vh,1rem)] ${fill ? "h-full" : ""}`}
       style={{
         ["--cat-rgb" as string]: catRgb,
         borderColor: "rgba(var(--cat-rgb),0.22)",
@@ -63,11 +63,12 @@ export function SkillCategoryCard({
 
       {/* heading — centered */}
       <div className="flex min-w-0 flex-col items-center text-center">
-        <h2 className="flex min-w-0 max-w-full items-center gap-1.5 text-[clamp(0.82rem,1.95vh,1.1rem)] font-semibold leading-tight tracking-tight" style={{ color: "var(--fg)" }}>
-          <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "rgb(var(--cat-rgb))", boxShadow: "0 0 8px rgba(var(--cat-rgb),0.8)" }} />
+        <h2 className="flex min-w-0 max-w-full items-center gap-2 text-[clamp(0.95rem,2.2vh,1.3rem)] font-bold leading-tight tracking-tight" style={{ color: "var(--fg)" }}>
+          <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: "rgb(var(--cat-rgb))", boxShadow: "0 0 8px rgba(var(--cat-rgb),0.8)" }} />
           <span className="truncate">{title}</span>
         </h2>
-        <p className="mt-0.5 line-clamp-2 text-[clamp(0.55rem,1.3vh,0.72rem)] leading-snug" style={{ color: "var(--fg-50)" }}>
+        {/* clear description subtitle under the heading (like the reference) */}
+        <p className="mt-1 line-clamp-2 max-w-[34ch] text-[clamp(0.62rem,1.45vh,0.82rem)] font-normal leading-snug" style={{ color: "var(--fg-50)" }}>
           {blurb}
         </p>
       </div>
@@ -76,17 +77,17 @@ export function SkillCategoryCard({
           height so the whole board fills the screen; on desktop the icons are a
           fixed size and the card is natural-height (scaled by FitToScreen). */}
       <div
-        className={`mt-[clamp(0.4rem,1.2vh,0.85rem)] grid grid-cols-3 gap-[clamp(0.25rem,0.8vh,0.55rem)]${fill ? " min-h-0 flex-1" : ""}`}
+        className={`mt-[clamp(0.4rem,1.2vh,0.85rem)] grid grid-cols-3 gap-[clamp(0.25rem,0.8vh,0.55rem)] ${fill ? "min-h-0 flex-1" : ""}`}
         style={fill ? { gridTemplateRows: `repeat(${Math.ceil(items.length / 3)}, minmax(0, 1fr))` } : undefined}
       >
         {items.map((s) => (
           <div
             key={s.id}
-            className="group/icon flex min-h-0 min-w-0 flex-col items-center justify-center gap-[clamp(0.1rem,0.5vh,0.3rem)] p-0 sm:p-1"
+            className={`group/icon flex min-h-0 min-w-0 flex-col items-center justify-center gap-[clamp(0.1rem,0.5vh,0.3rem)] p-0 sm:p-1 ${fill ? "h-full" : ""}`}
             title={s.name}
           >
             <div
-              className={`relative aspect-square transition-transform duration-300 group-hover/icon:scale-[1.1] ${fill ? "w-[clamp(1.7rem,7vmin,2.9rem)]" : "w-[clamp(1.5rem,4.8vh,2.4rem)]"}`}
+              className={`relative transition-transform duration-300 group-hover/icon:scale-[1.1] ${fill ? "min-h-0 w-full flex-1" : "aspect-square w-[clamp(1.5rem,4.8vh,2.4rem)]"}`}
             >
               <SkillIcon s={s} />
             </div>

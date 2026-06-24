@@ -79,16 +79,16 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
   const rows = cats.filter((c) => (byCat[c.key]?.length ?? 0) > 0);
 
   return (
-    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.5rem,2vh,1.25rem)]${fill ? " h-full" : ""}`}>
+    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.5rem,2vh,1.25rem)] ${fill ? "h-full" : ""}`}>
       {/* Editorial header — compact so all rows fit on one screen */}
       <header className="animate-row shrink-0 pb-[clamp(0.5rem,1.6vh,1rem)]" style={{ animationFillMode: "both" }}>
         <p
-          className="text-[clamp(0.6rem,1.4vh,0.72rem)] font-medium uppercase tracking-[0.32em]"
+          className="text-[clamp(0.55rem,1.1vh,0.66rem)] font-medium uppercase tracking-[0.3em]"
           style={{ color: "rgba(var(--accent-rgb),0.95)" }}
         >
           Toolbox
         </p>
-        <h1 className="mt-1 text-[clamp(1.5rem,4.5vh,2.75rem)] font-bold leading-[1.05] tracking-tight">
+        <h1 className="mt-0.5 text-[clamp(1.15rem,3vh,1.85rem)] font-bold leading-[1.05] tracking-tight">
           Skills &amp; Technologies
         </h1>
       </header>
@@ -96,7 +96,7 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
       {/* Category cards in a responsive grid — 2-up on phones, 3-up on larger
           screens — so every icon keeps its full label and it all still fits one
           screen (scaled by FitToScreen), no scrolling. */}
-      <div className={`grid grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] sm:grid-cols-3${fill ? " min-h-0 flex-1 auto-rows-fr" : ""}`}>
+      <div className={`grid grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] sm:grid-cols-3 ${fill ? "min-h-0 flex-1 auto-rows-fr" : ""}`}>
         {rows.map((c, i) => (
           <SkillCategoryCard
             key={c.key}
