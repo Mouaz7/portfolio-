@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { isValidEmail, NAME_MAX, EMAIL_MAX, MESSAGE_MAX } from "@/lib/contact/validate";
 
 type LinkItem = { id: number; title: string; href: string; svgPath: string; viewBox?: string; color?: string | null };
@@ -182,13 +181,12 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
       style={{
         background: "color-mix(in srgb, var(--surface) 92%, transparent)",
         backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid var(--surface-border)", boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+        border: "1px solid var(--surface-border)", boxShadow: "none",
       }}
     >
       {/* header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3.5 min-[380px]:px-5 sm:px-6" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
+      <div className="head-pane flex flex-wrap items-center justify-between gap-2 px-4 py-3.5 min-[380px]:px-5 sm:px-6" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
         <div className="flex min-w-0 items-center gap-2 font-mono" style={{ fontSize: 15, color: "var(--fg)" }}>
-          <Image src="/logo.svg" alt="Mouaz Naji" width={26} height={26} className="shrink-0 rounded-md" style={{ boxShadow: "0 0 0 1px var(--surface-border)" }} priority />
           <Ico s={18} d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
           <span className="font-semibold" style={{ color: "var(--fg-70)" }}>Mouaz7</span>
           <span style={{ color: "var(--fg-50)" }}>/</span>
@@ -202,7 +200,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_252px]">
         {/* MAIN */}
-        <div className="min-w-0 px-4 py-5 min-[380px]:px-5 sm:px-6" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
+        <div className="main-pane min-w-0 px-4 py-5 min-[380px]:px-5 sm:px-6">
           {status === "ok" ? (
             <div className="grid place-items-center py-16 text-center">
               <div className="grid h-14 w-14 place-items-center rounded-full" style={{ background: `${GREEN}22`, border: `1px solid ${GREEN}66` }}>
@@ -229,7 +227,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               </div>
 
               {/* comment editor (WYSIWYG) with avatar bubble */}
-              <div className="mt-4">
+              <div className="comment-block mt-4">
                 <label className={label} style={{ color: "var(--fg)" }}>Add a comment</label>
                 <div className="flex gap-2.5">
                   <div className="hidden shrink-0 lg:block">
@@ -250,7 +248,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                     <span aria-hidden className="absolute hidden lg:block" style={{ left: -7, top: 13, width: 12, height: 12, transform: "rotate(45deg)", background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderLeft: "1px solid var(--surface-border)", borderBottom: "1px solid var(--surface-border)" }} />
 
                     {/* toolbar — formats instantly */}
-                    <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5" style={{ background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderBottom: "1px solid var(--surface-border)" }}>
+                    <div className="comment-toolbar flex flex-wrap items-center gap-0.5 px-2 py-1.5" style={{ background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderBottom: "1px solid var(--surface-border)" }}>
                       {tools.map(({ k, fn, t }, i) => (
                         <React.Fragment key={k}>
                           {(i === 2 || i === 4) && <span className="mx-1 h-4 w-px" style={{ background: "var(--surface-border)" }} />}
@@ -277,7 +275,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                     />
 
                     {/* attach */}
-                    <button type="button" onClick={() => fileRef.current?.click()} className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 13, color: "var(--fg-70)", borderTop: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 45%, transparent)" }}>
+                    <button type="button" onClick={() => fileRef.current?.click()} className="attach-row flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 13, color: "var(--fg-70)", borderTop: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 45%, transparent)" }}>
                       <Ico s={15} d="M3.5 6.5v3.25a4.25 4.25 0 0 0 8.5 0V4.5a2.75 2.75 0 1 0-5.5 0v5.25a1.25 1.25 0 1 0 2.5 0V6.5a.75.75 0 0 1 1.5 0v3.25a2.75 2.75 0 1 1-5.5 0V4.5a4.25 4.25 0 0 1 8.5 0v5.25a5.75 5.75 0 1 1-11.5 0V6.5a.75.75 0 0 1 1.5 0Z" />
                       Attach files, or drag &amp; drop them here
                       <span className="ml-auto font-mono" style={{ fontSize: 11 }}>max {MAX_TOTAL_MB} MB</span>
@@ -313,7 +311,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                 </div>
               )}
 
-              <div className="mt-4 flex flex-col-reverse items-stretch gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
+              <div className="submit-row mt-4 flex flex-col-reverse items-stretch gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
                 <span className="text-center font-mono lg:text-left" style={{ fontSize: 12, color: "var(--fg-70)" }}>Name {name.length}/{NAME_MAX} · Email {email.length}/{EMAIL_MAX}</span>
                 <button onClick={submit} disabled={status === "sending"} className="issue-submit flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-all disabled:opacity-60 lg:w-auto lg:rounded-md lg:py-2" style={{ fontSize: 15, color: "#fff", background: GREEN, border: `1px solid ${GREEN}`, boxShadow: `0 4px 14px ${GREEN}55` }}>
                   {status === "sending" ? (
@@ -334,7 +332,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         </div>
 
         {/* SIDEBAR */}
-        <aside className="px-4 py-5 min-[380px]:px-5 sm:px-6">
+        <aside className="side-pane px-4 py-5 min-[380px]:px-5 sm:px-6">
           {/* Assignees — desktop only (cleaner, app-like mobile keeps just the form + Connect) */}
           <div className="hidden pb-4 lg:block" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
             <div className="mb-2 flex items-center justify-between text-[13px] font-semibold" style={{ color: "var(--fg-70)" }}>
@@ -385,7 +383,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
 
           {links.length > 0 && (
           <div className="pt-4">
-            <div className="mb-3 text-center text-[13px] font-semibold lg:mb-2.5 lg:text-left" style={{ color: "var(--fg-70)" }}>Connect</div>
+            <div className="connect-head mb-3 text-center text-[13px] font-semibold lg:mb-2.5 lg:text-left" style={{ color: "var(--fg-70)" }}>Connect</div>
             <div className="connect-grid flex flex-col gap-1">
               {links.map((l) => (
                 <a
@@ -413,13 +411,9 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
 
       <style>{`
         @keyframes issueIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: none; } }
-        @keyframes neonPulse {
-          0%, 100% { box-shadow: 0 0 0 0 ${GREEN}55, 0 4px 18px ${GREEN}55; }
-          50%       { box-shadow: 0 0 0 5px ${GREEN}18, 0 6px 28px ${GREEN}77; }
-        }
         .contact-issue { animation: issueIn .5s cubic-bezier(.2,.7,.2,1) both; }
-        .issue-submit { animation: neonPulse 2.4s ease-in-out infinite; }
-        .issue-submit:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); animation: none; box-shadow: 0 0 0 5px ${GREEN}30, 0 8px 28px ${GREEN}88; }
+        .issue-submit { box-shadow: none; }
+        .issue-submit:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); box-shadow: none; }
         .connect-link:hover { background: var(--gh-row-hover); transform: translateX(2px); }
         .contact-issue input::placeholder { color: var(--fg-50); opacity: 1; }
         .ce { outline: none; overflow-y: auto; overflow-x: hidden; max-height: 360px; overflow-wrap: anywhere; word-break: break-word; }
@@ -429,15 +423,31 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
         .ce blockquote { border-left: 3px solid var(--surface-border); margin: 4px 0; padding-left: 12px; color: var(--fg-70); }
         .ce ul { padding-left: 22px; list-style: disc; margin: 4px 0; }
         .ce ol { padding-left: 22px; list-style: decimal; margin: 4px 0; }
+        /* On desktop the form is the LEFT column, so it keeps a divider under it.
+           On mobile the form stacks ON TOP of the Connect section, where that same
+           divider made the bottom look like a separate nested box — so it's only
+           applied at the lg layout breakpoint. */
+        @media (min-width: 1024px) {
+          .contact-issue .main-pane { border-bottom: 1px solid color-mix(in srgb, var(--surface-border) 60%, transparent); }
+        }
         /* mobile/tablet (single-column, below the lg layout breakpoint):
            one consistent mobile experience across every phone size */
         @media (max-width: 1023.98px) {
-          .contact-issue .ce { font-size: 16px; min-height: 150px; }
+          /* Compact the form so the whole contact page fits a phone screen without
+             scrolling (the form keeps the same size across all phones). */
+          .contact-issue .ce { font-size: 16px; min-height: 78px; max-height: 180px; }
           .contact-issue input { font-size: 16px; }
+          .contact-issue .head-pane { padding-top: 9px; padding-bottom: 9px; }
+          .contact-issue .main-pane { padding-top: 12px; padding-bottom: 12px; }
+          .contact-issue .side-pane { padding-top: 10px; padding-bottom: 12px; }
+          /* tighten vertical rhythm so the whole card fits a small phone screen */
+          .contact-issue .comment-block { margin-top: 12px; }
+          .contact-issue .submit-row { margin-top: 12px; }
+          .contact-issue .connect-head { margin-bottom: 8px; }
           /* Connect becomes one row of round, brand-glowing icon buttons (always 4 across) */
           .connect-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; justify-items: center; padding-top: 6px; }
           .connect-grid .connect-link {
-            width: 56px; height: 56px; max-width: 100%; aspect-ratio: 1; padding: 0; justify-content: center; gap: 0;
+            width: 100%; max-width: 56px; aspect-ratio: 1; padding: 0; justify-content: center; gap: 0;
             border-radius: 50%;
             border: 1.5px solid color-mix(in srgb, var(--brand) 48%, var(--surface-border));
             background: color-mix(in srgb, var(--brand) 10%, color-mix(in srgb, var(--surface) 55%, transparent));

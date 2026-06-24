@@ -204,7 +204,7 @@ const ProjectsPageClient: React.FC = () => {
                 backdropFilter: "blur(14px)",
                 WebkitBackdropFilter: "blur(14px)",
                 border: "1px solid var(--surface-border)",
-                boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                boxShadow: "none",
               }}
             >
               {/* panel header */}

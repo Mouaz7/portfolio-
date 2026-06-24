@@ -24,7 +24,7 @@ export default function LoadingAnimation({ text }: LoadingAnimationProps) {
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
           border: "1px solid var(--surface-border)",
-          boxShadow: "0 18px 50px rgba(0,0,0,0.28)",
+          boxShadow: "none",
           fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
         }}
       >

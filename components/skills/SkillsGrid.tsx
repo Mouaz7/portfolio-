@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SkillRow } from "./SkillRow";
+import { SkillCategoryCard } from "./SkillCategoryCard";
 import LoadingAnimation from "@/components/ui/LoadingAnimation";
 
 export type UISkill = {
@@ -16,7 +16,7 @@ export type UISkill = {
 
 type Category = { key: string; title: string; blurb: string; accentRgb?: string | null };
 
-export default function SkillsGrid() {
+export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
   const [allSkills, setAllSkills] = useState<UISkill[]>([]);
   const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function SkillsGrid() {
 
   if (loading) {
     return (
-      <main className="flex items-center justify-center h-full">
+      <main className="flex min-h-[70vh] items-center justify-center">
         <LoadingAnimation text="Loading skills..." />
       </main>
     );
@@ -65,11 +65,11 @@ export default function SkillsGrid() {
 
   if (error || cats.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center h-full gap-4 text-center px-6">
-        <p className="text-white/40 text-sm">
+      <main className="flex min-h-[70vh] flex-col items-center justify-center gap-4 text-center px-6">
+        <p className="text-sm" style={{ color: "var(--fg-50)" }}>
           {error ? "Kunde inte hämta skills från databasen." : "Inga skills hittades i databasen."}
         </p>
-        <p className="text-white/25 text-xs">
+        <p className="text-xs" style={{ color: "var(--fg-50)" }}>
           Konfigurera SUPABASE_ANON_KEY i .env.local och kör setup.sql i Supabase SQL Editor.
         </p>
       </main>
@@ -77,11 +77,9 @@ export default function SkillsGrid() {
   }
 
   const rows = cats.filter((c) => (byCat[c.key]?.length ?? 0) > 0);
-  // Shared column count = the largest category, so icons align across all rows.
-  const columns = Math.max(1, ...rows.map((c) => byCat[c.key]?.length ?? 0));
 
   return (
-    <main className="mx-auto flex h-full w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.5rem,2vh,1.25rem)]">
+    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.5rem,2vh,1.25rem)]${fill ? " h-full" : ""}`}>
       {/* Editorial header — compact so all rows fit on one screen */}
       <header className="animate-row shrink-0 pb-[clamp(0.5rem,1.6vh,1rem)]" style={{ animationFillMode: "both" }}>
         <p
@@ -95,18 +93,19 @@ export default function SkillsGrid() {
         </h1>
       </header>
 
-      {/* Rows share the remaining viewport height equally — no scrolling */}
-      <div className="flex min-h-0 flex-1 flex-col">
+      {/* Category cards in a responsive grid — 2-up on phones, 3-up on larger
+          screens — so every icon keeps its full label and it all still fits one
+          screen (scaled by FitToScreen), no scrolling. */}
+      <div className={`grid grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] sm:grid-cols-3${fill ? " min-h-0 flex-1 auto-rows-fr" : ""}`}>
         {rows.map((c, i) => (
-          <SkillRow
+          <SkillCategoryCard
             key={c.key}
             title={c.title}
             blurb={c.blurb}
             accentRgb={c.accentRgb}
             items={byCat[c.key] ?? []}
-            columns={columns}
             index={i + 1}
-            isLast={i === rows.length - 1}
+            fill={fill}
           />
         ))}
       </div>
@@ -117,8 +116,11 @@ export default function SkillsGrid() {
           100% { opacity: 1; transform: translateY(0);    filter: none; }
         }
         .animate-row { animation: rowFadeUp 700ms cubic-bezier(.2,.7,.2,1) both; will-change: transform, opacity, filter; }
+        .skill-card { transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s; }
+        .skill-card:hover { transform: translateY(-3px); border-color: rgba(var(--cat-rgb),0.5) !important; }
         @media (prefers-reduced-motion: reduce) {
           .animate-row { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+          .skill-card:hover { transform: none; }
         }
       `}</style>
     </main>

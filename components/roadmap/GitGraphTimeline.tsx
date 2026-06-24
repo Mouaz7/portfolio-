@@ -121,7 +121,7 @@ export default function GitGraphTimeline({
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
           border: "1px solid var(--surface-border)",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.14)",
+          boxShadow: "none",
         }}
       >
         <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -256,7 +256,7 @@ export default function GitGraphTimeline({
                     WebkitBackdropFilter: "blur(12px)",
                     border: "1px solid var(--surface-border)",
                     borderLeft: `3px solid ${myColor}`,
-                    boxShadow: `0 10px 30px rgba(0,0,0,0.16), 0 0 18px ${myColor}14`,
+                    boxShadow: "none",
                   }}
                 >
                   <div className="flex items-start" style={{ gap: isMobile ? 10 : 14 }}>
