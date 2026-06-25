@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import Header from "@/components/layout/Header";
 import GithubRepoRow, { type Project, type RepoMeta, CATEGORY_META, catColor } from "@/components/projects/GithubRepoRow";
 import LoadingAnimation from "@/components/ui/LoadingAnimation";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
+import { translateOr } from "@/lib/i18n";
 
 type GhRepo = {
   id: number;
@@ -41,6 +43,7 @@ const ProjectsPageClient: React.FC = () => {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"pushed" | "name">("pushed");
   const [isMobile, setIsMobile] = useState(false);
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 680px)");
@@ -99,7 +102,7 @@ const ProjectsPageClient: React.FC = () => {
       const project: Project = db ?? {
         id: String(r.id),
         title: r.name,
-        description: r.description || "No description provided.",
+        description: r.description || t("projects.noDescription"),
         category: deriveCategory(r.language),
         github_url: r.html_url,
         languages: ((r.topics && r.topics.length ? r.topics : r.language ? [r.language] : []) as string[]).slice(0, 6),
@@ -112,7 +115,7 @@ const ProjectsPageClient: React.FC = () => {
       return dbProjects.map((p) => ({ project: p, meta: undefined as RepoMeta | undefined, pushed: 0 }));
     }
     return built;
-  }, [ghRepos, dbBySlug, dbProjects]);
+  }, [ghRepos, dbBySlug, dbProjects, t]);
 
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;
@@ -166,16 +169,19 @@ const ProjectsPageClient: React.FC = () => {
 
   const metaFor = (it: { meta?: RepoMeta }) => it.meta;
   const showEmpty = !loading && merged.length === 0;
+  const categoryLabel = (category: string) => translateOr(language, `projects.categories.${category}`, category);
 
   return (
     <div className="relative flex flex-col overflow-hidden h-screen">
       <Header />
 
-      <main className="relative flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 md:px-8 py-6 md:py-8">
-        <div className="relative z-10 mx-auto w-full max-w-[940px]">
+      {/* Page itself never scrolls (no page-swipe either). The repo list is the
+          only scroll region, contained inside the fixed panel below. */}
+      <main className="relative z-10 flex min-h-0 flex-1 px-4 sm:px-6 md:px-8 py-4 md:py-6">
+        <div className="relative mx-auto flex h-full w-full max-w-[940px] flex-col">
           {loading && merged.length === 0 && (
             <div className="grid place-items-center" style={{ minHeight: "60vh" }}>
-              <LoadingAnimation text="Loading projects..." />
+              <LoadingAnimation text={t("projects.loading")} />
             </div>
           )}
 
@@ -184,7 +190,7 @@ const ProjectsPageClient: React.FC = () => {
               <div className="text-center">
                 <p className="mb-4 text-lg text-red-400">{error}</p>
                 <button onClick={() => window.location.reload()} className="rounded-full bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-strong">
-                  Retry
+                  {t("projects.retry")}
                 </button>
               </div>
             </div>
@@ -192,13 +198,13 @@ const ProjectsPageClient: React.FC = () => {
 
           {showEmpty && (
             <div className="flex items-center justify-center" style={{ minHeight: "60vh" }}>
-              <p style={{ color: "var(--fg-70)" }}>No repositories available right now.</p>
+              <p style={{ color: "var(--fg-70)" }}>{t("projects.noRepos")}</p>
             </div>
           )}
 
           {merged.length > 0 && (
             <div
-              className="flex flex-col overflow-hidden rounded-xl"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl"
               style={{
                 background: "color-mix(in srgb, var(--surface) 72%, transparent)",
                 backdropFilter: "blur(14px)",
@@ -215,10 +221,10 @@ const ProjectsPageClient: React.FC = () => {
                   </svg>
                   <span className="truncate font-semibold" style={{ color: "var(--fg-70)" }}>{GH_USER}</span>
                   <span style={{ color: "var(--fg-50)" }}>/</span>
-                  <span className="truncate font-bold" style={{ color: "var(--gh-link)" }}>repositories</span>
+                  <span className="truncate font-bold" style={{ color: "var(--gh-link)" }}>{t("projects.repositories")}</span>
                 </div>
                 <span className="shrink-0 font-mono" style={{ fontSize: isMobile ? 11 : 12.5, color: "var(--fg-70)" }}>
-                  <span style={{ color: "var(--fg)", fontWeight: 700 }}>{merged.length}</span> repos
+                  <span style={{ color: "var(--fg)", fontWeight: 700 }}>{merged.length}</span> {t("projects.repos")}
                 </span>
               </div>
 
@@ -231,7 +237,7 @@ const ProjectsPageClient: React.FC = () => {
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Find a repository…"
+                    placeholder={t("projects.searchPlaceholder")}
                     className="w-full rounded-md py-1.5 pl-9 pr-3 outline-none transition-colors focus:border-[var(--gh-link)]"
                     style={{ fontSize: 13, color: "var(--fg)", background: "color-mix(in srgb, var(--surface) 50%, transparent)", border: "1px solid var(--surface-border)" }}
                   />
@@ -242,8 +248,8 @@ const ProjectsPageClient: React.FC = () => {
                   className="shrink-0 cursor-pointer rounded-md py-1.5 pl-3 pr-7 font-medium outline-none transition-colors focus:border-[var(--gh-link)]"
                   style={{ fontSize: 12.5, color: "var(--fg-70)", background: "color-mix(in srgb, var(--surface) 50%, transparent)", border: "1px solid var(--surface-border)", appearance: "none", backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='%238b949e'><path d='M4.427 7.427 7.25 10.25a1.06 1.06 0 0 0 1.5 0l2.823-2.823A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z'/></svg>\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center" }}
                 >
-                  <option value="pushed">Sort: Recently pushed</option>
-                  <option value="name">Sort: Name</option>
+                  <option value="pushed">{t("projects.sortRecent")}</option>
+                  <option value="name">{t("projects.sortName")}</option>
                 </select>
               </div>
 
@@ -270,7 +276,7 @@ const ProjectsPageClient: React.FC = () => {
                         }}
                       >
                         <span className="inline-block rounded-full" style={{ width: 9, height: 9, background: color }} />
-                        {category}
+                        {categoryLabel(category)}
                         <span className="rounded-full px-1.5 font-bold" style={{ fontSize: 10, color: "var(--fg-50)", background: "var(--fg-10)" }}>{count}</span>
                       </button>
                     );
@@ -278,19 +284,19 @@ const ProjectsPageClient: React.FC = () => {
                 </div>
                 <span className="shrink-0 font-mono" style={{ fontSize: isMobile ? 10.5 : 12, color: "var(--fg-50)" }}>
                   {searching
-                    ? `${filtered.length} result${filtered.length === 1 ? "" : "s"}`
+                    ? `${filtered.length} ${filtered.length === 1 ? t("projects.resultOne") : t("projects.resultMany")}`
                     : !openCategory && sortBy === "pushed"
-                    ? `${filtered.length} · last 6 months`
-                    : `${filtered.length} repositor${filtered.length === 1 ? "y" : "ies"}`}
+                    ? `${filtered.length} · ${t("projects.lastSixMonths")}`
+                    : `${filtered.length} ${filtered.length === 1 ? t("projects.repositoryOne") : t("projects.repositoryMany")}`}
                 </span>
               </div>
 
-              {/* repo list — all repos, ordered by the Sort dropdown (Recently pushed = latest first) */}
-              <div>
+              {/* repo list — the only scroll area; the page/shell stays fixed */}
+              <div className="min-h-0 flex-1 overflow-y-auto">
                 {filtered.length === 0 ? (
                   <div className="px-5 py-14 text-center" style={{ color: "var(--fg-50)", fontSize: 14 }}>
                     <div style={{ fontSize: 30, marginBottom: 6 }}>🔍</div>
-                    No repositories matched <span style={{ color: "var(--fg-70)", fontWeight: 600 }}>“{query}”</span>.
+                    {t("projects.noMatchStart")} <span style={{ color: "var(--fg-70)", fontWeight: 600 }}>“{query}”</span>.
                   </div>
                 ) : (
                   filtered.map((it, i) => (
@@ -307,7 +313,7 @@ const ProjectsPageClient: React.FC = () => {
                 className="flex shrink-0 items-center justify-center gap-2 px-4 py-3 font-mono font-semibold transition-colors hover:underline"
                 style={{ fontSize: isMobile ? 12 : 13, color: "var(--gh-link)", borderTop: "1px solid var(--surface-border)" }}
               >
-                View all repositories on GitHub
+                {t("projects.viewAllGithub")}
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z" /></svg>
               </a>
             </div>

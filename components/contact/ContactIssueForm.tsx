@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { isValidEmail, NAME_MAX, EMAIL_MAX, MESSAGE_MAX } from "@/lib/contact/validate";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 type LinkItem = { id: number; title: string; href: string; svgPath: string; viewBox?: string; color?: string | null };
 type LabelItem = { id: number; text: string; color: string };
@@ -70,6 +71,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
   const [picked, setPicked] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const edRef = useRef<HTMLDivElement>(null);
+  const { t, dir } = useLanguage();
 
   // social links + selectable labels, both fully database driven
   useEffect(() => {
@@ -112,17 +114,17 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
     syncLen();
   };
   const applyLink = () => {
-    const url = window.prompt("Link URL", "https://");
+    const url = window.prompt(t("contact.linkUrlPrompt"), "https://");
     if (url) exec("createLink", url);
   };
 
   const tools: { k: keyof typeof I; fn: () => void; t: string }[] = [
-    { k: "bold", fn: () => exec("bold"), t: "Bold (Ctrl+B)" },
-    { k: "italic", fn: () => exec("italic"), t: "Italic (Ctrl+I)" },
-    { k: "code", fn: applyCode, t: "Inline code" },
-    { k: "link", fn: applyLink, t: "Link (Ctrl+K)" },
-    { k: "quote", fn: () => exec("formatBlock", "blockquote"), t: "Quote" },
-    { k: "list", fn: () => exec("insertUnorderedList"), t: "Bulleted list" },
+    { k: "bold", fn: () => exec("bold"), t: `${t("contact.tools.bold")} (Ctrl+B)` },
+    { k: "italic", fn: () => exec("italic"), t: `${t("contact.tools.italic")} (Ctrl+I)` },
+    { k: "code", fn: applyCode, t: t("contact.tools.code") },
+    { k: "link", fn: applyLink, t: `${t("contact.tools.link")} (Ctrl+K)` },
+    { k: "quote", fn: () => exec("formatBlock", "blockquote"), t: t("contact.tools.quote") },
+    { k: "list", fn: () => exec("insertUnorderedList"), t: t("contact.tools.list") },
   ];
 
   const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -143,12 +145,12 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
   const submit = async () => {
     setError("");
     const body = edRef.current ? serialize(edRef.current) : "";
-    if (!name.trim() || !email.trim() || !body.trim()) return setError("Please fill in your name, email and message.");
-    if (!isValidEmail(email)) return setError("That email address doesn't look right.");
-    if (body.length > MESSAGE_MAX) return setError(`Message is too long (${body.length}/${MESSAGE_MAX}).`);
-    if (overSize) return setError(`Attachments exceed ${MAX_TOTAL_MB} MB.`);
+    if (!name.trim() || !email.trim() || !body.trim()) return setError(t("contact.errors.required"));
+    if (!isValidEmail(email)) return setError(t("contact.errors.invalidEmail"));
+    if (body.length > MESSAGE_MAX) return setError(`${t("contact.errors.tooLong")} (${body.length}/${MESSAGE_MAX}).`);
+    if (overSize) return setError(`${t("contact.errors.attachments")} ${MAX_TOTAL_MB} MB.`);
     // selected labels are attached to the message so I see the intent of the inquiry
-    const labelLine = picked.length ? `Labels: ${picked.join(", ")}\n\n` : "";
+    const labelLine = picked.length ? `${t("contact.labels")}: ${picked.join(", ")}\n\n` : "";
     const message = labelLine + body;
     setStatus("sending");
     const ok = await onSend({ name, email, message, files });
@@ -190,11 +192,11 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
           <Ico s={18} d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
           <span className="font-semibold" style={{ color: "var(--fg-70)" }}>Mouaz7</span>
           <span style={{ color: "var(--fg-50)" }}>/</span>
-          <span className="font-bold" style={{ color: "var(--gh-link)" }}>contact</span>
+          <span className="font-bold" style={{ color: "var(--gh-link)" }}>{t("nav.contact").toLowerCase()}</span>
         </div>
         <span className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono font-semibold" style={{ fontSize: 11.5, color: GREEN, background: `${GREEN}1f`, border: `1px solid ${GREEN}55` }}>
           <span className="inline-block rounded-full" style={{ width: 8, height: 8, background: GREEN }} />
-          Open an issue
+          {t("contact.openIssue")}
         </span>
       </div>
 
@@ -206,10 +208,10 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               <div className="grid h-14 w-14 place-items-center rounded-full" style={{ background: `${GREEN}22`, border: `1px solid ${GREEN}66` }}>
                 <Ico s={28} d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.78 6.28-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06L6.75 9.19l3.97-3.97a.75.75 0 1 1 1.06 1.06Z" />
               </div>
-              <h3 className="mt-3 font-bold" style={{ color: "var(--fg)", fontSize: 18 }}>Message sent, thank you!</h3>
-              <p className="mt-1 font-medium" style={{ color: "var(--fg-70)", fontSize: 14 }}>I&apos;ll get back to you as soon as I can.</p>
+              <h3 className="mt-3 font-bold" style={{ color: "var(--fg)", fontSize: 18 }}>{t("contact.sentTitle")}</h3>
+              <p className="mt-1 font-medium" style={{ color: "var(--fg-70)", fontSize: 14 }}>{t("contact.sentBody")}</p>
               <button onClick={() => setStatus("idle")} className="mt-4 rounded-md px-4 py-1.5 font-mono font-semibold" style={{ fontSize: 13, color: "var(--gh-link)", border: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 50%, transparent)" }}>
-                Open another
+                {t("contact.openAnother")}
               </button>
             </div>
           ) : (
@@ -217,18 +219,18 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               {/* name + email */}
               <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
                 <div>
-                  <label className={label} style={{ color: "var(--fg)" }} htmlFor="c-name">Your name</label>
+                  <label className={label} style={{ color: "var(--fg)" }} htmlFor="c-name">{t("contact.yourName")}</label>
                   <input id="c-name" value={name} maxLength={NAME_MAX} onChange={(e) => setName(e.target.value.slice(0, NAME_MAX))} placeholder="Jane Doe" style={field} onFocus={(e) => { e.currentTarget.style.borderColor = "var(--gh-link)"; e.currentTarget.style.boxShadow = glowFocus; }} onBlur={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--gh-link) 35%, var(--surface-border))"; e.currentTarget.style.boxShadow = glowIdle; }} />
                 </div>
                 <div>
-                  <label className={label} style={{ color: "var(--fg)" }} htmlFor="c-email">Your email</label>
+                  <label className={label} style={{ color: "var(--fg)" }} htmlFor="c-email">{t("contact.yourEmail")}</label>
                   <input id="c-email" type="email" value={email} maxLength={EMAIL_MAX} onChange={(e) => setEmail(e.target.value.slice(0, EMAIL_MAX))} placeholder="jane@example.com" style={field} onFocus={(e) => { e.currentTarget.style.borderColor = "var(--gh-link)"; e.currentTarget.style.boxShadow = glowFocus; }} onBlur={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--gh-link) 35%, var(--surface-border))"; e.currentTarget.style.boxShadow = glowIdle; }} />
                 </div>
               </div>
 
               {/* comment editor (WYSIWYG) with avatar bubble */}
               <div className="comment-block mt-4">
-                <label className={label} style={{ color: "var(--fg)" }}>Add a comment</label>
+                <label className={label} style={{ color: "var(--fg)" }}>{t("contact.addComment")}</label>
                 <div className="flex gap-2.5">
                   <div className="hidden shrink-0 lg:block">
                     <div className="grid h-9 w-9 place-items-center rounded-full font-bold" style={{ background: "var(--accent)", color: "#04201b", fontSize: 16 }}>M</div>
@@ -242,7 +244,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                   >
                     {dragging && (
                       <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center" style={{ background: "color-mix(in srgb, var(--gh-link) 12%, var(--surface))" }}>
-                        <span className="font-mono font-semibold" style={{ fontSize: 13, color: "var(--gh-link)" }}>Drop files to attach</span>
+                        <span className="font-mono font-semibold" style={{ fontSize: 13, color: "var(--gh-link)" }}>{t("contact.dropFiles")}</span>
                       </div>
                     )}
                     <span aria-hidden className="absolute hidden lg:block" style={{ left: -7, top: 13, width: 12, height: 12, transform: "rotate(45deg)", background: "color-mix(in srgb, var(--surface) 45%, transparent)", borderLeft: "1px solid var(--surface-border)", borderBottom: "1px solid var(--surface-border)" }} />
@@ -268,7 +270,8 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                       suppressContentEditableWarning
                       role="textbox"
                       aria-multiline="true"
-                      data-ph="Tell me about the opportunity, collaboration, or just say hi…"
+                      data-ph={t("contact.commentPlaceholder")}
+                      dir={dir}
                       onInput={syncLen}
                       onKeyDown={onKey}
                       style={{ fontSize: 15, lineHeight: 1.6, color: "var(--fg)", background: "color-mix(in srgb, var(--surface) 60%, transparent)" }}
@@ -277,8 +280,8 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                     {/* attach */}
                     <button type="button" onClick={() => fileRef.current?.click()} className="attach-row flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-[var(--gh-row-hover)]" style={{ fontSize: 13, color: "var(--fg-70)", borderTop: "1px solid var(--surface-border)", background: "color-mix(in srgb, var(--surface) 45%, transparent)" }}>
                       <Ico s={15} d="M3.5 6.5v3.25a4.25 4.25 0 0 0 8.5 0V4.5a2.75 2.75 0 1 0-5.5 0v5.25a1.25 1.25 0 1 0 2.5 0V6.5a.75.75 0 0 1 1.5 0v3.25a2.75 2.75 0 1 1-5.5 0V4.5a4.25 4.25 0 0 1 8.5 0v5.25a5.75 5.75 0 1 1-11.5 0V6.5a.75.75 0 0 1 1.5 0Z" />
-                      Attach files, or drag &amp; drop them here
-                      <span className="ml-auto font-mono" style={{ fontSize: 11 }}>max {MAX_TOTAL_MB} MB</span>
+                      {t("contact.attachFiles")}
+                      <span className="ml-auto font-mono" style={{ fontSize: 11 }}>{t("contact.max")} {MAX_TOTAL_MB} MB</span>
                     </button>
                     <input ref={fileRef} type="file" accept={ACCEPT} multiple hidden onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }} />
                   </div>
@@ -293,7 +296,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                         <span key={key} className="flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono" style={{ fontSize: 11.5, color: "var(--fg-70)", background: "color-mix(in srgb, var(--surface) 55%, transparent)", border: `1px solid ${overSize ? "#f85149" : "var(--surface-border)"}` }}>
                           {f.name.length > 22 ? f.name.slice(0, 12) + "…" + f.name.slice(-7) : f.name}
                           <span style={{ color: "var(--fg-50)" }}>{(f.size / (1024 * 1024)).toFixed(1)}MB</span>
-                          <button onClick={() => removeFile(key)} aria-label="Remove" style={{ color: "var(--fg-50)" }}>✕</button>
+                          <button onClick={() => removeFile(key)} aria-label={t("common.remove")} style={{ color: "var(--fg-50)" }}>✕</button>
                         </span>
                       );
                     })}
@@ -301,28 +304,28 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
                 )}
 
                 <p className="mt-2 hidden items-start gap-1.5 lg:flex lg:pl-[46px]" style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--fg-70)" }}>
-                  <Ico s={14} d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 7.5a.75.75 0 0 1 1.5 0v4a.75.75 0 0 1-1.5 0v-4ZM8 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" /> <span>Select any text, then click a button to format it, just like a document.</span>
+                  <Ico s={14} d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 7.5a.75.75 0 0 1 1.5 0v4a.75.75 0 0 1-1.5 0v-4ZM8 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" /> <span>{t("contact.formatHint")}</span>
                 </p>
               </div>
 
               {(error || status === "error" || overSize || over) && (
                 <div className="mt-3 rounded-md px-3 py-2 lg:ml-[46px]" style={{ fontSize: 13, color: "#f85149", background: "rgba(248,81,73,0.1)", border: "1px solid rgba(248,81,73,0.4)" }}>
-                  {error || (over ? `Message is too long (${textLen}/${MESSAGE_MAX}).` : overSize ? `Attachments exceed ${MAX_TOTAL_MB} MB.` : "Something went wrong sending your message. Please try again.")}
+                  {error || (over ? `${t("contact.errors.tooLong")} (${textLen}/${MESSAGE_MAX}).` : overSize ? `${t("contact.errors.attachments")} ${MAX_TOTAL_MB} MB.` : t("contact.errors.send"))}
                 </div>
               )}
 
               <div className="submit-row mt-4 flex flex-col-reverse items-stretch gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
-                <span className="text-center font-mono lg:text-left" style={{ fontSize: 12, color: "var(--fg-70)" }}>Name {name.length}/{NAME_MAX} · Email {email.length}/{EMAIL_MAX}</span>
+                <span className="text-center font-mono lg:text-left" style={{ fontSize: 12, color: "var(--fg-70)" }}>{t("contact.nameCount")} {name.length}/{NAME_MAX} · {t("contact.emailCount")} {email.length}/{EMAIL_MAX}</span>
                 <button onClick={submit} disabled={status === "sending"} className="issue-submit flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-all disabled:opacity-60 lg:w-auto lg:rounded-md lg:py-2" style={{ fontSize: 15, color: "#fff", background: GREEN, border: `1px solid ${GREEN}`, boxShadow: `0 4px 14px ${GREEN}55` }}>
                   {status === "sending" ? (
                     <>
                       <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                      Submitting…
+                      {t("contact.submitting")}
                     </>
                   ) : (
                     <>
                       <Ico s={15} d="M7.75 2a.75.75 0 0 1 .75.75V8h5.25a.75.75 0 0 1 0 1.5H8.5v5.25a.75.75 0 0 1-1.5 0V9.5H1.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z" />
-                      Submit new issue
+                      {t("contact.submitIssue")}
                     </>
                   )}
                 </button>
@@ -336,7 +339,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
           {/* Assignees — desktop only (cleaner, app-like mobile keeps just the form + Connect) */}
           <div className="hidden pb-4 lg:block" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
             <div className="mb-2 flex items-center justify-between text-[13px] font-semibold" style={{ color: "var(--fg-70)" }}>
-              Assignees <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
+              {t("contact.assignees")} <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
             </div>
             <a href={links.find((l) => /github/i.test(l.title))?.href || "https://github.com/Mouaz7"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ fontSize: 13.5, color: "var(--fg)" }}>
               <span className="grid h-6 w-6 place-items-center rounded-full font-bold" style={{ background: "var(--accent)", color: "#04201b", fontSize: 12 }}>M</span>
@@ -348,7 +351,7 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
           {labels.length > 0 && (
           <div className="hidden py-4 lg:block" style={{ borderBottom: "1px solid color-mix(in srgb, var(--surface-border) 60%, transparent)" }}>
             <div className="mb-2 flex items-center justify-between text-[13px] font-semibold" style={{ color: "var(--fg-70)" }}>
-              Labels <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
+              {t("contact.labels")} <span style={{ color: "var(--fg)" }}><Gear s={19} /></span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {labels.map((l) => {
@@ -376,14 +379,14 @@ export default function ContactIssueForm({ onSend }: { onSend: SendFn }) {
               })}
             </div>
             <p className="mt-2 leading-snug" style={{ fontSize: 12, color: "var(--fg-70)" }}>
-              {picked.length ? `${picked.length} selected and added to your message.` : "Tap any that fit your message."}
+              {picked.length ? `${picked.length} ${t("contact.selectedAdded")}` : t("contact.tapLabels")}
             </p>
           </div>
           )}
 
           {links.length > 0 && (
           <div className="pt-4">
-            <div className="connect-head mb-3 text-center text-[13px] font-semibold lg:mb-2.5 lg:text-left" style={{ color: "var(--fg-70)" }}>Connect</div>
+            <div className="connect-head mb-3 text-center text-[13px] font-semibold lg:mb-2.5 lg:text-left" style={{ color: "var(--fg-70)" }}>{t("contact.connect")}</div>
             <div className="connect-grid flex flex-col gap-1">
               {links.map((l) => (
                 <a

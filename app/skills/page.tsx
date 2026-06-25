@@ -6,8 +6,11 @@ import SkillsGrid from "@/components/skills/SkillsGrid";
 
 export default function Page() {
   // Desktop/tablet (≥640px): UNCHANGED — FitToScreen scales the natural-size
-  // card board to fit one screen. Phones (<640px): the board stretches to fill
-  // the whole screen height (no empty space) instead of being scaled small.
+  // card board to fit one screen.
+  // Phones (<640px): the board FILLS the whole screen height — cards grow to
+  // share the height evenly so there's no empty space, while each card centers
+  // its (fixed-size) icon rows in the extra room. No scroll, no swipe, no
+  // overlap (the icon rows are centered, never stretched apart).
   const [mobile, setMobile] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
@@ -21,10 +24,7 @@ export default function Page() {
     <div className="relative flex h-dvh w-full flex-col overflow-hidden text-white">
       <Header />
 
-      {/* Constellation backdrop is rendered globally in app/layout.tsx.
-          Desktop (UNCHANGED): FitToScreen scales the natural-size board to fit.
-          Mobile: the board STRETCHES to fill the whole screen height (cards and
-          icon rows grow) — no empty space, no scroll. */}
+      {/* Constellation backdrop is rendered globally in app/layout.tsx. */}
       <div className="relative z-10 min-h-0 flex-1">
         {mobile ? (
           <SkillsGrid fill />

@@ -62,7 +62,7 @@ export default function MagneticButton({
   const look =
     variant === "primary"
       ? "bg-accent text-[#03201b] shadow-[0_10px_34px_rgba(var(--accent-rgb),0.4)] hover:shadow-[0_16px_46px_rgba(var(--accent-rgb),0.55)]"
-      : "border border-gray-300 bg-[rgba(var(--bg-rgb),0.35)] text-white backdrop-blur-md hover:border-accent/60 hover:text-accent";
+      : "border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.22)] text-[var(--fg)] backdrop-blur-md hover:border-accent/60 hover:text-accent";
 
   const cls = `${base} ${look} ${className}`;
   const internal = href.startsWith("/") && !download;

@@ -2,6 +2,8 @@ import "./global.css";
 import { urbanist } from "./fonts";
 import { getSiteTheme, themeToCss } from "@/lib/theme";
 import SiteBackground from "@/components/layout/SiteBackground";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import AiChatbot from "@/components/chat/AiChatbot";
 
 export const metadata = {
   title: "Mouaz Naji - Software Engineer Portfolio",
@@ -78,10 +80,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <style dangerouslySetInnerHTML={{ __html: themeCss }} />
       </head>
-      <body className="antialiased h-full overflow-hidden bg-black text-white">
-        {/* Single shared themed backdrop behind every page (dark + light) */}
-        <SiteBackground />
-        {children}
+      <body className="antialiased h-full overflow-hidden bg-[var(--bg)] text-[var(--fg)]">
+        <LanguageProvider>
+          {/* Single shared themed backdrop behind every page (dark + light) */}
+          <SiteBackground />
+          {children}
+          <AiChatbot />
+        </LanguageProvider>
       </body>
     </html>
   );

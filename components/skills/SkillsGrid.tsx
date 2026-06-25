@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { SkillCategoryCard } from "./SkillCategoryCard";
 import LoadingAnimation from "@/components/ui/LoadingAnimation";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
+import { translateOr } from "@/lib/i18n";
 
 export type UISkill = {
   id: string;
@@ -21,6 +23,7 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
   const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     let off = false;
@@ -58,7 +61,7 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
   if (loading) {
     return (
       <main className="flex min-h-[70vh] items-center justify-center">
-        <LoadingAnimation text="Loading skills..." />
+        <LoadingAnimation text={t("skills.loading")} />
       </main>
     );
   }
@@ -67,10 +70,10 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
     return (
       <main className="flex min-h-[70vh] flex-col items-center justify-center gap-4 text-center px-6">
         <p className="text-sm" style={{ color: "var(--fg-50)" }}>
-          {error ? "Kunde inte hämta skills från databasen." : "Inga skills hittades i databasen."}
+          {error ? t("skills.fetchError") : t("skills.empty")}
         </p>
         <p className="text-xs" style={{ color: "var(--fg-50)" }}>
-          Konfigurera SUPABASE_ANON_KEY i .env.local och kör setup.sql i Supabase SQL Editor.
+          {t("skills.configHint")}
         </p>
       </main>
     );
@@ -79,20 +82,7 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
   const rows = cats.filter((c) => (byCat[c.key]?.length ?? 0) > 0);
 
   return (
-    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.5rem,2vh,1.25rem)] ${fill ? "h-full" : ""}`}>
-      {/* Editorial header — compact so all rows fit on one screen */}
-      <header className="animate-row shrink-0 pb-[clamp(0.5rem,1.6vh,1rem)]" style={{ animationFillMode: "both" }}>
-        <p
-          className="text-[clamp(0.55rem,1.1vh,0.66rem)] font-medium uppercase tracking-[0.3em]"
-          style={{ color: "rgba(var(--accent-rgb),0.95)" }}
-        >
-          Toolbox
-        </p>
-        <h1 className="mt-0.5 text-[clamp(1.15rem,3vh,1.85rem)] font-bold leading-[1.05] tracking-tight">
-          Skills &amp; Technologies
-        </h1>
-      </header>
-
+    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.7rem,2.2vh,1.6rem)] ${fill ? "h-full" : ""}`}>
       {/* Category cards in a responsive grid — 2-up on phones, 3-up on larger
           screens — so every icon keeps its full label and it all still fits one
           screen (scaled by FitToScreen), no scrolling. */}
@@ -100,8 +90,8 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
         {rows.map((c, i) => (
           <SkillCategoryCard
             key={c.key}
-            title={c.title}
-            blurb={c.blurb}
+            title={translateOr(language, `skills.categories.${c.key}.title`, c.title)}
+            blurb={translateOr(language, `skills.categories.${c.key}.blurb`, c.blurb)}
             accentRgb={c.accentRgb}
             items={byCat[c.key] ?? []}
             index={i + 1}

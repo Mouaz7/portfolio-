@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
+import FitToScreen from "@/components/layout/FitToScreen";
 import GitGraphTimeline, { type RoadmapItem } from "@/components/roadmap/GitGraphTimeline";
 import LoadingAnimation from "@/components/ui/LoadingAnimation";
 import { useAccentHex } from "@/lib/hooks/useAccentRgb";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 type ApiItem = { id: string; title: string; description: string; icon?: string; from: string; to?: string | null };
 
@@ -13,6 +15,7 @@ export default function RoadmapPage() {
 
   // DB-driven accent, live with the theme toggle.
   const BRAND = useAccentHex();
+  const { t } = useLanguage();
 
   useEffect(() => {
     let off = false;
@@ -36,22 +39,23 @@ export default function RoadmapPage() {
   }, []);
 
   return (
-    <div className="relative flex flex-col overflow-hidden" style={{ minHeight: "100dvh" }}>
+    <div className="relative flex h-dvh w-full flex-col overflow-hidden">
       <Header />
 
-      {/* Slide area (constellation backdrop is global in app/layout.tsx) */}
-      <main className="relative flex-1 min-h-0 overflow-y-auto px-6 py-10 max-[675px]:px-4 max-[675px]:py-6">
-        {/* Loading state */}
-        {loading && (
-          <div className="absolute inset-0 z-20 bg-black/50 backdrop-blur-sm">
-            <LoadingAnimation text="Loading roadmap..." />
+      {/* One screen, no scroll: FitToScreen scales the timeline to fit on every
+          device (constellation backdrop is global in app/layout.tsx). */}
+      <main className="relative z-10 min-h-0 flex-1">
+        {loading ? (
+          <div className="absolute inset-0 z-20 grid place-items-center bg-black/50 backdrop-blur-sm">
+            <LoadingAnimation text={t("roadmap.loading")} />
           </div>
+        ) : (
+          <FitToScreen>
+            <div className="mx-auto w-full max-w-[820px] px-6 py-4 max-[675px]:px-4">
+              <GitGraphTimeline items={items} accentColor={BRAND} />
+            </div>
+          </FitToScreen>
         )}
-
-        {/* Content above the global backdrop */}
-        <div className="relative z-10 mx-auto w-full max-w-[820px]">
-          <GitGraphTimeline items={items} accentColor={BRAND} />
-        </div>
       </main>
     </div>
   );

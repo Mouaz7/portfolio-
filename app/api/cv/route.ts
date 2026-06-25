@@ -1,73 +1,50 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0; // Don't cache, always fetch latest
 
+const BUCKET = "cv-icons";
+const FILE_PATH = "CV.pdf";
+
+// Use the service-role key server-side so the download works regardless of the
+// bucket's public/RLS state. Falls back to the anon key if not configured.
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL ?? "https://placeholder.supabase.co",
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? "placeholder",
+  { auth: { persistSession: false } }
+);
+
 /**
- * GET /api/cv
- * 
- * Downloads the CV.pdf file from Supabase Storage.
- * This allows you to update your CV in Supabase without changing code.
- * Just replace the CV.pdf file in your storage bucket.
+ * GET /api/cv — streams the CV PDF from Supabase Storage (bucket `cv-icons`,
+ * path `cv/CV.pdf`). Update the CV by replacing that file in Storage; no code
+ * change needed. On failure we redirect to /contact instead of returning a JSON
+ * body (which the browser would otherwise save as a broken "cv.json").
  */
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const bucketName = "cv-icons"; // Your Supabase storage bucket name
-    const filePath = "cv/CV.pdf"; // Path to CV file in the bucket
+    const { data, error } = await supabaseAdmin.storage.from(BUCKET).download(FILE_PATH);
 
-    // Get the file from Supabase Storage
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .download(filePath);
-
-    if (error) {
-      console.error("[/api/cv] Supabase download error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch CV from storage", details: error.message },
-        { status: 500 }
-      );
+    if (error || !data) {
+      console.error("[/api/cv] CV not available in storage:", error?.message ?? "no data", `(${BUCKET}/${FILE_PATH})`);
+      // Don't hand the browser a JSON error to "download" — send them somewhere useful.
+      return NextResponse.redirect(new URL("/contact", req.url), 302);
     }
 
-    if (!data) {
-      console.error("[/api/cv] No data returned from Supabase");
-      return NextResponse.json(
-        { error: "CV file not found" },
-        { status: 404 }
-      );
-    }
+    const buffer = Buffer.from(await data.arrayBuffer());
 
-    // Check if the downloaded file is actually a PDF
-    if (!data.type.includes('pdf') && !data.type.includes('octet-stream')) {
-      console.error("[/api/cv] Downloaded file is not a PDF. Type:", data.type);
-      return NextResponse.json(
-        { error: "File is not a PDF", fileType: data.type },
-        { status: 400 }
-      );
-    }
-
-    // Convert blob to buffer for response
-    const arrayBuffer = await data.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Return the PDF with proper headers
     return new NextResponse(buffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="CV.pdf"',
+        "Content-Disposition": 'attachment; filename="Mouaz-Naji-CV.pdf"',
         "Content-Length": buffer.length.toString(),
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
       },
     });
   } catch (err) {
     console.error("[/api/cv] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error", details: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
-    );
+    return NextResponse.redirect(new URL("/contact", req.url), 302);
   }
 }

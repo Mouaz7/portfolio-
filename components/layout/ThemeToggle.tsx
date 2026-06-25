@@ -42,7 +42,7 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       title={isLight ? "Switch to dark mode" : "Switch to light mode"}
       className={[
         "relative inline-flex h-9 w-9 items-center justify-center rounded-xl",
-        "border border-gray-300 text-white",
+        "border border-[var(--surface-border)] bg-[rgba(var(--bg-rgb),0.18)] text-[var(--fg)] backdrop-blur-md",
         "transition-colors duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
         "hover:text-accent hover:border-accent/50",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70",

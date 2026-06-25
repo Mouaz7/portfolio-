@@ -26,6 +26,18 @@ export default function CursorGlow() {
     let raf = 0;
     let shown = false;
 
+    const tick = () => {
+      cx += (tx - cx) * 0.12;
+      cy += (ty - cy) * 0.12;
+      el.style.transform = `translate3d(${cx - SIZE / 2}px, ${cy - SIZE / 2}px, 0)`;
+      // Stop the loop once the glow has caught up — no perpetual rAF while idle.
+      if (Math.abs(tx - cx) + Math.abs(ty - cy) < 0.5) {
+        raf = 0;
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
     const onMove = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
       tx = e.clientX;
@@ -34,17 +46,10 @@ export default function CursorGlow() {
         shown = true;
         el.style.opacity = "1";
       }
-    };
-
-    const tick = () => {
-      cx += (tx - cx) * 0.12;
-      cy += (ty - cy) * 0.12;
-      el.style.transform = `translate3d(${cx - SIZE / 2}px, ${cy - SIZE / 2}px, 0)`;
-      raf = requestAnimationFrame(tick);
+      if (!raf) raf = requestAnimationFrame(tick); // resume only while moving
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
-    raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);

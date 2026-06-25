@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import React from "react";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 type Props = {
   className?: string;
@@ -49,6 +50,8 @@ export default function Footer({
   logoW = 28,
   logoH = 30,
 }: Props) {
+  const { t } = useLanguage();
+
   return (
     <footer
       className={[
@@ -60,7 +63,7 @@ export default function Footer({
       ].join(" ")}
     >
       <div className="tracking-[-0.5px] leading-[38px]">
-        © {year} {owner}, All Rights Reserved
+        © {year} {owner}, {t("footer.rights")}
       </div>
 
       <Image

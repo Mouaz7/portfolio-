@@ -5,8 +5,10 @@ import { useCallback } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ContactIssueForm from "@/components/contact/ContactIssueForm";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 const ContactPage: NextPage = () => {
+  const { t } = useLanguage();
   const handleSend = useCallback(
     async ({ name, email, message, files }: { name: string; email: string; message: string; files: File[] }) => {
       const fd = new FormData();
@@ -32,9 +34,9 @@ const ContactPage: NextPage = () => {
       <main className="contact-main relative z-10 flex flex-1 flex-col px-4 py-4 sm:px-6 sm:py-6">
         <div className="m-auto w-full max-w-[940px]">
           <div className="contact-intro mb-4 px-1 sm:mb-6">
-            <h1 className="text-[22px] font-bold tracking-tight sm:text-[28px]" style={{ color: "var(--fg)" }}>Get in touch</h1>
+            <h1 className="text-[22px] font-bold tracking-tight sm:text-[28px]" style={{ color: "var(--fg)" }}>{t("contact.title")}</h1>
             <p className="contact-intro-desc mt-1.5 max-w-xl text-[13.5px] sm:mt-2 sm:text-[15px]" style={{ lineHeight: 1.5, color: "var(--fg-70)" }}>
-              Whether it&apos;s a collaboration, an opportunity, or just a friendly hello, I&apos;d love to hear from you. I&apos;ll get back to you soon.
+              {t("contact.intro")}
             </p>
           </div>
           <ContactIssueForm onSend={handleSend} />

@@ -1,9 +1,6 @@
-// app/fonts.ts
-import { Urbanist } from "next/font/google";
-
-export const urbanist = Urbanist({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-urbanist",
-  display: "swap",
-});
+// Keep the same API shape as next/font without making production builds depend
+// on fetching Google Fonts. app/global.css still defines the Urbanist face when
+// the browser can reach Google Fonts, with system fonts as the fallback.
+export const urbanist = {
+  variable: "font-urbanist",
+};

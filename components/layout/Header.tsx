@@ -3,12 +3,11 @@ import type { NextPage } from "next";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import RouteScrollNavigator from "./RouteScrollNavigator";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 export type HeaderType = { className?: string };
-
-const ROUTES = ["/", "/skills", "/roadmap", "/projects", "/contact"];
 
 type NavItemProps = {
   label: string;
@@ -37,8 +36,8 @@ function NavItem({ label, onClick, active = false, size = "md" }: NavItemProps) 
           size === "md" ? "text-xl" : "text-lg",
           "transition-colors duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
           active
-            ? "text-white"
-            : "text-white group-hover:text-accent group-focus-visible:text-accent",
+            ? "text-[var(--fg)]"
+            : "text-[var(--fg-70)] group-hover:text-accent group-focus-visible:text-accent",
         ].join(" ")}
       >
         {label}
@@ -55,7 +54,6 @@ function NavItem({ label, onClick, active = false, size = "md" }: NavItemProps) 
  * - A logo
  * - A horizontal navigation bar for desktop / tablet
  * - A mobile slide‑in navigation panel with accessible open/close controls
- * - A global route scroll navigator (wheel / touch navigation between defined routes)
  *
  * Behavior:
  * - Collapses the full navigation into a burger button below 675px viewport width.
@@ -90,24 +88,17 @@ function NavItem({ label, onClick, active = false, size = "md" }: NavItemProps) 
  * @param props.className Optional additional class names merged onto the root header element.
  *
  * @remarks
- * Ensure that ROUTES, NavItem, RouteScrollNavigator, HeaderType, and required Next.js hooks
+ * Ensure that NavItem, HeaderType, and required Next.js hooks
  * (useRouter, usePathname) are available in the component's module scope.
  *
  * @example
  * // Basic usage inside a layout:
  * <Header className="shadow-lg" />
- *
- * @example
- * // Custom wrapper with sticky positioning:
- * <div className="sticky top-0">
- *   <Header />
- * </div>
- *
- * @see RouteScrollNavigator for scroll-based route switching behavior.
  */
 const Header: NextPage<HeaderType> = ({ className = "" }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const goHome = useCallback(() => router.push("/"), [router]);
   const goSkills = useCallback(() => router.push("/skills"), [router]);
@@ -157,27 +148,29 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         />
       </div>
 
-      <nav className="m-0 flex flex-row items-center justify-start gap-5 text-center text-xl text-white font-urbanist max-[675px]:hidden">
-        <NavItem label="Home" active={pathname === "/"} onClick={goHome} />
-        <NavItem label="Skills" active={pathname === "/skills"} onClick={goSkills} />
-        <NavItem label="Roadmap" active={pathname === "/roadmap"} onClick={goRoadmap} />
-        <NavItem label="Projects" active={pathname === "/projects"} onClick={goProjects} />
-        <NavItem label="Contact" active={pathname === "/contact"} onClick={goContact} />
+      <nav className="m-0 flex flex-row items-center justify-start gap-5 text-center text-xl text-[var(--fg)] font-urbanist max-[900px]:gap-3 max-[675px]:hidden">
+        <NavItem label={t("nav.home")} active={pathname === "/"} onClick={goHome} />
+        <NavItem label={t("nav.skills")} active={pathname === "/skills"} onClick={goSkills} />
+        <NavItem label={t("nav.roadmap")} active={pathname === "/roadmap"} onClick={goRoadmap} />
+        <NavItem label={t("nav.projects")} active={pathname === "/projects"} onClick={goProjects} />
+        <NavItem label={t("nav.contact")} active={pathname === "/contact"} onClick={goContact} />
+        <LanguageSwitcher className="ml-1" />
         <ThemeToggle className="ml-1" />
       </nav>
 
       {/* Mobile: theme toggle + burger */}
       <div className="hidden max-[675px]:flex items-center gap-2">
+        <LanguageSwitcher />
         <ThemeToggle />
         <button
           type="button"
           className="inline-flex items-center justify-center rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          aria-label="Open menu"
+          aria-label={t("nav.openMenu")}
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => setOpen((v) => !v)}
         >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-[var(--fg)]" aria-hidden="true">
             <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </button>
@@ -197,14 +190,14 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         className={[
           "hidden max-[675px]:flex",
           "fixed z-[80] top-0 right-0 h-dvh w-[78vw] max-w-[360px]",
-          "bg-[var(--surface-2)]/95 backdrop-blur-md border-l border-white/10",
+          "bg-[var(--surface-2)]/95 backdrop-blur-md border-l border-[var(--surface-border)]",
           open ? "translate-x-0" : "translate-x-full",
           "transition-transform duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
           "flex-col",
         ].join(" ")}
         role="dialog"
         aria-modal="true"
-        aria-label="Site navigation"
+        aria-label={t("nav.siteNavigation")}
       >
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
           <div className="flex items-center gap-2">
@@ -219,37 +212,30 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
           </div>
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t("nav.closeMenu")}
             className="rounded-xl p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             onClick={() => setOpen(false)}
           >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-[var(--fg)]" aria-hidden="true">
               <path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
         </div>
 
-        <nav className="mt-2 px-2 text-white font-urbanist">
+        <nav className="mt-2 px-2 text-[var(--fg)] font-urbanist">
           <ul className="flex flex-col">
-            <li><NavItem label="Home" size="sm" active={pathname === "/"} onClick={goHome} /></li>
-            <li><NavItem label="Skills" size="sm" active={pathname === "/skills"} onClick={goSkills} /></li>
-            <li><NavItem label="Roadmap" size="sm" active={pathname === "/roadmap"} onClick={goRoadmap} /></li>
-            <li><NavItem label="Projects" size="sm" active={pathname === "/projects"} onClick={goProjects} /></li>
-            <li><NavItem label="Contact" size="sm" active={pathname === "/contact"} onClick={goContact} /></li>
+            <li><NavItem label={t("nav.home")} size="sm" active={pathname === "/"} onClick={goHome} /></li>
+            <li><NavItem label={t("nav.skills")} size="sm" active={pathname === "/skills"} onClick={goSkills} /></li>
+            <li><NavItem label={t("nav.roadmap")} size="sm" active={pathname === "/roadmap"} onClick={goRoadmap} /></li>
+            <li><NavItem label={t("nav.projects")} size="sm" active={pathname === "/projects"} onClick={goProjects} /></li>
+            <li><NavItem label={t("nav.contact")} size="sm" active={pathname === "/contact"} onClick={goContact} /></li>
           </ul>
         </nav>
 
         <div className="mt-auto p-4 flex items-center justify-end">
-          <span className="text-xs text-white/60 select-none">© {new Date().getFullYear()}</span>
+          <span className="text-xs text-[var(--fg-50)] select-none">© {new Date().getFullYear()}</span>
         </div>
       </div>
-
-      <RouteScrollNavigator
-        routes={ROUTES}
-        wheelThreshold={160}
-        cooldownMs={900}
-        touchThreshold={60}
-      />
     </header>
   );
 };

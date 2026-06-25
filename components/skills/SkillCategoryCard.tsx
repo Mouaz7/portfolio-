@@ -8,8 +8,9 @@ export type CardSkill = { id: string; name: string; src: string; xOffset?: numbe
  * One category rendered as a glassmorphic bento card: a translucent, blurred
  * surface with a soft accent glow, a centered heading, and the category's icons
  * in a roomy 3-column grid (each in its own subtle chip) with full text labels.
- * Cards tile in a responsive grid and the whole board is scaled by FitToScreen
- * so everything fits one screen — no scrolling, no swiping.
+ * Cards tile in a responsive grid. On desktop/tablet the whole board is scaled by
+ * FitToScreen to fit one screen; on phones (fill) the cards grow to share the
+ * screen height and center their icon rows, so it fills the screen with no scroll.
  */
 export function SkillCategoryCard({
   title,
@@ -24,16 +25,16 @@ export function SkillCategoryCard({
   accentRgb?: string | null;
   items: CardSkill[];
   index: number;
-  // fill = stretch the card + icons to fill the cell height (phones). When false
-  // (desktop) the card is natural-height with fixed-size icons — the version the
-  // user approved, scaled by FitToScreen.
+  // fill = stretch the card to fill its grid cell (phones, no-scroll). The icon
+  // rows stay fixed-size and are CENTERED in the extra height, so the card grows
+  // to remove empty space without ever stretching/overlapping the labels.
   fill?: boolean;
 }) {
   const catRgb = accentRgb ?? "var(--accent-rgb)";
 
   return (
     <section
-      className={`skill-card animate-row group/card relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border p-[clamp(0.5rem,1.4vh,1rem)] ${fill ? "h-full" : ""}`}
+      className={`skill-card animate-row group/card relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border ${fill ? "h-full p-[clamp(0.35rem,0.9vh,0.7rem)]" : "p-[clamp(0.5rem,1.4vh,1rem)]"}`}
       style={{
         ["--cat-rgb" as string]: catRgb,
         borderColor: "rgba(var(--cat-rgb),0.22)",
@@ -63,31 +64,37 @@ export function SkillCategoryCard({
 
       {/* heading — centered */}
       <div className="flex min-w-0 flex-col items-center text-center">
-        <h2 className="flex min-w-0 max-w-full items-center gap-2 text-[clamp(0.95rem,2.2vh,1.3rem)] font-bold leading-tight tracking-tight" style={{ color: "var(--fg)" }}>
+        <h2 className={`flex min-w-0 max-w-full items-center justify-center gap-2 font-bold leading-tight tracking-tight ${fill ? "text-[clamp(0.8rem,1.95vh,1.05rem)]" : "text-[clamp(0.95rem,2.2vh,1.3rem)]"}`} style={{ color: "var(--fg)" }}>
           <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: "rgb(var(--cat-rgb))", boxShadow: "0 0 8px rgba(var(--cat-rgb),0.8)" }} />
-          <span className="truncate">{title}</span>
+          {/* Wrap (max 2 lines, balanced) instead of truncating, so long merged
+              names like "Cloud, DevOps & Testing" show in full. */}
+          <span className="line-clamp-2 text-balance">{title}</span>
         </h2>
-        {/* clear description subtitle under the heading (like the reference) */}
-        <p className="mt-1 line-clamp-2 max-w-[34ch] text-[clamp(0.62rem,1.45vh,0.82rem)] font-normal leading-snug" style={{ color: "var(--fg-50)" }}>
+        {/* Description subtitle. Hidden on phones (fill): with 9 categories there
+            isn't room for heading + blurb + labelled icons on one no-scroll screen,
+            so phones drop the sentence and keep bigger, centered labelled icons. */}
+        <p className={`mt-1 line-clamp-2 max-w-[34ch] text-[clamp(0.62rem,1.45vh,0.82rem)] font-normal leading-snug ${fill ? "hidden" : ""}`} style={{ color: "var(--fg-50)" }}>
           {blurb}
         </p>
       </div>
 
-      {/* icons — 3 across. On phones (fill) the rows stretch to fill the card
-          height so the whole board fills the screen; on desktop the icons are a
-          fixed size and the card is natural-height (scaled by FitToScreen). */}
+      {/* icons — 3 across, ALWAYS the same fixed size (so they fit their column
+          and never overlap). On desktop the board is scaled by FitToScreen. On
+          phones (fill) the card stretches to fill the screen height and the grid
+          takes the leftover room and CENTERS its rows (content-center) with a
+          little extra vertical breathing space — the surplus becomes even air,
+          never a stretch or an oversized icon that collides. */}
       <div
-        className={`mt-[clamp(0.4rem,1.2vh,0.85rem)] grid grid-cols-3 gap-[clamp(0.25rem,0.8vh,0.55rem)] ${fill ? "min-h-0 flex-1" : ""}`}
-        style={fill ? { gridTemplateRows: `repeat(${Math.ceil(items.length / 3)}, minmax(0, 1fr))` } : undefined}
+        className={`grid grid-cols-3 gap-[clamp(0.25rem,0.8vh,0.55rem)] ${fill ? "mt-[clamp(0.15rem,0.5vh,0.35rem)] min-h-0 flex-1 content-center" : "mt-[clamp(0.4rem,1.2vh,0.85rem)]"}`}
       >
         {items.map((s) => (
           <div
             key={s.id}
-            className={`group/icon flex min-h-0 min-w-0 flex-col items-center justify-center gap-[clamp(0.1rem,0.5vh,0.3rem)] p-0 sm:p-1 ${fill ? "h-full" : ""}`}
+            className="group/icon flex min-h-0 min-w-0 flex-col items-center justify-center gap-[clamp(0.1rem,0.5vh,0.3rem)] p-0 sm:p-1"
             title={s.name}
           >
             <div
-              className={`relative transition-transform duration-300 group-hover/icon:scale-[1.1] ${fill ? "min-h-0 w-full flex-1" : "aspect-square w-[clamp(1.5rem,4.8vh,2.4rem)]"}`}
+              className={`relative aspect-square transition-transform duration-300 group-hover/icon:scale-[1.1] ${fill ? "w-[clamp(0.9rem,2.9vh,1.5rem)]" : "w-[clamp(1.5rem,4.8vh,2.4rem)]"}`}
             >
               <SkillIcon s={s} />
             </div>

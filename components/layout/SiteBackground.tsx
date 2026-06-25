@@ -42,7 +42,8 @@ float noise(vec2 p){
 float fbm(vec2 p){
   float v = 0.0;
   float amp = 0.5;
-  for (int i = 0; i < 6; i++){
+  // 4 octaves is plenty for this soft, low-frequency nebula (was 6) — cheaper.
+  for (int i = 0; i < 4; i++){
     v += amp * noise(p);
     p *= 2.0;
     amp *= 0.5;
@@ -172,14 +173,22 @@ export default function SiteBackground() {
     const themeObs = new MutationObserver(refreshColors);
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Decorative low-frequency noise → render BELOW CSS resolution and let the
+    // browser scale the canvas up. ~0.44x the pixels of a 1:1 buffer (and far
+    // less than DPR=2 fullscreen) with no visible quality loss, a big GPU win.
+    const RENDER_SCALE = 0.66;
     const resize = () => {
-      canvas.width = Math.floor(window.innerWidth * dpr);
-      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.width = Math.max(2, Math.floor(window.innerWidth * RENDER_SCALE));
+      canvas.height = Math.max(2, Math.floor(window.innerHeight * RENDER_SCALE));
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resize();
-    window.addEventListener("resize", resize);
+    let resizeRaf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(resize);
+    };
+    window.addEventListener("resize", onResize);
 
     let mx = 0.5, my = 0.5, tmx = 0.5, tmy = 0.5, amt = 0, tamt = 0;
     const onMove = (e: PointerEvent) => {
@@ -193,8 +202,12 @@ export default function SiteBackground() {
     window.addEventListener("pointerout", onLeave);
 
     const start = performance.now();
+    const FRAME_MS = 1000 / 30; // 30fps is ample for this very slow drift; halves GPU work vs 60fps
     let raf = 0;
-    const draw = (now: number) => {
+    let last = -Infinity;
+    let running = true;
+
+    const render = (now: number) => {
       mx += (tmx - mx) * 0.06;
       my += (tmy - my) * 0.06;
       amt += (tamt - amt) * 0.05;
@@ -207,15 +220,43 @@ export default function SiteBackground() {
       gl.uniform3fv(U.accent2, colors.accent2);
       gl.uniform1f(U.light, colors.light);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      if (!reduced) raf = requestAnimationFrame(draw);
     };
-    raf = requestAnimationFrame(draw);
+
+    const loop = (now: number) => {
+      if (!running) return;
+      raf = requestAnimationFrame(loop);
+      if (now - last < FRAME_MS) return;
+      last = now;
+      render(now);
+    };
+
+    if (reduced) {
+      render(performance.now()); // single static frame, then idle
+    } else {
+      raf = requestAnimationFrame(loop);
+    }
+
+    // Stop drawing entirely when the tab is hidden — no wasted GPU/battery.
+    const onVisibility = () => {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(raf);
+      } else if (!reduced && !running) {
+        running = true;
+        last = -Infinity;
+        raf = requestAnimationFrame(loop);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      running = false;
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(resizeRaf);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerout", onLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
       themeObs.disconnect();
     };
   }, []);

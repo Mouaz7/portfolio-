@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 export type RoadmapItem = {
   id: string;
@@ -47,6 +48,7 @@ export default function GitGraphTimeline({
   accentColor?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
+  const { locale, t } = useLanguage();
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 680px)");
     const apply = () => setIsMobile(mq.matches);
@@ -97,11 +99,11 @@ export default function GitGraphTimeline({
     const safe = (d?: string | null) => {
       if (!d) return "";
       const x = new Date(d);
-      return isNaN(x.getTime()) ? "" : x.toLocaleString("en-US", { month: "short", year: "numeric" });
+      return isNaN(x.getTime()) ? "" : x.toLocaleString(locale, { month: "short", year: "numeric" });
     };
     const f = safe(from);
-    const t = to ? safe(to) : "present";
-    return f ? `${f} → ${t}` : "";
+    const end = to ? safe(to) : t("roadmap.present");
+    return f ? `${f} → ${end}` : "";
   };
   const hashOf = (seed: string) => {
     let h = 0;
@@ -134,7 +136,7 @@ export default function GitGraphTimeline({
             </span>
             <span style={{ color: "var(--fg-50)" }}>/</span>
             <span className="truncate font-bold" style={{ color: accentColor }}>
-              career
+              {t("roadmap.career")}
             </span>
           </div>
           <span
@@ -146,7 +148,7 @@ export default function GitGraphTimeline({
               border: "1px solid var(--surface-border)",
             }}
           >
-            <BranchIcon size={isMobile ? 11 : 13} color={accentColor} /> main
+          <BranchIcon size={isMobile ? 11 : 13} color={accentColor} /> {t("roadmap.main")}
           </span>
         </div>
         <div
@@ -161,9 +163,9 @@ export default function GitGraphTimeline({
           <span style={{ color: accentColor, display: "inline-flex" }}>
             <CommitIcon size={isMobile ? 12 : 14} color={accentColor} />
           </span>
-          <span style={{ color: "var(--fg)", fontWeight: 600 }}>{sorted.length}</span> commits
+          <span style={{ color: "var(--fg)", fontWeight: 600 }}>{sorted.length}</span> {t("roadmap.commits")}
           <span style={{ color: "var(--fg-50)" }}>·</span>
-          <span style={{ color: "var(--fg)", fontWeight: 600 }}>{branchCount}</span> branches
+          <span style={{ color: "var(--fg)", fontWeight: 600 }}>{branchCount}</span> {t("roadmap.branches")}
         </div>
       </div>
 
@@ -287,7 +289,7 @@ export default function GitGraphTimeline({
                             className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-mono font-semibold"
                             style={{ fontSize: 10.5, color: accentColor, background: `color-mix(in srgb, ${accentColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${accentColor} 35%, transparent)` }}
                           >
-                            <VerifiedIcon size={12} icon={icons.verified} /> Verified
+                            <VerifiedIcon size={12} icon={icons.verified} /> {t("roadmap.verified")}
                           </span>
                         )}
                       </div>

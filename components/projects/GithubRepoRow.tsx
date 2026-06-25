@@ -1,5 +1,8 @@
 "use client";
 
+import { useLanguage } from "@/components/i18n/LanguageProvider";
+import { translateOr } from "@/lib/i18n";
+
 export interface Project {
   id: string;
   title: string;
@@ -48,17 +51,25 @@ const ForkIcon = ({ c = "currentColor" }: { c?: string }) => (
   </svg>
 );
 
-function timeAgo(iso?: string) {
+function timeAgo(iso: string | undefined, locale: string) {
   if (!iso) return "";
   const t = new Date(iso).getTime();
   if (isNaN(t)) return "";
   const s = Math.max(1, Math.floor((Date.now() - t) / 1000));
-  const u: [string, number][] = [["year", 31536000], ["month", 2592000], ["week", 604800], ["day", 86400], ["hour", 3600], ["minute", 60]];
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const u: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["year", 31536000],
+    ["month", 2592000],
+    ["week", 604800],
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ];
   for (const [name, sec] of u) {
     const v = Math.floor(s / sec);
-    if (v >= 1) return `${v} ${name}${v > 1 ? "s" : ""} ago`;
+    if (v >= 1) return rtf.format(-v, name);
   }
-  return "just now";
+  return rtf.format(-s, "second");
 }
 
 export default function GithubRepoRow({
@@ -74,13 +85,15 @@ export default function GithubRepoRow({
   last?: boolean;
   index?: number;
 }) {
+  const { language, locale, t } = useLanguage();
   const slug = (project.github_url || "").replace(/^https?:\/\/github\.com\//i, "");
   const name = slug.split("/")[1] || project.title;
   const primary = meta?.language || project.languages[0];
   const dot = (primary && LANG_COLOR[primary]) || catColor(project.category);
   const stars = meta?.stars ?? 0;
   const forks = meta?.forks ?? 0;
-  const updated = timeAgo(meta?.pushedAt);
+  const updated = timeAgo(meta?.pushedAt, locale);
+  const categoryLabel = translateOr(language, `projects.categories.${project.category}`, project.category);
 
   return (
     <div
@@ -104,13 +117,13 @@ export default function GithubRepoRow({
               className="rounded-full px-2 py-[1px] font-medium"
               style={{ fontSize: 11, color: "var(--fg-50)", border: "1px solid var(--surface-border)" }}
             >
-              Public
+              {t("projectRow.public")}
             </span>
             <span
               className="hidden rounded-full px-2 py-[1px] font-mono font-medium sm:inline"
               style={{ fontSize: 10.5, color: catColor(project.category), background: `color-mix(in srgb, ${catColor(project.category)} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${catColor(project.category)} 40%, transparent)` }}
             >
-              {project.category}
+              {categoryLabel}
             </span>
           </div>
 
@@ -146,7 +159,7 @@ export default function GithubRepoRow({
             {forks > 0 && (
               <span className="flex items-center gap-1"><ForkIcon /> {forks}</span>
             )}
-            {updated && <span>Updated {updated}</span>}
+            {updated && <span>{t("projectRow.updated")} {updated}</span>}
           </div>
         </div>
 
@@ -164,7 +177,7 @@ export default function GithubRepoRow({
           }}
         >
           <StarIcon c="#e3b341" />
-          <span className={isMobile ? "hidden" : ""}>Star</span>
+          <span className={isMobile ? "hidden" : ""}>{t("projectRow.star")}</span>
           {stars > 0 && (
             <span className="rounded-full px-1.5" style={{ fontSize: 11, color: "var(--fg-70)", background: "var(--fg-10)" }}>
               {stars}
