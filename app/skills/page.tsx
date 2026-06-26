@@ -7,10 +7,8 @@ import SkillsGrid from "@/components/skills/SkillsGrid";
 export default function Page() {
   // Desktop/tablet (≥640px): UNCHANGED — FitToScreen scales the natural-size
   // card board to fit one screen.
-  // Phones (<640px): the board FILLS the whole screen height — cards grow to
-  // share the height evenly so there's no empty space, while each card centers
-  // its (fixed-size) icon rows in the extra room. No scroll, no swipe, no
-  // overlap (the icon rows are centered, never stretched apart).
+  // Phones (<640px): the board fills the viewport without scrolling. Skill
+  // labels are hidden there so all categories and icons can fit cleanly.
   const [mobile, setMobile] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
@@ -29,9 +27,11 @@ export default function Page() {
         {mobile ? (
           <SkillsGrid fill />
         ) : (
-          <FitToScreen desktopMaxScale={1.32}>
-            <SkillsGrid />
-          </FitToScreen>
+          <div className="h-full lg:pt-12 xl:pt-14">
+            <FitToScreen desktopMaxScale={1.32}>
+              <SkillsGrid />
+            </FitToScreen>
+          </div>
         )}
       </div>
     </div>

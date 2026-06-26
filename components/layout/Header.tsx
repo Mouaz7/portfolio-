@@ -32,7 +32,7 @@ function NavItem({ label, onClick, active = false, size = "md" }: NavItemProps) 
     >
       <span
         className={[
-          "font-urbanist font-bold tracking-[-0.01em]",
+          "font-display font-bold tracking-[-0.01em]",
           size === "md" ? "text-xl" : "text-lg",
           "transition-colors duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
           active
@@ -148,7 +148,7 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
         />
       </div>
 
-      <nav className="m-0 flex flex-row items-center justify-start gap-5 text-center text-xl text-[var(--fg)] font-urbanist max-[900px]:gap-3 max-[675px]:hidden">
+      <nav className="m-0 flex flex-row items-center justify-start gap-5 text-center text-xl text-[var(--fg)] font-display max-[900px]:gap-3 max-[675px]:hidden">
         <NavItem label={t("nav.home")} active={pathname === "/"} onClick={goHome} />
         <NavItem label={t("nav.skills")} active={pathname === "/skills"} onClick={goSkills} />
         <NavItem label={t("nav.roadmap")} active={pathname === "/roadmap"} onClick={goRoadmap} />
@@ -222,7 +222,7 @@ const Header: NextPage<HeaderType> = ({ className = "" }) => {
           </button>
         </div>
 
-        <nav className="mt-2 px-2 text-[var(--fg)] font-urbanist">
+        <nav className="mt-2 px-2 text-[var(--fg)] font-display">
           <ul className="flex flex-col">
             <li><NavItem label={t("nav.home")} size="sm" active={pathname === "/"} onClick={goHome} /></li>
             <li><NavItem label={t("nav.skills")} size="sm" active={pathname === "/skills"} onClick={goSkills} /></li>

@@ -1,14 +1,18 @@
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
-@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap");
 @layer theme, base, components, utilities;
 @config "../tailwind.config.js";
 
+/* Fonts are self-hosted via next/font/google (see app/fonts.ts). The
+   --font-display / --font-sans-i / --font-mono-i variables are injected on
+   <html> by Next; we map them to semantic tokens here. No CDN @import — the
+   page never depends on reaching Google Fonts at runtime. */
 @layer theme {
   :root {
-    --font-urbanist: "Urbanist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-sans: var(--font-urbanist);
+    --font-display: var(--font-display-i), system-ui, sans-serif;
+    --font-sans: var(--font-sans-i), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: var(--font-mono-i), ui-monospace, "SFMono-Regular", Menlo, monospace;
   }
 }
 
@@ -25,6 +29,7 @@
   --bg: #0a0b10;
   --bg-rgb: 10, 11, 16;
   --fg: #f4f6fb;
+  --fg-rgb: 244, 246, 251;
   --fg-70: rgba(244, 246, 251, 0.84);
   --fg-50: rgba(244, 246, 251, 0.66);
   --fg-10: rgba(244, 246, 251, 0.1);
@@ -71,6 +76,7 @@ html.light {
   --bg: #f6f7fb;
   --bg-rgb: 246, 247, 251;
   --fg: #0c0d14;
+  --fg-rgb: 12, 13, 20;
   --fg-70: rgba(12, 13, 20, 0.86);
   --fg-50: rgba(12, 13, 20, 0.68);
   --fg-10: rgba(12, 13, 20, 0.08);
@@ -109,6 +115,12 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Apply the body font-family (this rule was missing — its absence is what let
+   the page fall back to the browser-default serif). */
+body {
+  font-family: var(--font-sans);
 }
 
 /* Cohesive site-wide accents */

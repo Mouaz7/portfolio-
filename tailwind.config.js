@@ -21,7 +21,9 @@ module.exports = {
         steelblue: "rgba(14, 96, 151, 0)",
       },
       fontFamily: {
-        urbanist: "Urbanist",
+        sans: "var(--font-sans)",
+        display: "var(--font-display)",
+        mono: "var(--font-mono)",
       },
     },
     screens: {},

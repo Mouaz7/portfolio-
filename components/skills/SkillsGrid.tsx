@@ -80,13 +80,13 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
   }
 
   const rows = cats.filter((c) => (byCat[c.key]?.length ?? 0) > 0);
+  const hasMobileOddLastCard = fill && rows.length % 2 === 1;
 
   return (
-    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(1rem,4vw,2.5rem)] py-[clamp(0.7rem,2.2vh,1.6rem)] ${fill ? "h-full" : ""}`}>
-      {/* Category cards in a responsive grid — 2-up on phones, 3-up on larger
-          screens — so every icon keeps its full label and it all still fits one
-          screen (scaled by FitToScreen), no scrolling. */}
-      <div className={`grid grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] sm:grid-cols-3 ${fill ? "min-h-0 flex-1 auto-rows-fr" : ""}`}>
+    <main className={`mx-auto flex w-full max-w-[1180px] flex-col px-[clamp(0.85rem,3vw,2.5rem)] py-[clamp(0.45rem,1.2vh,1.6rem)] ${fill ? "h-full" : ""}`}>
+      {/* Phones use a compact 2-column icon board that fits one viewport. Larger
+          screens keep the approved labelled board scaled by FitToScreen. */}
+      <div className={`grid grid-cols-2 gap-[clamp(0.45rem,1.2vh,1rem)] sm:grid-cols-3 ${fill ? "min-h-0 flex-1 auto-rows-fr" : ""}`}>
         {rows.map((c, i) => (
           <SkillCategoryCard
             key={c.key}
@@ -96,6 +96,7 @@ export default function SkillsGrid({ fill = false }: { fill?: boolean }) {
             items={byCat[c.key] ?? []}
             index={i + 1}
             fill={fill}
+            mobileFullWidth={hasMobileOddLastCard && i === rows.length - 1}
           />
         ))}
       </div>

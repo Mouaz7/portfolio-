@@ -8,8 +8,13 @@ import SocialLinks from "@/components/layout/SocialLinks";
 import RoleCycler from "@/components/home/RoleCycler";
 import CursorGlow from "@/components/home/CursorGlow";
 import MagneticButton from "@/components/home/MagneticButton";
+import ParticleField from "@/components/home/ParticleField";
+import CountUp from "@/components/home/CountUp";
 import type { SiteProfile } from "@/lib/profile";
+import type { FeaturedProject } from "@/lib/featured";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
+
+/* ─── Types ─────────────────────────────────────────────────────────────── */
 
 type HomeCopy = {
   eyebrow: string;
@@ -19,18 +24,35 @@ type HomeCopy = {
   focusAreas: string[];
   status: string;
   statusValue: string;
-  commandTitle: string;
-  commandSubtitle: string;
-  commandLines: string[];
+  nowTitle: string;
+  nowValue: string;
+  coreLabel: string;
+  consoleLine: string;
+  featuredLabel: string;
+  openLabel: string;
+  availLabel: string;
   metrics: Array<{ value: string; label: string }>;
-  process: Array<{ title: string; body: string }>;
-  stackTitle: string;
   stack: string[];
-  proofTitle: string;
-  proofItems: string[];
-  assistantTitle: string;
-  assistantBody: string;
 };
+
+/* ─── Preloader (also guarantees fonts are ready before reveal) ─────────── */
+
+function Preloader({ done }: { done: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className={[
+        "pointer-events-none fixed inset-0 z-[199] flex items-center justify-center bg-[var(--bg)]",
+        "transition-opacity duration-[350ms] ease-out",
+        done ? "opacity-0" : "opacity-100",
+      ].join(" ")}
+    >
+      <span className="preloader-dot" />
+    </div>
+  );
+}
+
+/* ─── Reveal (spring-physics entrance) ─────────────────────────────────── */
 
 function Reveal({
   show,
@@ -46,8 +68,8 @@ function Reveal({
   return (
     <div
       className={[
-        "transition-all duration-[700ms] ease-[cubic-bezier(.22,1,.36,1)] will-change-transform",
-        show ? "translate-y-0 opacity-100 blur-0" : "translate-y-4 opacity-0 blur-[5px]",
+        "transition-all duration-[720ms] ease-[cubic-bezier(.22,1,.36,1)] will-change-transform",
+        show ? "translate-y-0 opacity-100 blur-0" : "translate-y-4 opacity-0 blur-[4px]",
         className,
       ].join(" ")}
       style={{ transitionDelay: `${show ? delay : 0}ms` }}
@@ -57,445 +79,1274 @@ function Reveal({
   );
 }
 
+/* ─── Icons ─────────────────────────────────────────────────────────────── */
+
 const ArrowIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="transition-transform duration-300 ease-out group-hover:translate-x-1">
-    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <path
+      d="M5 12h14M13 6l6 6-6 6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="transition-transform duration-300 ease-out group-hover:translate-x-1"
+    />
   </svg>
 );
 
 const DownloadIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="transition-transform duration-300 ease-out group-hover:translate-y-0.5">
-    <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <path
+      d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="transition-transform duration-300 ease-out group-hover:translate-y-0.5"
+    />
   </svg>
 );
 
-const SparkIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M12 3l1.7 5.1L19 10l-5.3 1.9L12 17l-1.7-5.1L5 10l5.3-1.9L12 3Zm6 12 .8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8L18 15Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const BotGlyph = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M12 3v3m-5.5 4.5A4.5 4.5 0 0 1 11 6h2a4.5 4.5 0 0 1 4.5 4.5v4A4.5 4.5 0 0 1 13 19h-2a4.5 4.5 0 0 1-4.5-4.5v-4Zm-2 1.5h2m13 0h2M9.25 12h.01M14.75 12h.01M9.5 15c1.35.9 3.65.9 5 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+/* ─── Copy ───────────────────────────────────────────────────────────────── */
 
 const COPY: Record<string, HomeCopy> = {
   en: {
-    eyebrow: "Software engineering",
-    rolePrefix: "Software",
-    roles: ["Engineer", "Developer", "AI Builder"],
+    eyebrow: "Software Engineer",
+    rolePrefix: "Building",
+    roles: ["web apps", "AI features", "systems"],
     tagline:
-      "I design and build polished web, AI, mobile, and systems experiences with clean architecture, practical security, and production-minded code.",
-    focusAreas: ["AI", "Full-stack", "Security", "Systems", "Mobile", "DevOps"],
-    status: "Current signal",
+      "I design and ship polished web, AI, and systems experiences with clean architecture, practical security, and production-minded code.",
+    focusAreas: ["AI", "Full-stack", "Systems"],
+    status: "Status",
     statusValue: "Open for collaboration",
-    commandTitle: "Engineering console",
-    commandSubtitle: "How I turn an idea into a working product.",
-    commandLines: [
-      "map requirements -> user flow -> architecture",
-      "build interface + API + data model together",
-      "verify with tests, accessibility, and performance checks",
-    ],
+    nowTitle: "Now building",
+    nowValue: "AI-driven web apps with clean, typed architecture.",
+    coreLabel: "Core",
+    consoleLine: "$ open to new opportunities",
+    featuredLabel: "Featured",
+    openLabel: "open",
+    availLabel: "Available",
     metrics: [
-      { value: "15+", label: "production-style projects" },
-      { value: "3", label: "languages on this site" },
-      { value: "AI", label: "assistant integrated" },
+      { value: "15+", label: "projects" },
+      { value: "3", label: "languages" },
+      { value: "AI", label: "assistant" },
     ],
-    process: [
-      { title: "Design the system", body: "Clear flows, state, data, and edge cases before code gets heavy." },
-      { title: "Build the experience", body: "Fast UI, reliable APIs, and details that make the product feel finished." },
-      { title: "Harden the result", body: "Tests, accessibility, responsive layout, and safer deployment habits." },
-    ],
-    stackTitle: "Core stack",
     stack: ["Next.js", "React", "TypeScript", "Node", "Python", "C++", "Kotlin", "Supabase", "Docker"],
-    proofTitle: "What this site shows",
-    proofItems: ["Live GitHub projects", "Database-driven content", "AI chatbot", "CV/contact workflow"],
-    assistantTitle: "AI assistant",
-    assistantBody: "The chat supports English, Swedish, Arabic, and longer pasted CV text.",
   },
   sv: {
-    eyebrow: "Mjukvaruutveckling",
-    rolePrefix: "",
-    roles: ["Mjukvaruutvecklare", "Systemutvecklare", "AI-byggare"],
+    eyebrow: "Mjukvaruutvecklare",
+    rolePrefix: "Bygger",
+    roles: ["webbappar", "AI-funktioner", "system"],
     tagline:
-      "Jag bygger moderna webbappar, AI-funktioner, mobilflöden och systemlösningar med tydlig arkitektur, stark finish och kod som håller.",
-    focusAreas: ["AI", "Fullstack", "Säkerhet", "System", "Mobil", "DevOps"],
-    status: "Aktuellt",
+      "Jag designar och levererar moderna webb, AI och systemlösningar med tydlig arkitektur, praktisk säkerhet och kod som håller.",
+    focusAreas: ["AI", "Fullstack", "System"],
+    status: "Status",
     statusValue: "Öppen för samarbete",
-    commandTitle: "Engineering console",
-    commandSubtitle: "Så tar jag en idé till fungerande produkt.",
-    commandLines: [
-      "krav -> användarflöde -> arkitektur",
-      "gränssnitt + API + datamodell byggs tillsammans",
-      "verifiering med tester, tillgänglighet och prestanda",
-    ],
+    nowTitle: "Bygger just nu",
+    nowValue: "AI-drivna webbappar med tydlig, typad arkitektur.",
+    coreLabel: "Kärna",
+    consoleLine: "$ öppen för nya möjligheter",
+    featuredLabel: "Utvalt",
+    openLabel: "öppna",
+    availLabel: "Tillgänglig",
     metrics: [
-      { value: "15+", label: "projekt med produktkänsla" },
-      { value: "3", label: "språk på sidan" },
-      { value: "AI", label: "chatbot integrerad" },
+      { value: "15+", label: "projekt" },
+      { value: "3", label: "språk" },
+      { value: "AI", label: "assistent" },
     ],
-    process: [
-      { title: "Designa systemet", body: "Flöden, state, data och edge cases sitter innan koden blir tung." },
-      { title: "Bygg upplevelsen", body: "Snabb UI, stabila API:er och detaljer som gör att sidan känns färdig." },
-      { title: "Säkra resultatet", body: "Tester, responsiv layout, tillgänglighet och bättre deploy-vanor." },
-    ],
-    stackTitle: "Kärnstack",
     stack: ["Next.js", "React", "TypeScript", "Node", "Python", "C++", "Kotlin", "Supabase", "Docker"],
-    proofTitle: "Det sidan visar",
-    proofItems: ["Live GitHub-projekt", "Databasdrivet innehåll", "AI-chatt", "CV/kontaktflöde"],
-    assistantTitle: "AI-assistent",
-    assistantBody: "Chatten stödjer svenska, engelska, arabiska och längre CV-text som klistras in.",
   },
   ar: {
-    eyebrow: "هندسة برمجيات",
-    rolePrefix: "مهندس",
-    roles: ["برمجيات", "أنظمة", "ذكاء اصطناعي"],
+    eyebrow: "مهندس برمجيات",
+    rolePrefix: "أبني",
+    roles: ["تطبيقات ويب", "ميزات ذكاء", "أنظمة"],
     tagline:
-      "أبني تطبيقات ويب وميزات ذكاء اصطناعي وتجارب موبايل وأنظمة بواجهة مصقولة وبنية واضحة وكود قابل للاعتماد.",
-    focusAreas: ["AI", "Full-stack", "الأمان", "الأنظمة", "الموبايل", "DevOps"],
+      "أصمم وأطلق تجارب ويب وذكاء اصطناعي وأنظمة مصقولة ببنية واضحة وأمان عملي وكود جاهز للإنتاج.",
+    focusAreas: ["ذكاء اصطناعي", "Full-stack", "أنظمة"],
     status: "الحالة",
     statusValue: "متاح للتعاون",
-    commandTitle: "لوحة هندسية",
-    commandSubtitle: "كيف أحول الفكرة إلى منتج يعمل.",
-    commandLines: [
-      "المتطلبات -> تدفق المستخدم -> البنية",
-      "واجهة + API + نموذج بيانات معا",
-      "تحقق بالاختبارات والوصولية والأداء",
-    ],
+    nowTitle: "أبني الآن",
+    nowValue: "تطبيقات ويب مدعومة بالذكاء الاصطناعي ببنية واضحة.",
+    coreLabel: "الأساس",
+    consoleLine: "$ متاح لفرص جديدة",
+    featuredLabel: "مختار",
+    openLabel: "افتح",
+    availLabel: "متاح",
     metrics: [
-      { value: "15+", label: "مشاريع بطابع إنتاجي" },
-      { value: "3", label: "لغات في الموقع" },
-      { value: "AI", label: "مساعد مدمج" },
+      { value: "15+", label: "مشروع" },
+      { value: "3", label: "لغات" },
+      { value: "AI", label: "مساعد" },
     ],
-    process: [
-      { title: "تصميم النظام", body: "تدفقات واضحة وحالات وبيانات قبل أن يصبح الكود ثقيلا." },
-      { title: "بناء التجربة", body: "واجهة سريعة وواجهات API مستقرة وتفاصيل تجعل المنتج مكتملا." },
-      { title: "تقوية النتيجة", body: "اختبارات وتجاوب ووصولية وعادات نشر أكثر أمانا." },
-    ],
-    stackTitle: "التقنيات الأساسية",
     stack: ["Next.js", "React", "TypeScript", "Node", "Python", "C++", "Kotlin", "Supabase", "Docker"],
-    proofTitle: "ما يعرضه الموقع",
-    proofItems: ["مشاريع GitHub مباشرة", "محتوى من قاعدة البيانات", "محادثة AI", "CV ونموذج تواصل"],
-    assistantTitle: "مساعد AI",
-    assistantBody: "المحادثة تدعم العربية والسويدية والإنجليزية ونصوص CV طويلة.",
   },
 };
 
-function getCopy(language: string) {
+function getCopy(language: string): HomeCopy {
   return COPY[language] ?? COPY.en;
 }
 
-export default function HomeHero({ profile }: { profile: SiteProfile }) {
+// Category → CSS class suffix for the coloured featured-card accent.
+function slugCat(c: string): string {
+  return c.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function techBadgeMonogram(name: string): string {
+  const normalized = name.toLowerCase();
+  if (normalized === "typescript") return "TS";
+  if (normalized === "next.js") return "N";
+  if (normalized === "node" || normalized === "node.js") return "N";
+  if (normalized === "c++") return "C++";
+
+  const capitals = (name.match(/[A-Z]/g) ?? []).join("").slice(0, 2);
+  if (capitals.length >= 2) return capitals;
+
+  const parts = name.split(/[^A-Za-z0-9+]+/).filter(Boolean);
+  if (parts.length > 1) return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
+
+  const compact = name.replace(/[^A-Za-z0-9+]/g, "").toUpperCase();
+  return compact.slice(0, compact.includes("+") ? 3 : 2);
+}
+
+/* ─── Component ─────────────────────────────────────────────────────────── */
+
+export default function HomeHero({
+  profile,
+  featured = [],
+}: {
+  profile: SiteProfile;
+  featured?: FeaturedProject[];
+}) {
+  const [fontsReady, setFontsReady] = useState(false);
   const [show, setShow] = useState(false);
+  const [techIcons, setTechIcons] = useState<Record<string, string>>({});
+  const [fIdx, setFIdx] = useState(0);
   const { language, t, dir } = useLanguage();
   const copy = getCopy(language);
-  const rolePrefix = copy.rolePrefix.trim();
+  const coreStack = copy.stack.slice(0, 4);
+  const mobileMarqueeStack = copy.stack.slice(0, 8);
+  const current = featured.length ? featured[fIdx % featured.length] : null;
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setShow(true), 70);
+    let timer: number | undefined;
+    document.fonts.ready.then(() => {
+      setFontsReady(true);
+      timer = window.setTimeout(() => setShow(true), 80);
+    });
     return () => window.clearTimeout(timer);
   }, []);
 
+  // Build a name → icon-URL map from the DB skills (used by the marquee and the
+  // featured-project language chips). Decorative, so a failure just means no icon.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/skills")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows: Array<{ name?: string; src?: string }>) => {
+        if (cancelled || !Array.isArray(rows)) return;
+        const map: Record<string, string> = {};
+        for (const s of rows) if (s?.name && s?.src) map[s.name.toLowerCase()] = s.src;
+        // Aliases + a couple of brand icons not in the skills table.
+        map["node"] ??= map["node.js"];
+        map["supabase"] ??= "https://cdn.simpleicons.org/supabase/3ecf8e";
+        map["gcp"] ??= "https://icon.icepanel.io/Technology/svg/Google-Cloud.svg";
+        map["ai"] ??= "https://api.iconify.design/lucide:sparkles.svg?color=%2319e3c2";
+        map["ai agents"] ??= map["ai"];
+        setTechIcons(map);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Cycle the featured-project card every few seconds (desktop card).
+  useEffect(() => {
+    if (featured.length < 2) return;
+    const id = window.setInterval(() => setFIdx((i) => (i + 1) % featured.length), 3800);
+    return () => window.clearInterval(id);
+  }, [featured.length]);
+
+  const iconFor = (name: string) => techIcons[name.toLowerCase()];
+
   return (
-    <div className="home-shell relative h-dvh w-full min-w-[320px] overflow-hidden text-[var(--fg)]" dir={dir}>
+    <div className="home-shell relative min-w-[320px] text-[var(--fg)]" dir={dir}>
       <Link href="/contact" prefetch className="hidden" aria-hidden tabIndex={-1} />
+
+      <Preloader done={fontsReady} />
+
+      {/* Atmospheric depth (toned down for the minimal aesthetic) */}
+      <div className="orb-a" aria-hidden />
+      <div className="orb-b" aria-hidden />
+      <div className="grain-overlay" aria-hidden />
+
       <CursorGlow />
 
-      <div className="relative z-10 flex h-dvh flex-col">
+      <div className="home-content relative z-10">
         <Header />
 
-        <main className="mx-auto grid w-full max-w-[1480px] min-h-0 flex-1 grid-cols-1 gap-5 px-4 pb-5 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:px-8 xl:px-10">
-          <section className="flex min-h-0 flex-1 flex-col justify-center py-2 lg:min-h-[560px] lg:flex-none lg:py-4">
-            <Reveal show={show} delay={40}>
-              <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-[var(--fg-50)]">
-                <span className="home-dot h-2 w-2 rounded-full bg-accent shadow-[0_0_22px_rgba(var(--accent-rgb),0.75)]" />
-                {copy.eyebrow}
+        <main className="home-main">
+          <div className="hero-grid">
+            {/* ═══════════ HERO TEXT ═══════════ */}
+            <section className="hero-text" aria-label="Introduction">
+              {/* Interactive constellation behind the hero text (desktop only) */}
+              <div className="particle-wrap" aria-hidden>
+                <ParticleField />
               </div>
-            </Reveal>
 
-            <Reveal show={show} delay={120}>
-              <h1 className="home-name mt-3 max-w-[9ch] text-[clamp(3.1rem,10.6vw,9.2rem)] font-black leading-[0.86] tracking-[-0.035em] text-[var(--fg)] sm:mt-5 sm:max-w-none">
-                {profile.name}
-              </h1>
-            </Reveal>
+              <Reveal show={show} delay={120}>
+                <h1 className="home-name">{profile.name}</h1>
+              </Reveal>
 
-            <Reveal show={show} delay={220}>
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-[clamp(1.35rem,3.1vw,2.8rem)] font-black leading-tight sm:mt-5">
-                {rolePrefix && <span>{rolePrefix}</span>}
-                <RoleCycler
-                  start={show}
-                  loop
-                  words={copy.roles}
-                  initialDelayMs={420}
-                  firstDwellMs={1500}
-                  dwellMs={1500}
-                  transitionMs={340}
-                  effect="fadeSlide"
-                  className="text-accent"
-                />
-              </div>
-            </Reveal>
-
-            <Reveal show={show} delay={300}>
-              <p className="mt-4 line-clamp-3 max-w-[64ch] text-[clamp(1rem,1.5vw,1.2rem)] font-semibold leading-relaxed text-[var(--fg-70)] sm:mt-6 sm:line-clamp-none sm:leading-[1.85]">
-                {copy.tagline}
-              </p>
-            </Reveal>
-
-            <Reveal show={show} delay={380} className="mt-5 flex flex-wrap gap-2 sm:mt-7">
-              {copy.focusAreas.map((area) => (
-                <span key={area} className="focus-chip inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-black">
-                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
-                  {area}
-                </span>
-              ))}
-            </Reveal>
-
-            <Reveal show={show} delay={460} className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">
-              <MagneticButton href="/projects" variant="primary">
-                {t("home.viewProjects")}
-                <ArrowIcon />
-              </MagneticButton>
-              <MagneticButton href={profile.cvUrl} variant="ghost" download>
-                {t("home.downloadCv")}
-                <DownloadIcon />
-              </MagneticButton>
-              <SocialLinks className="ms-0 sm:ms-2" />
-            </Reveal>
-
-            <Reveal show={show} delay={540} className="mt-6 grid max-w-[760px] grid-cols-3 overflow-hidden rounded-lg border border-[var(--surface-border)] sm:mt-8">
-              {copy.metrics.map((metric) => (
-                <div key={metric.label} className="metric-cell px-3 py-3 sm:px-5 sm:py-4">
-                  <div className="home-metric-num text-2xl font-black text-[var(--fg)] sm:text-3xl">{metric.value}</div>
-                  <div className="mt-1 text-xs font-bold leading-snug text-[var(--fg-50)] sm:text-sm">{metric.label}</div>
+              <Reveal show={show} delay={210}>
+                <div className="role-row">
+                  <span className="role-prefix">{copy.rolePrefix}</span>
+                  <RoleCycler
+                    start={show}
+                    loop
+                    words={copy.roles}
+                    initialDelayMs={420}
+                    firstDwellMs={1600}
+                    dwellMs={1600}
+                    transitionMs={340}
+                    effect="fadeSlide"
+                    className="text-accent"
+                  />
                 </div>
-              ))}
-            </Reveal>
-          </section>
+              </Reveal>
 
-          <section className="hidden min-h-[560px] grid-cols-1 gap-4 py-4 lg:grid lg:grid-rows-[auto_1fr_auto]">
-            <Reveal show={show} delay={160}>
-              <div className="status-panel flex items-center justify-between gap-3 rounded-lg border p-4">
-                <div>
-                  <div className="text-xs font-black uppercase tracking-[0.18em] text-[var(--fg-50)]">{copy.status}</div>
-                  <div className="mt-1 text-lg font-black">{copy.statusValue}</div>
-                </div>
-                <div className="home-spark grid h-12 w-12 place-items-center rounded-lg bg-accent text-black shadow-[0_14px_34px_rgba(var(--accent-rgb),0.28)]">
-                  <SparkIcon />
-                </div>
-              </div>
-            </Reveal>
+              <Reveal show={show} delay={300}>
+                <p className="tagline">{copy.tagline}</p>
+              </Reveal>
 
-            <Reveal show={show} delay={260}>
-              <div className="console-panel rounded-lg border p-4 sm:p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-black">{copy.commandTitle}</h2>
-                    <p className="mt-1 text-sm font-semibold leading-relaxed text-[var(--fg-50)]">{copy.commandSubtitle}</p>
+              <Reveal show={show} delay={390}>
+                <div className="cta-row">
+                  <div className="cta-primary-row">
+                    <MagneticButton href="/projects" variant="primary" className="cta-primary-btn">
+                      {t("home.viewProjects")}
+                      <ArrowIcon />
+                    </MagneticButton>
                   </div>
-                  <div className="flex gap-1.5 pt-1" aria-hidden>
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+
+                  <div className="cta-secondary-row">
+                    <MagneticButton href={profile.cvUrl} variant="ghost" download className="cta-secondary-btn">
+                      {t("home.downloadCv")}
+                      <DownloadIcon />
+                    </MagneticButton>
+                    <SocialLinks className="cta-social" />
                   </div>
                 </div>
-                <div className="mt-5 space-y-3 font-mono text-[12px] font-bold leading-relaxed text-[var(--fg-70)] sm:text-[13px]">
-                  {copy.commandLines.map((line, index) => (
-                    <div key={line} className="console-line rounded-md border border-[var(--surface-border)] px-3 py-2">
-                      <span className="me-2 text-accent">0{index + 1}</span>
-                      {line}
-                      {index === copy.commandLines.length - 1 && <span aria-hidden className="home-caret ms-1 text-accent">▋</span>}
+              </Reveal>
+            </section>
+
+            {/* ═══════════ RIGHT MODULE STACK (desktop only) ═══════════ */}
+            <div className="now-wrap hidden lg:flex">
+              <Reveal show={show} delay={280} className="now-reveal shrink-0">
+                <aside className="now-card" aria-label="Current status">
+                  <div className="now-head">
+                    <span className="now-status-dot" aria-hidden />
+                    <span className="now-status-text">{copy.statusValue}</span>
+                  </div>
+
+                  <div className="now-block">
+                    <div className="now-label">{copy.nowTitle}</div>
+                    <p className="now-value">{copy.nowValue}</p>
+                  </div>
+
+                  <div className="now-block">
+                    <div className="now-label">{copy.coreLabel}</div>
+                    <div className="now-core">
+                      {coreStack.map((s, i) => (
+                        <span key={s} className="now-core-item">
+                          {s}
+                          {i < coreStack.length - 1 && <span className="now-core-sep" aria-hidden>·</span>}
+                        </span>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
+                  </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Reveal show={show} delay={340}>
-                <div className="stack-panel h-full rounded-lg border p-4">
-                  <h3 className="text-sm font-black uppercase tracking-[0.16em] text-[var(--fg-50)]">{copy.stackTitle}</h3>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {copy.stack.map((item) => (
-                      <span key={item} className="stack-chip rounded-md border border-[var(--surface-border)] px-2.5 py-1.5 text-xs font-black text-[var(--fg-70)]">
-                        {item}
+                  <div className="now-console">{copy.consoleLine}<span className="home-caret">▋</span></div>
+                </aside>
+              </Reveal>
+
+              {current && (
+                <Reveal show={show} delay={380} className="featured-reveal grow min-h-0">
+                  <a
+                    href={current.githubUrl || "/projects"}
+                    target={current.githubUrl ? "_blank" : undefined}
+                    rel={current.githubUrl ? "noopener noreferrer" : undefined}
+                    className={`featured-card cat-${slugCat(current.category)}`}
+                    aria-label={`${copy.featuredLabel}: ${current.title}`}
+                  >
+                    <div className="featured-head">
+                      <span className="featured-cat">
+                        <span className="featured-cat-dot" aria-hidden />
+                        {current.category}
                       </span>
-                    ))}
-                  </div>
-                </div>
-              </Reveal>
+                      <span className="featured-open">
+                        {copy.openLabel}
+                        <ArrowIcon />
+                      </span>
+                    </div>
 
-              <Reveal show={show} delay={420}>
-                <div className="assistant-panel h-full rounded-lg border p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-10 w-10 place-items-center rounded-lg bg-[rgba(var(--accent-rgb),0.16)] text-accent">
-                      <BotGlyph />
-                    </span>
-                    <h3 className="text-lg font-black">{copy.assistantTitle}</h3>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold leading-relaxed text-[var(--fg-70)]">{copy.assistantBody}</p>
-                </div>
-              </Reveal>
+                    {/* key on index → fade/slide each time the project changes */}
+                    <div className="featured-swap" key={fIdx}>
+                      <div className="featured-title">{current.title}</div>
+                      {current.description && (
+                        <p className="featured-desc">{current.description}</p>
+                      )}
+                      <div className="featured-langs">
+                        {(current.languages.length ? current.languages : coreStack)
+                          .slice(0, 4)
+                          .map((l) => {
+                            const ic = iconFor(l);
+                            return (
+                              <span key={l} className="featured-lang">
+                                {ic && (
+                                  /* eslint-disable-next-line @next/next/no-img-element */
+                                  <img src={ic} alt="" className="featured-lang-ic" loading="lazy" decoding="async" />
+                                )}
+                                {l}
+                              </span>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+                    {/* progress dots showing the cycle position */}
+                    {featured.length > 1 && (
+                      <div className="featured-dots" aria-hidden>
+                        {featured.map((_, i) => (
+                          <span
+                            key={i}
+                            className={`featured-dot${i === fIdx % featured.length ? " is-on" : ""}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </a>
+                </Reveal>
+              )}
             </div>
-          </section>
+          </div>
 
-          <Reveal show={show} delay={580} className="hidden lg:col-span-2 lg:block">
-            <section className="proof-rail grid gap-3 rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-[0.9fr_1.2fr_1fr]">
-              <div className="px-2 py-2">
-                <h2 className="text-lg font-black">{copy.proofTitle}</h2>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {copy.proofItems.map((item) => (
-                    <span key={item} className="rounded-md bg-[rgba(var(--accent-rgb),0.12)] px-2.5 py-1 text-xs font-black text-[var(--fg)]">
-                      {item}
+          {/* ═══════════ BOTTOM BAND: count-up metrics + marquee ═══════════ */}
+          <Reveal show={show} delay={470} className="rail-wrap">
+            <div className="rail">
+              <div className="rail-metrics">
+                {copy.metrics.map((m) => (
+                  <div key={m.label} className="rail-metric">
+                    <span className="rail-metric-num">
+                      <CountUp value={m.value} show={show} />
                     </span>
-                  ))}
-                </div>
-              </div>
-              <div className="grid gap-3 sm:col-span-1 lg:grid-cols-3">
-                {copy.process.map((item) => (
-                  <article key={item.title} className="process-card rounded-md border border-[var(--surface-border)] p-3">
-                    <h3 className="text-sm font-black">{item.title}</h3>
-                    <p className="mt-2 text-xs font-semibold leading-relaxed text-[var(--fg-50)]">{item.body}</p>
-                  </article>
+                    <span className="rail-metric-label">{m.label}</span>
+                  </div>
                 ))}
               </div>
-              <div className="hidden items-center justify-end px-2 text-end lg:flex">
-                <div className="max-w-[26ch] text-sm font-bold leading-relaxed text-[var(--fg-50)]">
-                  Next.js, Supabase, AI, responsive UI, and multilingual site logic in one place.
+
+              {/* Infinite marquee of the stack with DB tech icons (desktop only) */}
+              <div className="marquee hidden lg:block" aria-hidden>
+                <div className="marquee-track">
+                  {[...copy.stack, ...copy.stack].map((s, i) => {
+                    const ic = iconFor(s);
+                    return (
+                      <span key={`${s}-${i}`} className="marquee-item">
+                        {ic && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={ic} alt="" className="marquee-ic" loading="lazy" decoding="async" />
+                        )}
+                        {s}
+                        <span className="marquee-dot">•</span>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
-            </section>
+
+              <div className="mobile-tech-stage" aria-label={copy.coreLabel}>
+                <div className="mobile-tech-lane mobile-tech-lane-a" aria-hidden>
+                  {[...mobileMarqueeStack, ...mobileMarqueeStack].map((s, i) => {
+                    const ic = iconFor(s);
+                    return (
+                      <span key={`a-${s}-${i}`} className="mobile-tech-pill" title={s}>
+                        <span className="mobile-tech-pill-badge" aria-hidden>
+                          {ic ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={ic} alt="" className="mobile-tech-ic" loading="lazy" decoding="async" />
+                          ) : (
+                            <span className="mobile-tech-fallback">{techBadgeMonogram(s)}</span>
+                          )}
+                        </span>
+                        <span className="mobile-tech-pill-label">{s}</span>
+                        <span className="mobile-tech-pill-dot" aria-hidden />
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="mobile-console" role="img" aria-label={copy.nowValue}>
+                <div className="mobile-console-body" aria-hidden>
+                  <p className="mobile-console-row mobile-console-comment">// systems_init [react/node/aws]</p>
+                  <p className="mobile-console-row">&gt; deploying edge: live</p>
+                  <p className="mobile-console-row">[ai] processing query</p>
+                  <p className="mobile-console-row mobile-console-active">
+                    &gt; AI assistance ACTIVE
+                    <span className="home-caret">▋</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </Reveal>
         </main>
       </div>
 
+      {/* ─── Styles ──────────────────────────────────────────────────── */}
       <style jsx>{`
+        /* ════════════ SHELL — no-scroll root ════════════ */
         .home-shell {
+          height: 100dvh;
+          max-height: 100dvh;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
           scrollbar-width: none;
         }
-        .home-shell::-webkit-scrollbar {
-          display: none;
+        .home-shell::-webkit-scrollbar { display: none; }
+        .home-content {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
         }
 
-        /* Animated display name: subtle accent shine sweeping across the bold type. */
+        /* ════════════ MAIN ════════════ */
+        .home-main {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: clamp(1rem, 3vh, 2.25rem);
+          padding: 0 1.25rem clamp(58px, 9vh, 74px);
+          max-width: 1320px;
+          width: 100%;
+          margin: 0 auto;
+        }
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: clamp(1.2rem, 4vh, 2.5rem);
+          align-items: center;
+        }
+
+        /* ════════════ HERO TEXT ════════════ */
+        .hero-text {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: clamp(0.7rem, 2.1vh, 1.4rem);
+          min-width: 0;
+        }
+        /* Particle field sits behind the text; text floats above it. */
+        .particle-wrap {
+          position: absolute;
+          inset: -6% -10% -6% -6%;
+          z-index: 0;
+          pointer-events: none;
+        }
+        .hero-text > :not(.particle-wrap) { position: relative; z-index: 1; }
+
+        .eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          font-size: clamp(0.66rem, 1.5vw, 0.78rem);
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--fg-50);
+          font-family: var(--font-mono);
+        }
+        .eyebrow-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgb(var(--accent-rgb));
+          box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.8);
+          animation: dotPulse 2.6s ease-in-out infinite;
+        }
+        .eyebrow-sep { opacity: 0.4; }
+        .eyebrow-loc { color: var(--fg-70); letter-spacing: 0.14em; }
+
         .home-name {
-          background: linear-gradient(
-            100deg,
-            var(--fg) 0%,
-            var(--fg) 42%,
-            rgb(var(--accent-rgb)) 50%,
-            var(--fg) 58%,
-            var(--fg) 100%
-          );
-          background-size: 260% 100%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          color: transparent;
-          animation: nameSheen 7s ease-in-out infinite;
-        }
-        @keyframes nameSheen {
-          0% { background-position: 120% 0; }
-          100% { background-position: -40% 0; }
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: clamp(2.9rem, 9vw, 4.6rem);
+          line-height: 0.95;
+          letter-spacing: -0.035em;
+          padding-bottom: 0.06em;
+          color: var(--fg);
         }
 
-        /* Gradient accent metric numbers. */
-        .home-metric-num {
+        .role-row {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+          gap: 0 0.5ch;
+          font-family: var(--font-display);
+          font-weight: 600;
+          font-size: clamp(1.25rem, 4.4vw, 1.9rem);
+          line-height: 1.15;
+          letter-spacing: -0.01em;
+        }
+        .role-prefix { color: var(--fg-70); }
+
+        .tagline {
+          font-size: clamp(0.95rem, 1.55vw, 1.12rem);
+          font-weight: 400;
+          line-height: 1.7;
+          color: var(--fg-70);
+          max-width: 52ch;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .cta-row {
+          --cta-gap: clamp(0.6rem, 1.4vw, 0.9rem);
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: var(--cta-gap);
+          margin-top: clamp(0.2rem, 1vh, 0.6rem);
+        }
+        .cta-primary-row,
+        .cta-secondary-row {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--cta-gap);
+          min-width: 0;
+        }
+        .cta-secondary-row {
+          flex-wrap: nowrap;
+        }
+        .cta-row :global(.cta-social) {
+          display: inline-flex;
+          align-items: center;
+          flex: none;
+          flex-shrink: 0;
+          margin-inline-start: 0;
+        }
+        .cta-row :global(.cta-social a) {
+          flex: none;
+        }
+
+        /* ════════════ NOW CARD (toggled via Tailwind hidden/lg:block) ════════════ */
+        .now-card {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(0.9rem, 2vh, 1.4rem);
+          border-radius: 18px;
+          border: 1px solid var(--surface-border);
+          background: color-mix(in srgb, var(--surface) 60%, transparent);
+          backdrop-filter: blur(22px);
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+          padding: clamp(1.1rem, 2vw, 1.6rem);
+        }
+        .now-head {
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          padding-bottom: clamp(0.6rem, 1.4vh, 1rem);
+          border-bottom: 1px solid var(--surface-border);
+        }
+        .now-status-dot {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: #22c55e;
+          flex: none;
+          animation: statusPulse 2.4s ease-in-out infinite;
+        }
+        .now-status-text {
+          font-size: 0.86rem;
+          font-weight: 700;
+          color: var(--fg);
+        }
+        .now-label {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--fg-50);
+        }
+        .now-value {
+          margin-top: 6px;
+          font-size: 0.96rem;
+          font-weight: 500;
+          line-height: 1.5;
+          color: var(--fg);
+        }
+        .now-core {
+          margin-top: 8px;
+          font-family: var(--font-display);
+          font-size: 0.92rem;
+          font-weight: 600;
+          color: var(--fg-70);
+        }
+        .now-core-sep { margin: 0 0.5ch; color: rgb(var(--accent-rgb)); }
+        .now-console {
+          margin-top: auto;
+          font-family: var(--font-mono);
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: rgb(var(--accent-rgb));
+          background: rgba(var(--bg-rgb), 0.3);
+          border: 1px solid var(--surface-border);
+          border-radius: 9px;
+          padding: 9px 12px;
+        }
+        .home-caret { animation: caretBlink 1.1s steps(1) infinite; margin-inline-start: 2px; }
+
+        /* ════════════ BOTTOM RAIL ════════════ */
+        .rail {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: clamp(0.8rem, 2vw, 1.6rem);
+          padding-top: clamp(0.6rem, 1.6vh, 1.1rem);
+        }
+        .rail-metrics {
+          display: flex;
+          align-items: stretch;
+          gap: clamp(0.9rem, 2vw, 1.6rem);
+          flex: none;
+        }
+        .rail-metric {
+          display: flex;
+          align-items: baseline;
+          gap: 7px;
+        }
+        .rail-metric-num {
+          font-family: var(--font-display);
+          font-size: clamp(1.1rem, 2vw, 1.45rem);
+          font-weight: 700;
+          line-height: 1;
           background: linear-gradient(125deg, var(--fg) 35%, rgb(var(--accent-rgb)));
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
           color: transparent;
         }
-
-        /* Pulsing accent dot + status spark. */
-        .home-dot { animation: dotPulse 2.6s ease-in-out infinite; }
-        @keyframes dotPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.55), 0 0 22px rgba(var(--accent-rgb), 0.75); }
-          50% { box-shadow: 0 0 0 7px rgba(var(--accent-rgb), 0), 0 0 22px rgba(var(--accent-rgb), 0.75); }
+        .rail-metric-label {
+          font-size: clamp(0.72rem, 1.2vw, 0.82rem);
+          font-weight: 500;
+          color: var(--fg-50);
         }
-        .home-spark { animation: sparkGlow 3.2s ease-in-out infinite; }
-        @keyframes sparkGlow {
-          0%, 100% { box-shadow: 0 14px 34px rgba(var(--accent-rgb), 0.28); }
-          50% { box-shadow: 0 14px 44px rgba(var(--accent-rgb), 0.55); }
+        .mobile-tech-stage,
+        .mobile-console { display: none; }
+        /* ════════════ MARQUEE (desktop) ════════════ */
+        .marquee {
+          flex: 1;
+          min-width: 0;
+          margin-inline-start: auto;
+          overflow: hidden;
+          -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+        }
+        .marquee-track {
+          display: inline-flex;
+          align-items: center;
+          white-space: nowrap;
+          will-change: transform;
+          animation: marqueeScroll 26s linear infinite;
+        }
+        .marquee:hover .marquee-track { animation-play-state: paused; }
+        .marquee-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: var(--font-mono);
+          font-size: 0.82rem;
+          font-weight: 500;
+          color: var(--fg-70);
+          padding-inline: 2px;
+        }
+        .marquee-ic {
+          width: 18px;
+          height: 18px;
+          object-fit: contain;
+          flex: none;
+        }
+        .marquee-dot { margin-inline: 0.7rem; color: rgb(var(--accent-rgb)); }
+        @keyframes marqueeScroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
         }
 
-        /* Blinking console caret. */
-        .home-caret { animation: caretBlink 1.1s steps(1) infinite; }
-        @keyframes caretBlink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
-
-        .focus-chip,
-        .status-panel,
-        .console-panel,
-        .stack-panel,
-        .assistant-panel,
-        .proof-rail {
-          background: color-mix(in srgb, var(--surface) 72%, transparent);
-          border-color: var(--surface-border);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-          backdrop-filter: blur(18px);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s, box-shadow 0.35s;
+        /* ════════════ META BAR (desktop) ════════════ */
+        .meta-bar {
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          width: 100%;
+          max-width: 1320px;
+          margin: 0 auto;
+          padding: 0.5rem 2.5rem 0;
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--fg-50);
         }
-        /* Layered depth + lift on hover for the panels. */
-        .status-panel:hover,
-        .console-panel:hover,
-        .stack-panel:hover,
-        .assistant-panel:hover {
-          transform: translateY(-3px);
-          border-color: rgba(var(--accent-rgb), 0.42);
-          box-shadow: 0 26px 70px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        .meta-tag { color: var(--fg-70); }
+        .meta-mid { display: inline-flex; align-items: center; gap: 7px; }
+        .meta-clock-icon { color: rgb(var(--accent-rgb)); }
+        .meta-clock { color: var(--fg); font-variant-numeric: tabular-nums; letter-spacing: 0.14em; }
+        .meta-dim { color: var(--fg-50); }
+        .meta-avail { display: inline-flex; align-items: center; gap: 7px; color: var(--fg-70); }
+        .meta-avail-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #22c55e;
+          box-shadow: 0 0 8px rgba(34, 197, 94, 0.85);
+          animation: statusPulse 2.4s ease-in-out infinite;
         }
-        .focus-chip:hover { transform: translateY(-2px); border-color: rgba(var(--accent-rgb), 0.6); }
 
-        /* Accent hairline along the top of the console panel. */
-        .console-panel { position: relative; }
-        .console-panel::before {
+        /* ════════════ NOW-WRAP STACK + FEATURED CARD (desktop) ════════════ */
+        .now-wrap {
+          flex-direction: column;
+          gap: clamp(0.8rem, 1.6vh, 1.2rem);
+          min-height: 0;
+        }
+        .now-reveal { flex: none; }
+        .featured-reveal { flex: 1; min-height: 0; }
+
+        .featured-card {
+          --cat: var(--accent-rgb);
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 0.85rem;
+          height: 100%;
+          border-radius: 16px;
+          border: 1px solid var(--surface-border);
+          background:
+            radial-gradient(120% 80% at 0% 0%, rgba(var(--cat), 0.10), transparent 60%),
+            color-mix(in srgb, var(--surface) 58%, transparent);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          padding: clamp(1rem, 1.7vw, 1.4rem);
+          text-decoration: none;
+          color: var(--fg);
+          overflow: hidden;
+          transition: transform 0.35s cubic-bezier(.22,1,.36,1), border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        /* accent hairline along the top, tinted per category */
+        .featured-card::before {
           content: "";
           position: absolute;
-          inset: 0 12% auto 12%;
+          inset: 0 0 auto 0;
           height: 2px;
+          background: linear-gradient(90deg, transparent, rgb(var(--cat)), transparent);
+          opacity: 0.8;
+        }
+        .featured-card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(var(--cat), 0.45);
+          box-shadow: 0 26px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(var(--cat), 0.14);
+        }
+        /* category palette */
+        .cat-full-stack { --cat: var(--accent-rgb); }
+        .cat-mobile     { --cat: 109, 139, 255; }
+        .cat-systems    { --cat: 245, 158, 66; }
+        .cat-build      { --cat: 232, 121, 198; }
+
+        .featured-head { display: flex; align-items: center; justify-content: space-between; }
+        .featured-cat {
+          display: inline-flex; align-items: center; gap: 7px;
+          font-family: var(--font-mono);
+          font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgb(var(--cat));
+          background: rgba(var(--cat), 0.12);
+          border: 1px solid rgba(var(--cat), 0.3);
           border-radius: 999px;
-          background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb)), transparent);
-          opacity: 0.75;
+          padding: 3px 10px;
+        }
+        .featured-cat-dot { width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--cat)); }
+        .featured-open {
+          display: inline-flex; align-items: center; gap: 4px;
+          font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+          color: rgb(var(--cat));
         }
 
-        .metric-cell {
-          background: color-mix(in srgb, var(--surface) 58%, transparent);
+        .featured-swap { animation: featSwap 0.5s cubic-bezier(.22,1,.36,1); }
+        @keyframes featSwap {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        .metric-cell + .metric-cell {
-          border-inline-start: 1px solid var(--surface-border);
+        .featured-title {
+          font-family: var(--font-display);
+          font-size: clamp(1.05rem, 1.5vw, 1.32rem);
+          font-weight: 700;
+          line-height: 1.18;
+          letter-spacing: -0.01em;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
-        .console-line,
-        .process-card {
-          background: rgba(var(--bg-rgb), 0.2);
+        .featured-desc {
+          margin-top: 8px;
+          font-size: clamp(0.78rem, 0.95vw, 0.88rem);
+          font-weight: 400;
+          line-height: 1.55;
+          color: var(--fg-50);
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
-        .stack-chip {
-          transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+        .featured-langs { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .featured-lang {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          font-weight: 500;
+          color: var(--fg-70);
+          border: 1px solid var(--surface-border);
+          background: rgba(var(--bg-rgb), 0.22);
+          border-radius: 7px;
+          padding: 3px 9px;
         }
-        .stack-chip:hover {
-          transform: translateY(-2px);
-          border-color: rgba(var(--accent-rgb), 0.6);
-          color: var(--fg);
+        .featured-lang-ic { width: 14px; height: 14px; object-fit: contain; flex: none; }
+        .featured-dots { margin-top: auto; display: flex; gap: 6px; padding-top: 0.6rem; }
+        .featured-dot {
+          width: 16px; height: 3px; border-radius: 999px;
+          background: var(--surface-border);
+          transition: background 0.3s ease, width 0.3s ease;
+        }
+        .featured-dot.is-on { width: 24px; background: rgb(var(--cat)); }
+
+        /* ════════════ ATMOSPHERE (subtle) ════════════ */
+        .orb-a {
+          position: absolute;
+          top: -18%;
+          left: -10%;
+          width: min(50vw, 640px);
+          height: min(50vw, 640px);
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(var(--accent-rgb), 0.16) 0%, transparent 68%);
+          pointer-events: none;
+          z-index: 0;
+          will-change: transform;
+          transform: translateZ(0);
+          filter: blur(64px);
+          animation: orbDrift 16s ease-in-out infinite alternate;
+        }
+        .orb-b {
+          position: absolute;
+          bottom: -16%;
+          right: -8%;
+          width: min(40vw, 500px);
+          height: min(40vw, 500px);
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(var(--accent-2-rgb), 0.12) 0%, transparent 68%);
+          pointer-events: none;
+          z-index: 0;
+          will-change: transform;
+          transform: translateZ(0);
+          filter: blur(56px);
+          animation: orbDrift 20s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes orbDrift {
+          from { transform: translateZ(0) translate(0, 0); }
+          to   { transform: translateZ(0) translate(20px, 26px); }
+        }
+        .grain-overlay {
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+          opacity: 0.028;
+          mix-blend-mode: overlay;
+          pointer-events: none;
+          z-index: 1;
         }
 
-        :global(html.light) .focus-chip,
-        :global(html.light) .status-panel,
-        :global(html.light) .console-panel,
-        :global(html.light) .stack-panel,
-        :global(html.light) .assistant-panel,
-        :global(html.light) .proof-rail {
-          background: rgba(255, 255, 255, 0.58);
-          box-shadow: 0 24px 70px rgba(12, 13, 20, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        /* ════════════ KEYFRAMES ════════════ */
+        @keyframes dotPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.55), 0 0 16px rgba(var(--accent-rgb), 0.8); }
+          50% { box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0), 0 0 16px rgba(var(--accent-rgb), 0.8); }
         }
-        @media (max-width: 1023px) {
-          .home-shell { height: 100dvh; }
+        @keyframes statusPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55), 0 0 7px rgba(34, 197, 94, 0.85); }
+          50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0), 0 0 7px rgba(34, 197, 94, 0.85); }
         }
+        @keyframes caretBlink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+        @keyframes mobileMarqueeForward {
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-50%, 0, 0); }
+        }
+        @keyframes mobileMarqueeReverse {
+          from { transform: translate3d(-50%, 0, 0); }
+          to   { transform: translate3d(0, 0, 0); }
+        }
+
+        @keyframes preloaderPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.65); opacity: 0.6; }
+        }
+        .preloader-dot {
+          display: block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: rgb(var(--accent-rgb));
+          box-shadow: 0 0 22px rgba(var(--accent-rgb), 0.65);
+          animation: preloaderPulse 0.9s ease-in-out infinite;
+        }
+
+        /* ════════════ DESKTOP (≥1024px) ════════════ */
+        @media (min-width: 1024px) {
+          .home-main {
+            padding: 0 2.5rem clamp(16px, 2.4vh, 30px);
+            gap: clamp(0.9rem, 2.4vh, 1.8rem);
+          }
+          .hero-grid {
+            grid-template-columns: minmax(0, 1.32fr) minmax(310px, 0.78fr);
+            gap: clamp(2rem, 5vw, 4rem);
+            align-items: stretch;
+          }
+          .hero-text { justify-content: center; }
+          .home-name {
+            font-size: clamp(4.2rem, 7vw, 7rem);
+            line-height: 0.92;
+          }
+          .role-row { font-size: clamp(1.7rem, 2.6vw, 2.5rem); }
+          .tagline { font-size: clamp(1.02rem, 1.2vw, 1.18rem); max-width: 46ch; }
+          .now-wrap { padding-top: clamp(0.5rem, 2vh, 1.5rem); }
+        }
+
+        @media (min-width: 1440px) {
+          .home-main, .meta-bar { max-width: 1440px; }
+          .home-name { font-size: clamp(5rem, 6.6vw, 8rem); }
+        }
+
+        /* ════════════ MOBILE layout tightening (≤675px) ════════════ */
+        @media (max-width: 675px) {
+          .home-main {
+            justify-content: flex-start;
+            gap: clamp(0.7rem, 1.8vh, 1rem);
+            padding: 0.5rem 1rem clamp(28px, 5vh, 40px);
+          }
+          .hero-grid {
+            gap: clamp(0.75rem, 1.8vh, 1.05rem);
+            align-items: start;
+          }
+          .hero-text {
+            gap: clamp(0.5rem, 1.3vh, 0.85rem);
+          }
+          .home-name {
+            font-size: clamp(3.2rem, 15vw, 4.6rem);
+            line-height: 0.92;
+            padding-bottom: 0.04em;
+          }
+          .role-row {
+            font-size: clamp(1.35rem, 6vw, 1.8rem);
+            line-height: 1.1;
+          }
+          .tagline {
+            font-size: clamp(1rem, 4.1vw, 1.1rem);
+            line-height: 1.6;
+            max-width: 36ch;
+            -webkit-line-clamp: 2;
+          }
+          .cta-row {
+            gap: 0.58rem;
+            margin-top: 0.16rem;
+            align-items: stretch;
+            flex-direction: column;
+          }
+          .cta-primary-row,
+          .cta-secondary-row {
+            width: 100%;
+          }
+          .cta-primary-row {
+            display: flex;
+          }
+          .cta-secondary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.55rem;
+          }
+          .cta-row :global(.cta-primary-btn) {
+            width: 100%;
+            justify-content: center;
+            padding-block: 0.95rem;
+          }
+          .cta-row :global(.cta-secondary-btn) {
+            flex: 1 1 auto;
+            min-width: 0;
+            justify-content: center;
+            padding-block: 0.9rem;
+          }
+          .cta-row :global(.cta-social) {
+            justify-content: flex-end;
+          }
+          .rail {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            flex: 1;
+            min-height: 0;
+            gap: 0.62rem;
+            padding-top: clamp(0.18rem, 0.7vh, 0.4rem);
+          }
+          .rail-metrics {
+            order: 2;
+            width: 100%;
+            margin-top: auto;
+            justify-content: flex-start;
+            gap: clamp(0.55rem, 2.4vw, 0.9rem);
+          }
+          .rail-metric:not(:last-child)::after {
+            content: "·";
+            margin-inline-start: clamp(0.55rem, 2.4vw, 0.9rem);
+            color: var(--fg-50);
+            font-weight: 600;
+          }
+          .rail-metric-num {
+            font-size: clamp(1rem, 4.5vw, 1.18rem);
+          }
+          .rail-wrap {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+          }
+          .rail-metric-label {
+            font-size: clamp(0.74rem, 2.7vw, 0.8rem);
+          }
+          .mobile-tech-stage {
+            order: 3;
+            position: relative;
+            display: block;
+            flex: none;
+            min-height: 0;
+            width: 100%;
+            margin-top: 0.12rem;
+            overflow: hidden;
+            padding: 0.14rem 0 0.18rem;
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+          }
+          .mobile-console {
+            order: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-height: clamp(7rem, 22vh, 13rem);
+            margin-top: clamp(0.35rem, 1.3vh, 0.72rem);
+            overflow: hidden;
+          }
+          /* corner-bracket frame (matches the hero mock) */
+          .mobile-console::before,
+          .mobile-console::after {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+            border-color: rgba(var(--accent-rgb), 0.5);
+          }
+          .mobile-console::before {
+            top: 0;
+            left: 0;
+            border-top: 1.5px solid;
+            border-left: 1.5px solid;
+            border-color: rgba(var(--accent-rgb), 0.5);
+          }
+          .mobile-console::after {
+            bottom: 0;
+            right: 0;
+            border-bottom: 1.5px solid;
+            border-right: 1.5px solid;
+            border-color: rgba(var(--accent-rgb), 0.5);
+          }
+          .mobile-console-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: clamp(0.28rem, 1.1vh, 0.5rem);
+            flex: 1 1 auto;
+            min-height: 0;
+            padding: clamp(0.7rem, 3.5vw, 1.05rem) clamp(0.85rem, 4vw, 1.2rem);
+            overflow: hidden;
+          }
+          .mobile-console-row {
+            font-family: var(--font-mono);
+            font-size: clamp(0.78rem, 3.3vw, 0.92rem);
+            line-height: 1.45;
+            letter-spacing: -0.01em;
+            color: var(--fg-70);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .mobile-console-comment { color: var(--fg-50); }
+          .mobile-console-active {
+            color: rgb(var(--accent-rgb));
+            font-weight: 500;
+          }
+          .mobile-tech-lane {
+            display: inline-flex;
+            align-items: center;
+            width: max-content;
+            min-width: 100%;
+            white-space: nowrap;
+            will-change: transform;
+            padding-inline: 0.75rem;
+          }
+          .mobile-tech-lane-a {
+            animation: mobileMarqueeForward 36s linear infinite;
+          }
+          .mobile-tech-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-inline: 0.3rem;
+            font-family: var(--font-mono);
+            font-size: clamp(0.95rem, 3.4vw, 1.12rem);
+            font-weight: 600;
+            color: var(--fg-70);
+          }
+          .mobile-tech-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.9rem;
+            height: 1.9rem;
+            flex: none;
+          }
+          .mobile-tech-ic {
+            width: 1.55rem;
+            height: 1.55rem;
+            object-fit: contain;
+            flex: none;
+            filter: drop-shadow(0 1px 5px rgba(0, 0, 0, 0.08));
+          }
+          .mobile-tech-fallback {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.16rem;
+            font-family: var(--font-mono);
+            font-size: 1.06rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--fg);
+            letter-spacing: -0.03em;
+          }
+          .mobile-tech-pill-label {
+            color: var(--fg-70);
+          }
+          .mobile-tech-pill-dot {
+            width: 0.26rem;
+            height: 0.26rem;
+            flex: none;
+            border-radius: 999px;
+            background: rgba(var(--accent-rgb), 0.7);
+            margin-inline-start: 0.45rem;
+          }
+        }
+
+        @media (max-width: 675px) and (max-height: 720px) {
+          .home-main {
+            gap: 0.58rem;
+            padding-bottom: clamp(20px, 3.5vh, 30px);
+          }
+          .home-name {
+            font-size: clamp(2.7rem, 12vw, 3.4rem);
+          }
+          .role-row {
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
+          }
+          .hero-text {
+            gap: 0.46rem;
+          }
+          .tagline {
+            line-height: 1.5;
+          }
+          .cta-row :global(.cta-primary-btn) {
+            padding-block: 0.78rem;
+          }
+          .cta-row :global(.cta-secondary-btn) {
+            padding-block: 0.74rem;
+          }
+          .cta-secondary-row {
+            gap: 0.45rem;
+          }
+          .mobile-tech-stage {
+            margin-top: 0.12rem;
+            padding-bottom: 0.04rem;
+          }
+          .mobile-console {
+            min-height: clamp(5rem, 16vh, 8rem);
+            margin-top: 0.42rem;
+          }
+          .mobile-console-body {
+            gap: 0.26rem;
+            padding: 0.6rem 0.85rem;
+          }
+          .mobile-tech-pill {
+            gap: 0.42rem;
+            font-size: 0.9rem;
+          }
+        }
+
+        /* ════════════ MOBILE breathing room ════════════ */
+        @media (max-width: 400px) {
+          .tagline { -webkit-line-clamp: 2; }
+          .eyebrow-sep, .eyebrow-loc { display: none; }
+          .mobile-tech-pill {
+            gap: 0.42rem;
+            font-size: 0.9rem;
+          }
+          .mobile-console-body {
+            padding: 0.55rem 0.7rem;
+          }
+          .mobile-console-row {
+            font-size: 0.74rem;
+          }
+          .mobile-tech-pill-badge {
+            width: 1.62rem;
+            height: 1.62rem;
+          }
+          .mobile-tech-ic {
+            width: 1.32rem;
+            height: 1.32rem;
+          }
+        }
+
+        /* ════════════ LIGHT MODE ════════════ */
+        :global(html.light) .now-card,
+        :global(html.light) .featured-card {
+          background: rgba(255, 255, 255, 0.66);
+          box-shadow: 0 24px 70px rgba(12, 13, 20, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        :global(html.light) .grain-overlay { opacity: 0.02; mix-blend-mode: multiply; }
+
+        /* ════════════ REDUCED MOTION ════════════ */
         @media (prefers-reduced-motion: reduce) {
-          .home-name { animation: none; }
-          .home-dot, .home-spark, .home-caret { animation: none; }
-          .status-panel:hover, .console-panel:hover, .stack-panel:hover, .assistant-panel:hover, .focus-chip:hover, .stack-chip:hover { transform: none; }
+          .eyebrow-dot, .now-status-dot, .home-caret, .meta-avail-dot,
+          .preloader-dot, .orb-a, .orb-b { animation: none; }
+          .marquee-track { animation: none; }
+          .mobile-tech-lane-a { animation: none; }
         }
       `}</style>
     </div>

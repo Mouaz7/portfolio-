@@ -1,5 +1,5 @@
 import "./global.css";
-import { urbanist } from "./fonts";
+import { display, sans, mono } from "./fonts";
 import { getSiteTheme, themeToCss } from "@/lib/theme";
 import SiteBackground from "@/components/layout/SiteBackground";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
@@ -75,7 +75,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     // Make the root viewport-height and non-scrollable
-    <html lang="en" className={`${urbanist.variable} h-dvh`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${display.variable} ${sans.variable} ${mono.variable} h-dvh`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <style dangerouslySetInnerHTML={{ __html: themeCss }} />

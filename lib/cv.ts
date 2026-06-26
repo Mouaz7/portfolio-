@@ -14,11 +14,7 @@ Skills: React, Next.js, TypeScript, Kotlin, Jetpack Compose, C++, C, Python, Bun
 Experience: Full-stack intern at Softhouse (TeamTemp, Pong Pal), Student Mentor and C++ Teaching Assistant at BTH.
 Contact: mouaz.naji.dev@gmail.com · github.com/Mouaz7 · linkedin.com/in/mouaz-naji.`;
 
-let cached: { value: string; at: number } | null = null;
-const TTL_MS = 60_000;
-
 export async function getSiteCv(): Promise<string> {
-  if (cached && Date.now() - cached.at < TTL_MS) return cached.value;
   try {
     const { data, error } = await supabase
       .from("site_cv")
@@ -26,11 +22,9 @@ export async function getSiteCv(): Promise<string> {
       .eq("id", 1)
       .single();
 
-    const content = !error && data && typeof data.content === "string" && data.content.trim()
+    return !error && data && typeof data.content === "string" && data.content.trim()
       ? data.content.trim()
       : FALLBACK_CV;
-    cached = { value: content, at: Date.now() };
-    return content;
   } catch {
     return FALLBACK_CV;
   }

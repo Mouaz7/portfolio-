@@ -20,8 +20,23 @@ const CHATBOT_ICON_FALLBACK: UiIcon = {
   viewBox: "0 0 24 24",
 };
 
-const BotIcon = ({ icon = CHATBOT_ICON_FALLBACK, size = 20 }: { icon?: UiIcon; size?: number }) => (
-  <svg width={size} height={size} viewBox={icon.viewBox ?? "0 0 24 24"} fill="none" aria-hidden="true">
+const BotIcon = ({
+  icon = CHATBOT_ICON_FALLBACK,
+  size = 20,
+  className,
+}: {
+  icon?: UiIcon;
+  size?: number;
+  className?: string;
+}) => (
+  <svg
+    width={className ? undefined : size}
+    height={className ? undefined : size}
+    viewBox={icon.viewBox ?? "0 0 24 24"}
+    fill="none"
+    aria-hidden="true"
+    className={className}
+  >
     <path
       d={icon.svgPath}
       stroke="currentColor"
@@ -157,19 +172,19 @@ export default function AiChatbot() {
         aria-label={t("chat.open")}
         onClick={() => setOpen(true)}
         className={[
-          "group fixed bottom-5 right-5 z-[120] grid h-14 w-14 place-items-center rounded-2xl",
-          "text-black transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
-          "hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70",
+          "group fixed z-[120] grid place-items-center",
+          "bottom-4 right-4 h-10 w-10 sm:bottom-5 sm:right-5 sm:h-11 sm:w-11 lg:h-14 lg:w-14 xl:h-16 xl:w-16",
+          "transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
+          "hover:-translate-y-0.5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70",
           open ? "pointer-events-none scale-90 opacity-0" : "opacity-100",
         ].join(" ")}
-        style={{
-          background:
-            "linear-gradient(140deg, rgb(var(--accent-rgb)), color-mix(in srgb, rgb(var(--accent-rgb)) 65%, #6d8bff))",
-          boxShadow: "0 12px 38px rgba(var(--accent-rgb),0.42)",
-        }}
+        style={{ color: "rgb(var(--accent-rgb))" }}
       >
         <span className="transition-transform duration-300 group-hover:scale-110">
-          <BotIcon icon={chatIcon} size={26} />
+          <BotIcon
+            icon={chatIcon}
+            className="h-5 w-5 sm:h-[22px] sm:w-[22px] lg:h-7 lg:w-7 xl:h-8 xl:w-8"
+          />
         </span>
       </button>
 
