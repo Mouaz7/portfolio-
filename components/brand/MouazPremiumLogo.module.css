@@ -1,0 +1,75 @@
+.logo {
+  --mouaz-logo-ink: #f4f7fa;
+  --mouaz-logo-accent: #19e3c2;
+  --mouaz-logo-cutout: #07191e;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  line-height: 0;
+  flex: none;
+}
+
+:global(html.light) .logo {
+  --mouaz-logo-ink: #0b2c31;
+  --mouaz-logo-accent: #007f87;
+  --mouaz-logo-cutout: #f4fffd;
+}
+
+.compact {
+  display: block;
+  width: 48px;
+  height: auto;
+  aspect-ratio: 96 / 104;
+  flex: none;
+}
+
+.inkFill {
+  fill: var(--mouaz-logo-ink);
+}
+
+.accentFill {
+  fill: var(--mouaz-logo-accent);
+}
+
+.cutoutStroke {
+  fill: none;
+  stroke: var(--mouaz-logo-cutout);
+}
+
+.logo[data-size="sm"] .compact {
+  width: 42px;
+}
+
+@media (min-width: 676px) and (max-width: 899px) {
+  .logo[data-size="sm"] .compact {
+    width: 38px;
+  }
+}
+
+@media (max-width: 675px) {
+  .logo[data-size="md"] .compact {
+    width: 36px;
+  }
+
+  :global(.site-header-mobile-panel) .logo[data-size="md"] .compact {
+    width: 38px;
+  }
+
+  .logo[data-size="sm"] .compact {
+    width: 36px;
+  }
+}
+
+@media (max-width: 340px) {
+  .logo[data-size="md"] .compact {
+    width: 34px;
+  }
+
+  :global(.site-header-mobile-panel) .logo[data-size="md"] .compact {
+    width: 36px;
+  }
+
+  .logo[data-size="sm"] .compact {
+    width: 32px;
+  }
+}

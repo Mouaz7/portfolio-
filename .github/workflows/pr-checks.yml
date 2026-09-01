@@ -1,0 +1,50 @@
+name: Pull request conventions
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-conventions-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  title:
+    name: PR title convention
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            perf
+
+  size:
+    name: PR size information
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Calculate change size
+        shell: bash
+        run: |
+          changed_files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" | wc -l)
+          additions=$(git diff --numstat "origin/${{ github.base_ref }}...HEAD" | awk '{ total += $1 } END { print total + 0 }')
+          echo "Changed files: $changed_files"
+          echo "Lines added: $additions"

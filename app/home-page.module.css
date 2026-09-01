@@ -1,0 +1,548 @@
+.root {
+  --home-capability-border: color-mix(in srgb, var(--accent) 24%, var(--page-border));
+  --home-capability-border-strong: color-mix(in srgb, var(--accent) 48%, var(--page-border));
+  --home-capability-surface: var(--page-panel);
+  --home-premium-muted: var(--page-text-muted);
+}
+
+:global(html.light) .root {
+  --home-capability-border: color-mix(in srgb, var(--accent) 24%, var(--page-border));
+  --home-capability-border-strong: color-mix(in srgb, var(--accent) 48%, var(--page-border));
+  --home-capability-surface: var(--page-panel);
+  --home-premium-muted: var(--page-text-muted);
+}
+
+.capabilityGrid {
+  display: none;
+}
+
+.nameLead,
+.nameAccent {
+  display: inline;
+}
+
+.nameAccent {
+  color: var(--home-brand-accent, var(--accent-strong));
+}
+
+@media (max-width: 675px) {
+  .root :global(.site-header) {
+    width: 100%;
+    min-height: 54px;
+    padding: 6px 12px 0;
+  }
+
+}
+
+@media (min-width: 676px) {
+  .root.root,
+  .root .slide,
+  .root .shell {
+    width: 100%;
+    max-width: 100%;
+    height: 100svh;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  @supports (height: 100dvh) {
+    .root.root,
+    .root .slide,
+    .root .shell {
+      height: 100dvh;
+      min-height: 100dvh;
+    }
+  }
+
+  .root.root {
+    position: relative;
+    isolation: isolate;
+    color: var(--fg);
+  }
+
+  .root .slide {
+    position: relative;
+  }
+
+  .root .shell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .root .main {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: min(calc(100% - clamp(32px, 6vw, 112px)), 1600px);
+    max-width: 1600px;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 auto;
+    flex: 1 1 auto;
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+    gap: clamp(18px, 3vw, 56px);
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  .root .main::before,
+  .root .main::after {
+    content: none;
+  }
+
+  .root .copy {
+    position: relative;
+    inset: auto;
+    z-index: 20;
+    display: flex;
+    width: 100%;
+    max-width: 700px;
+    min-width: 0;
+    margin: 0;
+    padding: clamp(18px, 3.5vh, 42px) 0 clamp(24px, 4vh, 54px);
+    align-self: center;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 1;
+    align-items: center;
+    text-align: center;
+    transform: none;
+  }
+
+  .root .mobileHello {
+    display: flex;
+    margin: 0 0 clamp(10px, 1.5vh, 16px);
+    justify-content: center;
+  }
+
+  .root .titleBlock {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    color: var(--fg);
+    font-family: var(--font-urbanist);
+    font-size: clamp(2.875rem, 6.5vw, 3.75rem);
+    font-weight: 780;
+    letter-spacing: -0.035em;
+    line-height: 0.96;
+    text-align: center;
+    white-space: normal;
+    transform: none;
+  }
+
+  .root .name {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    color: var(--fg);
+    font-size: 1em;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .root .role {
+    display: block;
+    margin: 0.03em 0 0;
+    color: var(--fg);
+    font-size: 0.8em;
+    font-weight: 780;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-align: center;
+    text-transform: none;
+    white-space: nowrap;
+  }
+
+  .root .role::before {
+    content: none;
+  }
+
+  .root .role::after {
+    display: block;
+    width: clamp(56px, 8vw, 112px);
+    height: 2px;
+    margin: 12px auto 0;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    content: "";
+    opacity: 0.72;
+  }
+
+  .root .roleVisual {
+    display: inline-flex;
+    min-width: 0;
+    align-items: baseline;
+  }
+
+  .root .capabilityGrid {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    margin-top: clamp(18px, 2.8vh, 30px);
+  }
+
+  .root .capabilityList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(7px, 0.9vw, 11px);
+  }
+
+  .root .capabilityCard {
+    box-sizing: border-box;
+    display: flex;
+    min-width: 0;
+    min-height: 82px;
+    margin: 0;
+    padding: clamp(11px, 1.25vw, 16px);
+    align-items: center;
+    gap: clamp(9px, 1vw, 13px);
+    border: 1px solid var(--home-capability-border);
+    border-radius: 14px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 48%),
+      var(--home-capability-surface);
+    box-shadow:
+      0 16px 38px -32px rgba(0, 0, 0, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.11);
+    text-align: left;
+    backdrop-filter: blur(10px) saturate(1.08);
+    -webkit-backdrop-filter: blur(10px) saturate(1.08);
+    transition: border-color 180ms ease, background-color 180ms ease;
+  }
+
+  .root .capabilityCard:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .root .capabilityIconWrap {
+    display: grid;
+    width: clamp(40px, 3.6vw, 50px);
+    height: clamp(40px, 3.6vw, 50px);
+    flex: 0 0 auto;
+    place-items: center;
+    color: var(--accent-strong);
+  }
+
+  .root .capabilityIcon {
+    width: clamp(31px, 2.65vw, 38px);
+    height: clamp(31px, 2.65vw, 38px);
+    opacity: 0.96;
+    filter: drop-shadow(0 4px 10px rgba(var(--accent-rgb), 0.2));
+  }
+
+  .root .capabilityCopy {
+    min-width: 0;
+  }
+
+  .root .capabilityTitle {
+    margin: 0;
+    color: var(--fg);
+    font-size: clamp(0.88rem, 1.25vw, 1.04rem);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .root .capabilityDescription {
+    margin: 6px 0 0;
+    color: var(--home-premium-muted);
+    font-size: clamp(0.74rem, 1vw, 0.88rem);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  .root .stage {
+    position: relative;
+    inset: auto;
+    z-index: 5;
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    grid-column: 1;
+    grid-row: 1;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .root .portraitAnchor {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .root .portraitArtbox {
+    position: relative;
+    width: clamp(420px, 58vw, 700px);
+    max-width: none;
+    height: 84%;
+    max-height: none;
+    min-width: 0;
+    min-height: 0;
+    flex: 0 0 auto;
+    transform: translateX(-6%);
+    transform-origin: bottom center;
+  }
+
+  .root .portraitImage {
+    filter: drop-shadow(0 28px 34px rgba(0, 8, 12, 0.3));
+  }
+}
+
+/* Tablet/iPad: same mobile hero geometry, scaled to larger viewport. */
+@media (min-width: 676px) and (max-width: 1199px) {
+  .root .main {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+  }
+
+  .root .shell {
+    position: relative;
+  }
+
+  .root .shell > :global(header) {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 90;
+  }
+
+  .root .copy {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    min-height: 100%;
+    padding: 0 18px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .root :global(.site-header) {
+    width: 100%;
+    min-height: 54px;
+    padding: 8px clamp(18px, 4vw, 36px) 0;
+  }
+
+  .root :global(.site-header-nav) {
+    display: flex !important;
+  }
+
+  .root :global(.site-header-mobile-controls) {
+    display: none !important;
+  }
+
+  .root :global(.site-header-mobile-backdrop) {
+    display: none !important;
+  }
+
+  .root :global(.site-header-mobile-panel) {
+    display: none !important;
+  }
+
+  .root .mobileHello {
+    position: absolute;
+    top: clamp(64px, 7.5dvh, 106px);
+    right: 0;
+    left: 0;
+    display: flex;
+    margin: 0;
+    justify-content: center;
+  }
+
+  .root .titleBlock {
+    position: absolute;
+    top: clamp(98px, 11.5dvh, 154px);
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    padding: 0 18px;
+    font-size: clamp(2.55rem, 6.25vw, 4.75rem);
+    line-height: 0.98;
+  }
+
+  .root .name,
+  .root .role {
+    white-space: nowrap;
+  }
+
+  .root .role {
+    font-size: 0.8em;
+    letter-spacing: -0.025em;
+  }
+
+  .root :global(.home-hero-actions) {
+    position: absolute;
+    right: 0;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 0;
+    z-index: 80;
+    width: min(calc(100% - 48px), 520px);
+    margin: 0 auto;
+    display: flex !important;
+    gap: clamp(8px, 1.4vw, 14px);
+    visibility: visible !important;
+    opacity: 1 !important;
+    isolation: isolate;
+    pointer-events: auto;
+  }
+
+  .root :global(.home-projects-cta),
+  .root :global(.home-download-cta) {
+    min-width: 0;
+    width: 50%;
+    min-height: 48px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .root .capabilityGrid {
+    display: none;
+  }
+
+  .root .stage {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: block;
+    overflow: hidden;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .root .portraitAnchor {
+    inset: clamp(178px, 20dvh, 270px) 0 0;
+    height: auto;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .root .portraitArtbox {
+    width: clamp(520px, 74dvh, 820px);
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    transform-origin: bottom center;
+  }
+
+  .root .portraitImage :global(img) {
+    object-position: center bottom !important;
+  }
+
+  .root .portraitImage > div {
+    transform: none !important;
+    transform-origin: bottom center !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .root .main {
+    grid-template-columns: minmax(0, 47fr) minmax(0, 53fr);
+    gap: clamp(46px, 4vw, 84px);
+  }
+
+  .root .copy {
+    max-width: 760px;
+  }
+
+  .root .name {
+    font-size: 1em;
+  }
+
+  .root .titleBlock {
+    font-size: clamp(4.5rem, 5.3vw, 6rem);
+  }
+
+  .root .portraitArtbox {
+    width: 104%;
+    height: 97%;
+    transform: translateX(-7%);
+  }
+
+  .root .capabilityList {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .root .capabilityCard {
+    min-height: 94px;
+    grid-column: span 2;
+  }
+
+  .root .capabilityCard:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+}
+
+@media (min-width: 676px) and (max-width: 1199px) and (max-height: 820px) {
+  .root .copy {
+    padding: 0 16px;
+  }
+
+  .root .titleBlock {
+    top: clamp(84px, 10.5dvh, 118px);
+    font-size: clamp(2.2rem, 5.4vw, 3.65rem);
+  }
+
+  .root .mobileHello {
+    top: clamp(52px, 7dvh, 74px);
+  }
+
+  .root .portraitAnchor {
+    inset: clamp(148px, 18dvh, 182px) 0 0;
+    height: auto;
+  }
+
+  .root .portraitArtbox {
+    width: clamp(460px, 76dvh, 680px);
+  }
+}
+
+/* Compact landscape cannot fit the title, portrait and actions vertically.
+   Keep the readable hero composition used by the localized compact layouts. */
+@media (max-width: 1199px) and (max-height: 500px) {
+  .root .stage {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .root .capabilityCard:hover {
+    border-color: var(--home-capability-border-strong);
+    background: rgba(var(--accent-rgb), 0.065);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (min-width: 676px) {
+  .root .capabilityCard {
+    transition: none;
+  }
+}

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="42" height="44" viewBox="0 0 96 104" role="img" aria-labelledby="title desc">
+  <title id="title">Mouaz compact logo</title>
+  <desc id="desc">A geometric M monogram with Mouaz in a compact lower band.</desc>
+  <style>
+    .ink{fill:#f4f7fa}.accent{fill:#19e3c2}.cutout{fill:none;stroke:#07191e}
+    @media(prefers-color-scheme:light){.ink{fill:#0b2c31}.accent{fill:#007f87}.cutout{stroke:#f4fffd}}
+  </style>
+  <path class="ink" d="M4 74V8h24l20 17L68 8h24v29L68 58V38L48 59 28 38v36H4Z"/>
+  <path class="accent" d="M37 74 92 30v44H68V52L43 74h-6Z"/>
+  <rect class="ink" x="0" y="78" width="96" height="26" rx="2"/>
+  <g class="cutout" transform="translate(4.5 82) scale(.36)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 45V4l17 21L38 4v41"/>
+    <rect x="51" y="4" width="43" height="41" rx="18"/>
+    <path d="M106 4v23c0 12 6 18 17 18s17-6 17-18V4"/>
+    <path d="m152 45 17-41 17 41"/>
+    <path d="M199 4h38l-38 41h38"/>
+  </g>
+</svg>

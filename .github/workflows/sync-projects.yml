@@ -1,0 +1,55 @@
+name: Sync GitHub projects
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-github-projects
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.x"
+          cache: npm
+      - run: npm ci
+      - run: npm run sync:projects
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CANONICAL_SITE_URL: ${{ vars.CANONICAL_SITE_URL }}
+      - name: Revalidate portfolio data
+        env:
+          REVALIDATE_URL: ${{ vars.CANONICAL_SITE_URL }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        run: |
+          test -n "$REVALIDATE_URL"
+          test -n "$REVALIDATE_SECRET"
+          curl --fail --silent --show-error \
+            --request POST "$REVALIDATE_URL/api/internal/revalidate" \
+            --header "Authorization: Bearer $REVALIDATE_SECRET" \
+            --header "Content-Type: application/json" \
+            --data '{"tags":["projects"]}'
+      - name: Refresh RAG index
+        env:
+          RAG_REINDEX_URL: ${{ vars.CANONICAL_SITE_URL }}
+          RAG_JOB_SECRET: ${{ secrets.RAG_JOB_SECRET }}
+        run: |
+          test -n "$RAG_REINDEX_URL"
+          test -n "$RAG_JOB_SECRET"
+          curl --fail --silent --show-error \
+            --request POST "$RAG_REINDEX_URL/api/internal/rag/reindex" \
+            --header "Authorization: Bearer $RAG_JOB_SECRET"

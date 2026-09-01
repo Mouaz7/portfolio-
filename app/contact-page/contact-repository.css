@@ -1,0 +1,2036 @@
+/* ------------------------------------------------------------------ *
+ * Contact repository experience
+ * A functional contact form presented as a Git repository workflow.
+ * ------------------------------------------------------------------ */
+.contact-page {
+  --contact-gh-canvas: var(--page-panel-muted);
+  --contact-gh-surface: var(--page-panel);
+  --contact-gh-surface-muted: color-mix(in srgb, var(--page-panel-muted) 78%, var(--page-panel));
+  --contact-gh-field: var(--page-field);
+  --contact-gh-border: var(--page-border);
+  --contact-gh-border-strong: color-mix(in srgb, var(--page-text-subtle) 40%, var(--page-border));
+  --contact-gh-text: var(--page-text);
+  --contact-gh-muted: var(--page-text-muted);
+  --contact-gh-subtle: var(--page-text-subtle);
+  --contact-gh-blue: #58a6ff;
+  --contact-gh-blue-rgb: 88, 166, 255;
+  --contact-gh-green: #3fb950;
+  --contact-gh-green-rgb: 63, 185, 80;
+  --contact-gh-orange: #f78166;
+  --contact-gh-orange-rgb: 247, 129, 102;
+  --contact-gh-danger: #f85149;
+  --contact-gh-shadow: 0 18px 55px -36px rgba(0, 0, 0, 0.78), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+html.light .contact-page {
+  --contact-gh-canvas: #f6f8fa;
+  --contact-gh-surface: #ffffff;
+  --contact-gh-surface-muted: #f6f8fa;
+  --contact-gh-field: #ffffff;
+  --contact-gh-border: #d0d7de;
+  --contact-gh-border-strong: #afb8c1;
+  --contact-gh-text: #1f2328;
+  --contact-gh-muted: #57606a;
+  --contact-gh-subtle: #6e7781;
+  --contact-gh-blue: #0969da;
+  --contact-gh-blue-rgb: 9, 105, 218;
+  --contact-gh-green: #1a7f37;
+  --contact-gh-green-rgb: 26, 127, 55;
+  --contact-gh-orange: #fd8c73;
+  --contact-gh-orange-rgb: 253, 140, 115;
+  --contact-gh-danger: #cf222e;
+  --contact-gh-shadow: 0 20px 60px -40px rgba(31, 35, 40, 0.32), 0 1px 0 rgba(255, 255, 255, 0.82) inset;
+}
+
+.contact-page .contact-main {
+  width: 100%;
+  padding: 10px 12px 16px;
+}
+
+.contact-repository-shell {
+  position: relative;
+  width: min(100%, 1328px);
+  overflow: hidden;
+  border: 1px solid var(--contact-gh-border);
+  border-radius: 10px;
+  background: var(--contact-gh-canvas);
+  box-shadow: var(--contact-gh-shadow);
+  color: var(--contact-gh-text);
+  font-family: var(--font-urbanist), system-ui, sans-serif;
+  isolation: isolate;
+}
+
+.contact-page .contact-form {
+  font-family: var(--font-urbanist), system-ui, sans-serif;
+}
+
+.contact-repository-shell::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(circle at 77% 14%, rgba(var(--contact-gh-blue-rgb), 0.08), transparent 30%),
+    radial-gradient(circle at 14% 88%, rgba(var(--contact-gh-green-rgb), 0.06), transparent 34%);
+  content: "";
+  pointer-events: none;
+}
+
+.contact-repository-header {
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px solid var(--contact-gh-border);
+  background: var(--contact-gh-surface-muted);
+}
+
+.contact-repository-title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px 10px;
+}
+
+.contact-repository-title,
+.contact-repository-state,
+.contact-repository-tab,
+.contact-branch-selector,
+.contact-toolbar-status {
+  display: inline-flex;
+  align-items: center;
+}
+
+.contact-repository-title {
+  min-width: 0;
+  gap: 5px;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.contact-repository-mark {
+  display: inline-grid;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--contact-gh-muted);
+}
+
+.contact-repository-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.contact-repository-owner,
+.contact-repository-title strong {
+  overflow: hidden;
+  color: var(--contact-gh-blue);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-repository-title strong {
+  font-weight: 650;
+}
+
+.contact-repository-slash {
+  color: var(--contact-gh-subtle);
+}
+
+.contact-repository-visibility,
+.contact-new-badge,
+.contact-profile-verified {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border: 1px solid var(--contact-gh-border-strong);
+  border-radius: 999px;
+  color: var(--contact-gh-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.contact-repository-visibility {
+  min-height: 20px;
+  margin-inline-start: 4px;
+  padding-inline: 8px;
+}
+
+.contact-repository-state {
+  flex: 0 0 auto;
+  gap: 7px;
+  color: var(--contact-gh-muted);
+  font-size: 0.72rem;
+}
+
+.contact-repository-state code,
+.contact-branch-selector {
+  border: 1px solid var(--contact-gh-border);
+  border-radius: 6px;
+  background: var(--contact-gh-surface);
+  color: var(--contact-gh-text);
+  font: 600 0.7rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-repository-state code {
+  padding: 5px 8px;
+}
+
+.contact-repository-state-dot,
+.contact-toolbar-status i,
+.contact-profile-branch-row i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--contact-gh-green);
+  box-shadow: 0 0 0 3px rgba(var(--contact-gh-green-rgb), 0.12);
+}
+
+.contact-repository-tabs {
+  display: flex;
+  min-width: 0;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 0 8px;
+  scrollbar-width: none;
+}
+
+.contact-repository-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.contact-repository-tab {
+  position: relative;
+  min-height: 39px;
+  flex: 0 0 auto;
+  gap: 6px;
+  padding: 0 12px;
+  color: var(--contact-gh-muted);
+  font-size: 0.76rem;
+  font-weight: 550;
+  white-space: nowrap;
+}
+
+.contact-repository-tab svg {
+  width: 16px;
+  height: 16px;
+  color: var(--contact-gh-subtle);
+}
+
+.contact-repository-tab small {
+  display: inline-grid;
+  min-width: 18px;
+  min-height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--contact-gh-border-strong) 48%, transparent);
+  color: var(--contact-gh-text);
+  font: 600 0.62rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-repository-tab[data-active="true"] {
+  background: transparent;
+  color: var(--contact-gh-text);
+}
+
+.contact-repository-tab:not([data-active="true"]):hover {
+  background: color-mix(in srgb, var(--contact-gh-surface) 58%, transparent);
+  color: var(--contact-gh-text);
+}
+
+.contact-repository-tab[data-active="true"]::after {
+  position: absolute;
+  right: 7px;
+  bottom: -1px;
+  left: 7px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--contact-gh-orange);
+  content: "";
+}
+
+.contact-repository-tab[data-active="true"] svg {
+  color: var(--contact-gh-text);
+}
+
+.contact-repository-workspace {
+  position: relative;
+  min-height: 0;
+  background-image:
+    linear-gradient(rgba(var(--contact-gh-blue-rgb), 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--contact-gh-blue-rgb), 0.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.contact-phone-layout {
+  width: 100%;
+  padding: 9px 7px 12px;
+}
+
+.contact-page .contact-form,
+.contact-page .contact-form-fields {
+  max-width: none !important;
+}
+
+.contact-form-worktree {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  min-width: 0;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.contact-commit-panel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--contact-gh-border-strong);
+  border-radius: 7px;
+  background: var(--contact-gh-surface);
+  box-shadow: 0 10px 34px -28px rgba(0, 0, 0, 0.72);
+}
+
+.contact-commit-toolbar {
+  display: flex;
+  min-height: 35px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--contact-gh-border);
+  background: var(--contact-gh-surface-muted);
+  padding: 5px 12px;
+}
+
+.contact-branch-selector {
+  min-height: 24px;
+  gap: 6px;
+  padding-inline: 7px;
+}
+
+.contact-branch-selector svg {
+  width: 14px;
+  height: 14px;
+  color: var(--contact-gh-muted);
+}
+
+.contact-toolbar-status {
+  gap: 6px;
+  color: var(--contact-gh-muted);
+  font: 0.66rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.contact-mobile-repository-context {
+  display: none;
+}
+
+.contact-commit-body {
+  min-width: 0;
+  padding: 16px;
+}
+
+.contact-commit-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.contact-commit-heading > div {
+  min-width: 0;
+}
+
+.contact-commit-kicker,
+.contact-profile-role {
+  display: block;
+  color: var(--contact-gh-green);
+  font: 700 0.62rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.09em;
+}
+
+.contact-commit-heading h2 {
+  overflow: hidden;
+  margin-top: 3px;
+  color: var(--contact-gh-text);
+  font-size: clamp(1rem, 2vw, 1.22rem);
+  font-weight: 650;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-new-badge {
+  min-height: 20px;
+  border-color: rgba(var(--contact-gh-blue-rgb), 0.44);
+  background: rgba(var(--contact-gh-blue-rgb), 0.09);
+  padding-inline: 8px;
+  color: var(--contact-gh-blue);
+}
+
+.contact-form-fields {
+  width: 100%;
+}
+
+.contact-identity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.contact-page .contact-identity-grid > div,
+.contact-message-control {
+  gap: 5px;
+}
+
+.contact-page .contact-identity-grid label,
+.contact-message-control > label {
+  min-width: 0;
+  color: var(--contact-gh-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.contact-page .contact-identity-grid label svg {
+  width: 11px;
+  height: 11px;
+  color: var(--contact-gh-subtle);
+}
+
+.contact-page .contact-input {
+  height: 37px !important;
+  border-width: 1px;
+  border-radius: 6px !important;
+  background: var(--contact-gh-field);
+  padding-inline: 11px !important;
+  color: var(--contact-gh-text);
+  font-size: 0.86rem !important;
+  font-weight: 500;
+  transition: border-color 300ms ease, box-shadow 300ms ease, background-color 300ms ease;
+}
+
+.contact-page .contact-input:hover,
+.contact-page .contact-message-field:hover {
+  border-color: var(--contact-gh-border-strong);
+}
+
+.contact-page .contact-input:focus-visible,
+.contact-page .contact-message-field:focus-within {
+  border-color: var(--contact-gh-blue);
+  box-shadow: 0 0 0 3px rgba(var(--contact-gh-blue-rgb), 0.18);
+  outline: none;
+}
+
+.contact-message-control {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.contact-message-control > label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.contact-message-control > label span {
+  overflow: hidden;
+  color: var(--contact-gh-subtle);
+  font: 0.62rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-page .contact-message-field {
+  display: flex;
+  border-width: 1px;
+  border-radius: 6px !important;
+  background: var(--contact-gh-field);
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.contact-editor-tabs {
+  display: flex;
+  min-height: 34px;
+  align-items: flex-end;
+  gap: 2px;
+  border-bottom: 1px solid var(--contact-gh-border);
+  background: var(--contact-gh-surface-muted);
+  padding: 5px 7px 0;
+}
+
+.contact-editor-tabs button {
+  position: relative;
+  min-height: 29px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  padding: 0 11px;
+  color: var(--contact-gh-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: color 300ms ease, background-color 300ms ease, border-color 300ms ease;
+}
+
+.contact-editor-tabs button[aria-selected="true"] {
+  bottom: -1px;
+  border-color: var(--contact-gh-border);
+  border-bottom-color: var(--contact-gh-field);
+  background: var(--contact-gh-field);
+  color: var(--contact-gh-text);
+}
+
+.contact-editor-tabs button:hover {
+  color: var(--contact-gh-text);
+}
+
+.contact-editor-tabs button:focus-visible,
+.contact-page .contact-portrait-links a:focus-visible,
+.contact-page .contact-attachment-toolbar .contact-field-action:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--contact-gh-blue);
+  outline-offset: -2px;
+}
+
+.contact-editor-language {
+  align-self: center;
+  margin: 0 3px 5px auto;
+  color: var(--contact-gh-subtle);
+  font: 0.58rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-page .contact-message-field textarea,
+.contact-message-preview {
+  height: 124px !important;
+  min-height: 124px;
+  padding: 11px 12px !important;
+  color: var(--contact-gh-text);
+  font: 500 0.86rem/1.48 var(--font-urbanist), system-ui, sans-serif;
+}
+
+.contact-message-preview {
+  overflow: auto;
+}
+
+.contact-message-preview p {
+  white-space: pre-wrap;
+}
+
+.contact-message-preview > span {
+  color: var(--contact-gh-subtle);
+}
+
+.contact-changed-files {
+  border-top: 1px solid var(--contact-gh-border);
+}
+
+.contact-changed-files-heading,
+.contact-no-files,
+.contact-attachment-toolbar {
+  min-height: 30px;
+  padding: 5px 9px;
+}
+
+.contact-changed-files-heading,
+.contact-attachment-toolbar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--contact-gh-surface-muted);
+}
+
+.contact-changed-files-heading {
+  border-bottom: 1px solid var(--contact-gh-border);
+  color: var(--contact-gh-muted);
+  font-size: 0.69rem;
+  font-weight: 600;
+}
+
+.contact-tracked-file {
+  display: grid;
+  min-height: 30px;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--contact-gh-border);
+  padding: 5px 9px;
+  color: var(--contact-gh-subtle);
+  font: 0.64rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-tracked-file > span {
+  color: var(--contact-gh-subtle);
+  font-weight: 700;
+  text-align: center;
+}
+
+.contact-tracked-file > span svg {
+  width: 13px;
+  height: 13px;
+}
+
+.contact-tracked-file code {
+  overflow: hidden;
+  color: var(--contact-gh-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-tracked-file small {
+  color: var(--contact-gh-subtle);
+  font: inherit;
+  white-space: nowrap;
+}
+
+.contact-tracked-file[data-modified="true"] > span,
+.contact-tracked-file[data-modified="true"] code,
+.contact-tracked-file[data-modified="true"] small {
+  color: var(--contact-gh-orange);
+}
+
+.contact-tracked-file[data-modified="true"] {
+  background: color-mix(in srgb, var(--contact-gh-orange) 7%, transparent);
+  box-shadow: inset 2px 0 var(--contact-gh-orange);
+}
+
+.contact-changed-files-heading > span,
+.contact-attachment-toolbar > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.contact-changed-files-heading > span small {
+  border-left: 1px solid var(--contact-gh-border);
+  margin-left: 2px;
+  padding-left: 8px;
+  color: var(--contact-gh-orange);
+  font: 600 0.58rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-changed-files-heading svg {
+  width: 14px;
+  height: 14px;
+}
+
+.contact-changed-files-heading strong {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--contact-gh-border-strong) 46%, transparent);
+  color: var(--contact-gh-text);
+  font: 600 0.62rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-no-files {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--contact-gh-subtle);
+  font: 0.66rem/1.25 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-no-files span {
+  color: var(--contact-gh-muted);
+}
+
+.contact-file-list {
+  display: grid;
+  max-height: 72px;
+  gap: 4px;
+  overflow: auto;
+  padding: 5px 7px;
+}
+
+.contact-page .contact-file-chip {
+  display: grid;
+  min-height: 28px;
+  grid-template-columns: auto 14px minmax(0, 1fr) auto auto;
+  gap: 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  padding: 3px 5px;
+  color: var(--contact-gh-muted);
+  font-size: 0.66rem;
+}
+
+.contact-page .contact-file-chip:hover {
+  background: rgba(var(--contact-gh-blue-rgb), 0.07);
+}
+
+.contact-page .contact-file-chip > svg {
+  width: 14px;
+  height: 14px;
+}
+
+.contact-file-status {
+  color: var(--contact-gh-green) !important;
+  font: 700 0.66rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-file-name {
+  overflow: hidden;
+  color: var(--contact-gh-text) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-page .contact-file-chip button {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 4px;
+  color: var(--contact-gh-subtle);
+}
+
+.contact-page .contact-file-chip button:hover {
+  background: rgba(248, 81, 73, 0.12);
+  color: var(--contact-gh-danger);
+}
+
+.contact-page .contact-attachment-toolbar {
+  min-height: 35px;
+  border-top: 1px solid var(--contact-gh-border);
+  padding-block: 6px;
+}
+
+.contact-page .contact-attachment-toolbar .contact-field-action {
+  gap: 5px;
+  color: var(--contact-gh-muted);
+  font-size: 0.7rem;
+  transition: color 300ms ease;
+}
+
+.contact-page .contact-attachment-toolbar .contact-field-action:hover {
+  color: var(--contact-gh-blue);
+}
+
+.contact-page .contact-attachment-toolbar .contact-field-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+.contact-page .contact-attachment-limit {
+  min-height: 18px;
+  border-color: var(--contact-gh-border);
+  background: var(--contact-gh-surface);
+  padding-inline: 6px;
+  font-size: 0.57rem;
+}
+
+.contact-form-error {
+  margin-top: 5px;
+  border-left: 2px solid var(--contact-gh-danger);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--contact-gh-danger) 9%, transparent);
+  padding: 5px 7px;
+  color: var(--contact-gh-danger);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.contact-commit-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.contact-page .contact-mobile-send > div,
+.contact-page .contact-mobile-send > div > div {
+  display: block;
+  padding: 0 !important;
+  border-radius: 6px !important;
+}
+
+.contact-page .contact-send-button button {
+  min-height: 35px;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 6px !important;
+  padding: 6px 13px;
+  transform: none !important;
+}
+
+.contact-page .contact-send-button button > span {
+  gap: 7px;
+}
+
+.contact-page .contact-send-button button > span > span:first-child {
+  font-size: 0.8rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.contact-page .contact-send-button button > span > span:last-child {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.contact-command-strip {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  margin: 12px -16px -16px;
+  border-top: 1px solid var(--contact-gh-border);
+  background: var(--contact-gh-surface-muted);
+  padding: 7px 10px;
+  color: var(--contact-gh-subtle);
+  font: 0.6rem/1.25 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-command-strip code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-command-strip span {
+  color: var(--contact-gh-muted);
+}
+
+.contact-command-strip span[data-ready="true"] {
+  color: var(--contact-gh-green);
+}
+
+.contact-command-strip small {
+  color: var(--contact-gh-blue);
+  font: inherit;
+}
+
+.contact-git-pipeline {
+  position: relative;
+  min-width: 0;
+  padding: 17px 0;
+}
+
+.contact-git-pipeline-line {
+  position: absolute;
+  top: 31px;
+  bottom: 31px;
+  left: 16px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(var(--contact-gh-green), var(--contact-gh-blue) 66%, var(--contact-gh-border-strong));
+  opacity: 0.72;
+}
+
+.contact-git-pipeline ol {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 380px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.contact-git-pipeline li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  color: var(--contact-gh-subtle);
+}
+
+.contact-git-pipeline-node {
+  display: inline-grid;
+  width: 33px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--contact-gh-border-strong);
+  border-radius: 999px;
+  background: var(--contact-gh-surface);
+  box-shadow: 0 0 0 4px var(--contact-gh-canvas);
+  color: var(--contact-gh-subtle);
+  font: 650 0.58rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  transition: border-color 300ms ease, color 300ms ease, box-shadow 300ms ease, background-color 300ms ease;
+}
+
+.contact-git-pipeline-node svg {
+  width: 13px;
+  height: 13px;
+}
+
+.contact-git-pipeline-label {
+  overflow: hidden;
+  font: 0.59rem/1.15 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-git-pipeline li[data-state="complete"] {
+  color: var(--contact-gh-green);
+}
+
+.contact-git-pipeline li[data-state="complete"] .contact-git-pipeline-node {
+  border-color: var(--contact-gh-green);
+  background: color-mix(in srgb, var(--contact-gh-green) 14%, var(--contact-gh-surface));
+  color: var(--contact-gh-green);
+}
+
+.contact-git-pipeline li[data-state="current"] {
+  color: var(--contact-gh-blue);
+}
+
+.contact-git-pipeline li[data-state="current"] .contact-git-pipeline-node {
+  border-color: var(--contact-gh-blue);
+  background: color-mix(in srgb, var(--contact-gh-blue) 12%, var(--contact-gh-surface));
+  box-shadow: 0 0 0 4px var(--contact-gh-canvas), 0 0 16px rgba(var(--contact-gh-blue-rgb), 0.28);
+  color: var(--contact-gh-blue);
+}
+
+/* GitHub maintainer profile */
+.contact-profile-card,
+.contact-portrait-panel {
+  min-width: 0;
+}
+
+.contact-page .contact-portrait-panel {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.contact-profile-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--contact-gh-border);
+  padding-bottom: 9px;
+}
+
+.contact-profile-heading h2 {
+  margin-top: 2px;
+  color: var(--contact-gh-text);
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.15;
+}
+
+.contact-profile-handle {
+  color: var(--contact-gh-subtle);
+  font: 0.68rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-profile-verified {
+  min-height: 21px;
+  gap: 4px;
+  border-color: rgba(var(--contact-gh-green-rgb), 0.34);
+  padding-inline: 7px;
+  color: var(--contact-gh-green);
+  white-space: nowrap;
+}
+
+.contact-profile-verified svg {
+  width: 12px;
+  height: 12px;
+}
+
+.contact-profile-portrait-row {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  place-items: center;
+}
+
+.contact-page .contact-portrait-frame {
+  aspect-ratio: 4 / 5;
+  width: min(100%, 272px);
+  height: auto;
+  max-height: 290px;
+  min-height: 0;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, rgba(var(--contact-gh-blue-rgb), 0.055), transparent 36%),
+    var(--contact-gh-field);
+}
+
+.contact-page .contact-portrait-frame img {
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.2));
+}
+
+.contact-profile-online {
+  position: absolute;
+  z-index: 4;
+  right: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--contact-gh-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--contact-gh-surface) 94%, transparent);
+  padding: 4px 7px;
+  color: var(--contact-gh-muted);
+  font: 0.59rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  backdrop-filter: blur(8px);
+}
+
+.contact-profile-online span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--contact-gh-green);
+  box-shadow: 0 0 0 3px rgba(var(--contact-gh-green-rgb), 0.13);
+}
+
+.contact-profile-terminal {
+  border: 1px solid var(--contact-gh-border);
+  border-radius: 6px;
+  background: var(--contact-gh-surface-muted);
+  padding: 8px 9px;
+}
+
+.contact-profile-terminal code,
+.contact-profile-terminal p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-profile-terminal code {
+  color: var(--contact-gh-muted);
+  font: 0.61rem/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-profile-terminal code span {
+  color: var(--contact-gh-green);
+}
+
+.contact-profile-terminal p {
+  margin-top: 4px;
+  color: var(--contact-gh-subtle);
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+.contact-profile-branch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--contact-gh-border);
+  padding-bottom: 8px;
+  color: var(--contact-gh-muted);
+  font: 0.61rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.contact-profile-branch-row > span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+}
+
+.contact-profile-branch-row svg {
+  width: 14px;
+  height: 14px;
+}
+
+.contact-page .contact-portrait-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.contact-page .contact-portrait-links a {
+  display: flex;
+  min-width: 0;
+  min-height: 34px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: var(--contact-gh-muted);
+  transition: border-color 300ms ease, color 300ms ease, background-color 300ms ease;
+}
+
+.contact-page .contact-portrait-links a span {
+  overflow: hidden;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-page .contact-portrait-links a:hover,
+.contact-page .contact-portrait-links a:focus-visible {
+  border-color: var(--contact-gh-blue);
+  background: rgba(var(--contact-gh-blue-rgb), 0.07);
+  color: var(--contact-gh-blue);
+}
+
+@media (min-width: 676px) {
+  .contact-page .contact-main {
+    display: grid;
+    padding: 10px clamp(12px, 2.2vw, 34px) 14px;
+    place-items: center;
+  }
+
+  .contact-repository-shell {
+    height: min(720px, calc(100dvh - 144px));
+    min-height: 540px;
+  }
+
+  .contact-repository-workspace {
+    height: calc(100% - 82px);
+  }
+
+  .contact-page .contact-adaptive-layout {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .contact-page .contact-premium-shell {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    grid-template-columns: minmax(230px, 0.37fr) minmax(420px, 0.63fr);
+    gap: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .contact-page .contact-profile-column {
+    display: grid;
+    min-height: 0;
+    border-right: 1px solid var(--contact-gh-border);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--contact-gh-surface-muted) 78%, transparent);
+    padding: 13px;
+    place-items: stretch;
+  }
+
+  .contact-page .contact-profile-card,
+  .contact-page .contact-portrait-panel {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    padding: 0;
+  }
+
+  .contact-page .contact-form-column {
+    display: grid;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    padding: 13px;
+    place-items: center;
+  }
+
+  .contact-page .contact-email-form {
+    width: 100%;
+  }
+
+  .contact-page .contact-form-worktree {
+    grid-template-columns: minmax(0, 1fr) 92px;
+  }
+
+  .contact-page .contact-git-pipeline {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .contact-page .contact-commit-panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+@media (min-width: 676px) and (max-width: 899px) {
+  .contact-repository-shell {
+    height: calc(100dvh - 132px);
+    min-height: 520px;
+  }
+
+  .contact-page .contact-main {
+    padding-inline: 9px;
+  }
+
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(205px, 0.32fr) minmax(405px, 0.68fr);
+  }
+
+  .contact-page .contact-profile-column,
+  .contact-page .contact-form-column {
+    padding: 9px;
+  }
+
+  .contact-page .contact-portrait-frame {
+    max-height: 238px;
+  }
+
+  .contact-profile-verified,
+  .contact-profile-terminal p,
+  .contact-profile-social-link span {
+    display: none;
+  }
+
+  .contact-page .contact-portrait-links {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .contact-page .contact-portrait-links a {
+    justify-content: center;
+    padding: 4px;
+  }
+
+  .contact-page .contact-form-worktree {
+    grid-template-columns: minmax(0, 1fr) 34px;
+    gap: 6px;
+  }
+
+  .contact-git-pipeline-label {
+    display: none;
+  }
+}
+
+@media (max-width: 675px) {
+  .contact-page .contact-main {
+    display: block;
+    padding: 4px 7px 8px;
+  }
+
+  .contact-repository-shell {
+    border-radius: 8px;
+  }
+
+  .contact-repository-title-row {
+    min-height: 39px;
+    gap: 7px;
+    padding: 7px 9px 5px;
+  }
+
+  .contact-repository-title {
+    gap: 4px;
+    font-size: 0.76rem;
+  }
+
+  .contact-repository-mark {
+    width: 18px;
+    height: 18px;
+  }
+
+  .contact-repository-visibility {
+    min-height: 17px;
+    padding-inline: 5px;
+    font-size: 0.55rem;
+  }
+
+  .contact-repository-state {
+    gap: 5px;
+  }
+
+  .contact-repository-state > span:last-child {
+    display: none;
+  }
+
+  .contact-repository-state code {
+    padding: 4px 6px;
+    font-size: 0.6rem;
+  }
+
+  .contact-repository-state-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .contact-repository-tabs {
+    justify-content: space-between;
+    gap: 0;
+    padding-inline: 4px;
+  }
+
+  .contact-repository-tab {
+    min-height: 32px;
+    gap: 3px;
+    padding-inline: 5px;
+    font-size: 0.6rem;
+  }
+
+  .contact-repository-tab svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .contact-repository-tab small {
+    min-width: 14px;
+    min-height: 14px;
+    font-size: 0.5rem;
+  }
+
+  .contact-phone-layout {
+    padding: 7px 5px 9px;
+  }
+
+  .contact-form-worktree {
+    grid-template-columns: 25px minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .contact-git-pipeline {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 14px 0;
+  }
+
+  .contact-commit-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .contact-git-pipeline-line {
+    top: 26px;
+    bottom: 26px;
+    left: 10px;
+    width: 1.5px;
+  }
+
+  .contact-git-pipeline ol {
+    min-height: 370px;
+  }
+
+  .contact-git-pipeline li {
+    gap: 0;
+  }
+
+  .contact-git-pipeline-node {
+    width: 21px;
+    height: 21px;
+    border-width: 1.5px;
+    box-shadow: 0 0 0 3px var(--contact-gh-canvas);
+    font-size: 0.52rem;
+  }
+
+  .contact-git-pipeline li[data-state="current"] .contact-git-pipeline-node {
+    box-shadow: 0 0 0 3px var(--contact-gh-canvas), 0 0 12px rgba(var(--contact-gh-blue-rgb), 0.3);
+  }
+
+  .contact-git-pipeline-label {
+    display: none;
+  }
+
+  .contact-commit-toolbar {
+    min-height: 30px;
+    padding: 4px 6px;
+  }
+
+  .contact-branch-selector {
+    min-height: 21px;
+    padding-inline: 5px;
+    font-size: 0.56rem;
+  }
+
+  .contact-branch-selector svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .contact-toolbar-status {
+    font-size: 0.54rem;
+  }
+
+  .contact-toolbar-status i {
+    width: 6px;
+    height: 6px;
+  }
+
+  .contact-commit-body {
+    padding: 9px;
+  }
+
+  .contact-commit-heading {
+    margin-bottom: 7px;
+  }
+
+  .contact-commit-kicker {
+    font-size: 0.52rem;
+  }
+
+  .contact-commit-heading h2 {
+    font-size: 0.9rem;
+  }
+
+  .contact-new-badge {
+    min-height: 18px;
+    padding-inline: 6px;
+    font-size: 0.56rem;
+  }
+
+  .contact-identity-grid {
+    gap: 6px;
+  }
+
+  .contact-page .contact-identity-grid label,
+  .contact-message-control > label {
+    font-size: 0.65rem;
+  }
+
+  .contact-page .contact-input {
+    height: 34px !important;
+    padding-inline: 8px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .contact-message-control {
+    margin-top: 7px;
+  }
+
+  .contact-message-control > label span {
+    font-size: 0.52rem;
+  }
+
+  .contact-editor-tabs {
+    min-height: 31px;
+    padding-top: 4px;
+  }
+
+  .contact-editor-tabs button {
+    min-height: 27px;
+    padding-inline: 9px;
+    font-size: 0.63rem;
+  }
+
+  .contact-page .contact-message-field textarea,
+  .contact-message-preview {
+    height: 105px !important;
+    min-height: 105px;
+    padding: 8px 9px !important;
+    font-size: 0.77rem;
+  }
+
+  .contact-changed-files-heading,
+  .contact-no-files {
+    min-height: 27px;
+    padding-block: 4px;
+    font-size: 0.59rem;
+  }
+
+  .contact-page .contact-attachment-toolbar {
+    min-height: 31px;
+    padding: 4px 6px;
+  }
+
+  .contact-page .contact-attachment-toolbar .contact-field-action {
+    font-size: 0.62rem;
+  }
+
+  .contact-attachment-limit {
+    display: none !important;
+  }
+
+  .contact-page .contact-mobile-actions {
+    margin-top: 7px;
+  }
+
+  .contact-page .contact-mobile-send button {
+    min-height: 33px;
+    padding: 5px 10px;
+  }
+
+  .contact-page .contact-mobile-socials {
+    display: flex;
+    min-width: 0;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .contact-page .contact-mobile-social-link {
+    display: inline-grid;
+    width: 31px;
+    height: 31px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 6px;
+    color: var(--contact-gh-muted);
+  }
+
+  .contact-page .contact-mobile-social-link svg,
+  .contact-page .contact-mobile-social-link img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .contact-command-strip {
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin: 7px -9px -9px;
+    padding: 6px 7px;
+    font-size: 0.51rem;
+  }
+
+  .contact-command-strip span {
+    display: none;
+  }
+
+  .contact-page .site-footer {
+    margin-top: 0;
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 359px) {
+  .contact-repository-visibility,
+  .contact-repository-state-dot,
+  .contact-repository-tab:nth-child(4) svg,
+  .contact-repository-tab:nth-child(1) svg {
+    display: none;
+  }
+
+  .contact-repository-tab {
+    padding-inline: 4px;
+    font-size: 0.56rem;
+  }
+
+  .contact-identity-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contact-toolbar-status,
+  .contact-new-badge,
+  .contact-message-control > label span {
+    display: none;
+  }
+
+  .contact-page .contact-mobile-actions {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .contact-page .contact-mobile-send,
+  .contact-page .contact-mobile-send button {
+    width: auto;
+  }
+}
+
+@media (max-width: 675px) and (max-height: 700px) {
+  .contact-page .contact-message-field textarea,
+  .contact-message-preview {
+    height: 65px !important;
+    min-height: 65px;
+  }
+
+  .contact-page .contact-mobile-send {
+    flex: 0 0 auto;
+  }
+
+  .contact-page .site-footer {
+    padding-top: 6px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(300px, 0.35fr) minmax(610px, 0.65fr);
+  }
+
+  .contact-page .contact-profile-column,
+  .contact-page .contact-form-column {
+    padding: 16px;
+  }
+
+  .contact-page .contact-portrait-frame {
+    width: min(100%, 286px);
+    max-height: 304px;
+  }
+}
+
+/* One connected GitHub profile footer: terminal, branch and contact remotes. */
+.contact-page .contact-profile-details {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--contact-gh-border);
+  border-radius: 6px;
+  background: var(--contact-gh-surface);
+}
+
+.contact-page .contact-profile-details .contact-profile-terminal {
+  border: 0;
+  border-bottom: 1px solid var(--contact-gh-border);
+  border-radius: 0;
+}
+
+.contact-page .contact-profile-details .contact-profile-branch-row {
+  min-height: 34px;
+  border-bottom: 1px solid var(--contact-gh-border);
+  padding: 8px 9px;
+}
+
+.contact-page .contact-profile-details .contact-portrait-links {
+  gap: 0;
+}
+
+.contact-page .contact-profile-details .contact-portrait-links a {
+  border: 0;
+  border-right: 1px solid var(--contact-gh-border);
+  border-radius: 0;
+  background: var(--contact-gh-surface);
+}
+
+.contact-page .contact-profile-details .contact-portrait-links a:last-child {
+  border-right: 0;
+}
+
+@media (min-width: 1200px) {
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(320px, 0.34fr) minmax(650px, 0.66fr);
+    gap: clamp(20px, 2.4vw, 38px);
+  }
+
+  .contact-page .contact-message-field textarea,
+  .contact-page .contact-message-preview {
+    height: 160px !important;
+    min-height: 160px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-repository-shell *,
+  .contact-repository-shell *::before,
+  .contact-repository-shell *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/*
+ * Lighter repository composition.
+ * GitHub language now lives in the commit UI instead of decorative rails and frames.
+ */
+.contact-repository-workspace {
+  background-image: none;
+}
+
+.contact-page .contact-form-worktree {
+  display: block;
+}
+
+.contact-page .contact-commit-panel {
+  width: 100%;
+  box-shadow: 0 14px 38px -34px rgba(31, 35, 40, 0.5);
+}
+
+@media (max-width: 675px) {
+  .contact-page .contact-main {
+    padding: 4px 8px 10px;
+  }
+
+  .contact-page .contact-repository-header {
+    display: none;
+  }
+
+  .contact-page .contact-repository-shell {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .contact-page .contact-repository-shell::after {
+    display: none;
+  }
+
+  .contact-page .contact-phone-layout {
+    padding: 2px 0 8px;
+  }
+
+  .contact-page .contact-commit-panel {
+    border-color: color-mix(in srgb, var(--contact-gh-border-strong) 84%, transparent);
+    border-radius: 7px;
+  }
+}
+
+@media (min-width: 676px) {
+  .contact-page .contact-repository-shell {
+    height: min(690px, calc(100dvh - 176px));
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--contact-gh-border) 88%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--contact-gh-canvas) 92%, transparent);
+    box-shadow: 0 22px 60px -48px rgba(31, 35, 40, 0.42);
+  }
+
+  .contact-page .contact-repository-shell::after {
+    display: none;
+  }
+
+  .contact-page .contact-repository-header {
+    margin-bottom: 0;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--contact-gh-border) 88%, transparent);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--contact-gh-surface-muted) 92%, transparent);
+    box-shadow: none;
+  }
+
+  .contact-page .contact-repository-workspace {
+    height: calc(100% - 82px);
+  }
+
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(310px, 0.34fr) minmax(540px, 0.66fr);
+    gap: 0;
+    padding: 0;
+  }
+
+  .contact-page .contact-profile-column {
+    border-right: 1px solid var(--contact-gh-border);
+    background: var(--contact-gh-surface-muted);
+    padding: 14px 18px 12px;
+  }
+
+  .contact-page .contact-form-column {
+    overflow: visible;
+    padding: 0;
+    place-items: stretch;
+  }
+
+  .contact-page .contact-email-form,
+  .contact-page .contact-form-worktree,
+  .contact-page .contact-commit-panel {
+    height: 100%;
+  }
+
+  .contact-page .contact-commit-panel {
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .contact-page .contact-commit-body {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .contact-page .contact-form-fields {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .contact-page .contact-message-control,
+  .contact-page .contact-message-field,
+  .contact-page .contact-message-field > [role="tabpanel"] {
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  .contact-page .contact-message-field > [role="tabpanel"] {
+    display: flex;
+  }
+
+  .contact-page .contact-message-field textarea,
+  .contact-page .contact-message-preview {
+    height: auto !important;
+    min-height: 150px;
+    flex: 1 1 auto;
+  }
+
+  .contact-page .contact-portrait-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0;
+    justify-content: stretch;
+  }
+
+  .contact-page .contact-profile-heading {
+    width: auto;
+    min-height: 35px;
+    margin: -14px -18px 0;
+    align-items: center;
+    padding: 4px 18px;
+  }
+
+  .contact-page .contact-profile-heading > div {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    column-gap: 7px;
+  }
+
+  .contact-page .contact-profile-heading .contact-profile-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    grid-column: 1 / -1;
+    color: var(--contact-gh-muted);
+    font-size: 0.58rem;
+    font-weight: 650;
+    letter-spacing: 0.035em;
+    line-height: 1;
+  }
+
+  .contact-page .contact-profile-heading .contact-profile-role svg {
+    width: 9px;
+    height: 9px;
+  }
+
+  .contact-page .contact-profile-heading h2 {
+    margin: 1px 0 0;
+    font-size: 0.94rem;
+    line-height: 1;
+  }
+
+  .contact-page .contact-profile-heading .contact-profile-handle {
+    overflow: hidden;
+    font-size: 0.63rem;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .contact-page .contact-profile-portrait-row {
+    width: 100%;
+    overflow: hidden;
+    padding: 0 10px;
+    background: transparent;
+  }
+
+  .contact-page .contact-profile-details {
+    width: auto;
+    margin: 0 -18px -12px;
+    border-width: 1px 0 0;
+    border-radius: 0;
+  }
+
+  .contact-page .contact-portrait-frame {
+    aspect-ratio: 1600 / 2405;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .contact-page .contact-portrait-aura {
+    display: none;
+  }
+
+  .contact-page .contact-portrait-frame img {
+    padding: 0;
+    filter: none;
+    transform: translateY(-26px) scale(1.16);
+    transform-origin: center top;
+  }
+
+  .contact-page .contact-portrait-links {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .contact-page .contact-portrait-links a {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 676px) and (max-width: 899px) {
+  .contact-page .contact-repository-shell {
+    height: calc(100dvh - 170px);
+    min-height: 500px;
+  }
+
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(220px, 0.34fr) minmax(420px, 0.66fr);
+    gap: 0;
+    padding: 0;
+  }
+
+  .contact-page .contact-profile-column {
+    padding: 10px;
+  }
+
+  .contact-page .contact-form-column {
+    padding: 0;
+  }
+
+  .contact-page .contact-profile-heading {
+    margin: -10px -10px 0;
+    padding: 4px 10px;
+  }
+
+  .contact-page .contact-profile-details {
+    margin: 0 -10px -10px;
+  }
+
+  .contact-page .contact-portrait-frame {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .contact-page .contact-portrait-frame img {
+    transform: translateY(-10px) scale(1.08);
+    transform-origin: center top;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 1050px) {
+  .contact-page .contact-repository-shell {
+    height: min(800px, calc(100dvh - 220px));
+  }
+}
+
+@media (min-width: 900px) {
+  .contact-page .contact-repository-shell {
+    transform: translateY(-2dvh);
+  }
+}
+
+@media (min-width: 1200px) {
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(340px, 0.33fr) minmax(690px, 0.67fr);
+    gap: 0;
+  }
+
+  .contact-page .contact-portrait-frame {
+    width: auto;
+    height: 100%;
+    max-height: 100%;
+  }
+}
+
+/* Mobile repository editor: roomy, GitHub-like commit flow. */
+@media (max-width: 675px) {
+  .contact-page .contact-main {
+    padding: 4px 4px 9px;
+  }
+
+  .contact-page .contact-phone-layout {
+    padding: 0 0 8px;
+  }
+
+  .contact-page .contact-commit-panel {
+    border-radius: 6px;
+  }
+
+  .contact-page .contact-commit-toolbar {
+    display: grid;
+    min-height: 34px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 5px 8px;
+  }
+
+  .contact-page .contact-mobile-repository-context {
+    display: flex;
+    min-width: 0;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 4px;
+    margin: -5px -8px 3px;
+    border-bottom: 1px solid var(--contact-gh-border);
+    padding: 5px 8px;
+    color: var(--contact-gh-blue);
+    font-size: 0.68rem;
+  }
+
+  .contact-page .contact-mobile-repository-context svg {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 auto;
+    color: var(--contact-gh-muted);
+  }
+
+  .contact-page .contact-mobile-repository-context i {
+    color: var(--contact-gh-subtle);
+    font-style: normal;
+  }
+
+  .contact-page .contact-mobile-repository-context strong {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .contact-page .contact-commit-body {
+    padding: 11px;
+  }
+
+  .contact-page .contact-commit-heading {
+    margin-bottom: 9px;
+  }
+
+  .contact-page .contact-commit-heading h2 {
+    font-size: 0.98rem;
+  }
+
+  .contact-page .contact-identity-grid {
+    gap: 8px;
+  }
+
+  .contact-page .contact-input {
+    height: 36px !important;
+  }
+
+  .contact-page .contact-message-control {
+    margin-top: 9px;
+  }
+
+  .contact-page .contact-message-field textarea,
+  .contact-page .contact-message-preview {
+    height: 72px !important;
+    min-height: 72px;
+  }
+
+  .contact-page .contact-changed-files-heading,
+  .contact-page .contact-tracked-file,
+  .contact-page .contact-no-files {
+    min-height: 31px;
+  }
+
+  .contact-page .contact-attachment-toolbar {
+    min-height: 35px;
+  }
+
+  .contact-page .contact-mobile-actions {
+    margin-top: 7px;
+  }
+
+  .contact-page .contact-mobile-send button {
+    min-height: 37px;
+  }
+
+  .contact-page .contact-mobile-social-link {
+    width: 32px;
+    height: 32px;
+  }
+
+  .contact-page .contact-command-strip {
+    margin: 7px -11px -11px;
+    padding: 6px 9px;
+  }
+}

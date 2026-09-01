@@ -1,0 +1,170 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22.x"
+
+jobs:
+  quality:
+    name: Security, tests, build and design lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies once
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit complete dependency tree
+        run: npm audit --audit-level=high
+
+      - name: Lint, types, dead code and design lock
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run check:dead
+          npm run test:design-lock
+
+      - name: Unit tests with coverage
+        run: npm run test:ci
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
+        with:
+          version: 2.111.0
+
+      - name: Start isolated test database and run SQL policy tests
+        run: |
+          supabase start
+          supabase db reset
+          # Docker cleanup on hosted runners can occasionally return exit 125
+          # after pgTAP has already passed. Retry once; a real test failure
+          # still exits non-zero after the second attempt.
+          for attempt in 1 2; do
+            if supabase test db --local; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 2 ]; then
+              exit 1
+            fi
+
+            echo "Supabase test runner cleanup failed; retrying once..."
+            sleep 5
+          done
+
+      - name: Export isolated CI runtime configuration
+        shell: bash
+        run: |
+          set -a
+          source <(supabase status -o env)
+          set +a
+
+          publishable_key="${PUBLISHABLE_KEY:-${ANON_KEY:-}}"
+          secret_key="${SECRET_KEY:-${SERVICE_ROLE_KEY:-}}"
+
+          test -n "$API_URL"
+          test -n "$publishable_key"
+          test -n "$secret_key"
+
+          echo "::add-mask::$secret_key"
+
+          rate_limit_pepper="$(openssl rand -hex 32)"
+          session_cookie_secret="$(openssl rand -hex 32)"
+          cron_secret="$(openssl rand -hex 32)"
+          rag_job_secret="$(openssl rand -hex 32)"
+          revalidate_secret="$(openssl rand -hex 32)"
+
+          echo "::add-mask::$rate_limit_pepper"
+          echo "::add-mask::$session_cookie_secret"
+          echo "::add-mask::$cron_secret"
+          echo "::add-mask::$rag_job_secret"
+          echo "::add-mask::$revalidate_secret"
+
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$publishable_key"
+            echo "SUPABASE_URL=$API_URL"
+            echo "SUPABASE_PUBLISHABLE_KEY=$publishable_key"
+            echo "SUPABASE_SECRET_KEY=$secret_key"
+            echo "RATE_LIMIT_PEPPER=$rate_limit_pepper"
+            echo "SESSION_COOKIE_SECRET=$session_cookie_secret"
+            echo "CRON_SECRET=$cron_secret"
+            echo "RAG_JOB_SECRET=$rag_job_secret"
+            echo "REVALIDATE_SECRET=$revalidate_secret"
+          } >> "$GITHUB_ENV"
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser and accessibility tests
+        run: npm run test:e2e
+
+      - name: Pixel comparison against the pre-change baseline
+        run: npm run test:pixel-lock
+
+      - name: Upload visual verification images
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: visual-verification
+          path: test-results/visual-actual/
+          retention-days: 7
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Lighthouse CI
+        run: npm run test:lighthouse
+
+      - name: Reject whitespace errors
+        run: git diff --check
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          include-hidden-files: true
+          retention-days: 7

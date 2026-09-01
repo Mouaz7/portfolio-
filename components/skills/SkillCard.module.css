@@ -1,0 +1,502 @@
+.card {
+  --skill-icon-canvas: 52px;
+  --git-canvas: rgba(13, 17, 23, 0.96);
+  --git-canvas-subtle: rgba(22, 27, 34, 0.94);
+  --git-canvas-inset: #010409;
+  --git-border: #30363d;
+  --git-border-muted: rgba(48, 54, 61, 0.72);
+  --git-fg: #f0f6fc;
+  --git-fg-muted: #9198a1;
+  --git-accent: #58a6ff;
+  --git-success: #3fb950;
+  --git-heat-0: #161b22;
+  --git-heat-1: #0e4429;
+  --git-heat-2: #006d32;
+  --git-heat-3: #26a641;
+  --git-heat-4: #39d353;
+
+  position: relative;
+  z-index: 1;
+  grid-template-rows: 30px 54px 24px minmax(0, 1fr) 22px;
+  border-color: var(--git-border) !important;
+  border-radius: 9px !important;
+  background:
+    radial-gradient(80% 90% at 50% -30%, var(--skills-card-local-tint), transparent 68%),
+    var(--git-canvas) !important;
+  box-shadow:
+    0 16px 38px -26px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.015) inset !important;
+  color: var(--git-fg);
+  isolation: isolate;
+  backdrop-filter: blur(18px) saturate(1.05) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;
+}
+
+.card[data-large-content="true"] {
+  grid-template-rows: 31px 54px 24px minmax(0, 1fr) 22px;
+}
+
+.card::after {
+  content: none !important;
+}
+
+:global(html.light) .card {
+  --git-canvas: rgba(255, 255, 255, 0.95);
+  --git-canvas-subtle: rgba(246, 248, 250, 0.96);
+  --git-canvas-inset: #eff2f5;
+  --git-border: #d1d9e0;
+  --git-border-muted: rgba(209, 217, 224, 0.78);
+  --git-fg: #1f2328;
+  --git-fg-muted: #59636e;
+  --git-accent: #0969da;
+  --git-success: #1a7f37;
+  --git-heat-0: #eff2f5;
+  --git-heat-1: #aceebb;
+  --git-heat-2: #4ac26b;
+  --git-heat-3: #2da44e;
+  --git-heat-4: #116329;
+  box-shadow:
+    0 16px 34px -27px rgba(31, 35, 40, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.72) inset !important;
+}
+
+.glow {
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0.62;
+}
+
+.repoBar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-width: 0;
+  min-height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 11px;
+  border-bottom: 1px solid var(--git-border-muted);
+  background: var(--git-canvas-subtle);
+  color: var(--git-fg-muted);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.repoPath,
+.repoActions,
+.repoActions span,
+.commitBar,
+.branchPill,
+.commitMeta,
+.checkMeta,
+.activityBar,
+.logLabel {
+  display: flex;
+  align-items: center;
+}
+
+.repoPath {
+  min-width: 0;
+  gap: 4px;
+  color: var(--git-accent);
+  white-space: nowrap;
+}
+
+.repoPath svg {
+  flex: 0 0 auto;
+  margin-right: 2px;
+  color: var(--git-fg);
+}
+
+.repoPath > span:not(.slash):not(.visibility),
+.repoPath strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repoPath strong {
+  font-weight: 650;
+}
+
+.slash {
+  color: var(--git-fg-muted);
+}
+
+.visibility {
+  flex: 0 0 auto;
+  margin-left: 4px;
+  padding: 2px 6px 2.5px;
+  border: 1px solid var(--git-border);
+  border-radius: 999px;
+  color: var(--git-fg-muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.repoActions {
+  flex: 0 0 auto;
+  gap: 8px;
+  color: var(--git-fg-muted);
+  font-size: 11px;
+}
+
+.repoActions span {
+  gap: 3px;
+}
+
+.summary {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: 3px 16px 2px;
+}
+
+.summaryLarge {
+  padding-top: 2px;
+  padding-bottom: 1px;
+}
+
+.title {
+  color: var(--git-fg) !important;
+  letter-spacing: -0.025em !important;
+}
+
+.categoryMarker {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border: 2px solid color-mix(in srgb, var(--skills-card-accent) 42%, var(--git-canvas));
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--skills-card-accent) 10%, transparent);
+}
+
+.description {
+  margin-top: 1px !important;
+  display: block !important;
+  overflow: hidden;
+  color: var(--git-fg-muted) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commitBar {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 24px;
+  gap: 9px;
+  padding: 3px 11px;
+  border-block: 1px solid var(--git-border-muted);
+  background: color-mix(in srgb, var(--git-canvas-subtle) 70%, transparent);
+  color: var(--git-fg-muted);
+  font-size: 11px;
+}
+
+.branchPill {
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--git-accent) 14%, transparent);
+  color: var(--git-accent);
+  font-weight: 650;
+}
+
+.commitMeta {
+  min-width: 0;
+  gap: 4px;
+}
+
+.commitMeta code,
+.logLabel code,
+.headLabel {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.commitMeta code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.checkMeta {
+  flex: 0 0 auto;
+  gap: 3px;
+  margin-left: auto;
+  color: var(--git-success);
+  font-weight: 650;
+}
+
+.iconArea {
+  position: relative;
+  z-index: 1;
+  padding: 2px 12px 3px;
+}
+
+.skillsGrid {
+  gap: 5px 12px;
+}
+
+.skillEntry {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.skillIconFrame {
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+}
+
+.skillIconScale {
+  width: min(100%, var(--skill-icon-canvas));
+  height: min(100%, var(--skill-icon-canvas));
+  overflow: hidden;
+}
+
+.skillLogoCorrection {
+  width: 100%;
+  height: 100%;
+  transform: scale(var(--skill-logo-scale, 1));
+  transform-origin: 50% 56%;
+}
+
+.skillsGrid[data-single-row="true"] .skillIconScale {
+  width: var(--skill-icon-canvas);
+  height: var(--skill-icon-canvas);
+}
+
+.skillsGrid[data-single-row="true"] .skillEntry {
+  height: calc(var(--skill-icon-canvas) + 24px);
+  align-self: center;
+  grid-template-rows: var(--skill-icon-canvas) auto !important;
+  row-gap: 4px;
+}
+
+/* Skill marks stay crisp and static: no drop-shadow, hover lift or filter tween. */
+.card :global(.skill-icon) {
+  filter: none !important;
+  transition: none !important;
+  will-change: auto;
+}
+
+.card :global(.skills-icon-interaction) {
+  transform: translate3d(0, 0, 0) scale(1);
+  transform-origin: center;
+  transition: transform 150ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: auto;
+}
+
+:global(html.light) .card :global(.skill-plain) {
+  filter: contrast(1.08) saturate(1.05) !important;
+}
+
+:global(html.light) .card :global(.skill-themed) {
+  filter: contrast(1.02) saturate(1.02) !important;
+}
+
+:global(html.light) .card :global(.skill-mono) {
+  filter: invert(1) contrast(1.08) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card :global(.skills-icon-interaction:hover) {
+    transform: translate3d(0, -1px, 0) scale(1.025);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .card :global(.skills-icon-interaction:active) {
+    transform: translate3d(0, -1px, 0) scale(1.025);
+  }
+}
+
+.skillLabel {
+  margin-top: 0 !important;
+  color: var(--git-fg) !important;
+  letter-spacing: -0.01em;
+}
+
+.activityBar {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 22px;
+  gap: 8px;
+  padding: 3px 10px;
+  border-top: 1px solid var(--git-border-muted);
+  background: var(--git-canvas-subtle);
+  color: var(--git-fg-muted);
+  font-size: 9px;
+}
+
+.logLabel {
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.contributionGraph {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  grid-template-columns: repeat(14, minmax(3px, 1fr));
+  grid-template-rows: repeat(2, 4px);
+  gap: 2px;
+}
+
+.contributionCell {
+  min-width: 3px;
+  border: 1px solid color-mix(in srgb, var(--git-border) 45%, transparent);
+  border-radius: 1.5px;
+  background: var(--git-heat-0);
+}
+
+.contributionCell[data-level="1"] { background: var(--git-heat-1); }
+.contributionCell[data-level="2"] { background: var(--git-heat-2); }
+.contributionCell[data-level="3"] { background: var(--git-heat-3); }
+.contributionCell[data-level="4"] { background: var(--git-heat-4); }
+
+.headLabel {
+  flex: 0 0 auto;
+  color: var(--git-success);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 675px) {
+  .card {
+    --skill-icon-canvas: 63px;
+    grid-template-rows: 30px 34px 24px minmax(0, 1fr) 18px;
+  }
+
+  .repoBar {
+    min-height: 30px;
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+
+  .repoActions {
+    display: none;
+  }
+
+  .summary {
+    padding: 4px 12px;
+  }
+
+  .description {
+    display: none !important;
+  }
+
+  .commitBar {
+    min-height: 24px;
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+
+  .iconArea {
+    padding: 0 10px 1px;
+  }
+
+  .skillsGrid {
+    gap: 4px 8px;
+  }
+
+  .skillLabel {
+    height: 18px !important;
+    font-size: 14px !important;
+    line-height: 18px !important;
+  }
+
+  .activityBar {
+    min-height: 18px;
+    gap: 0;
+    padding: 2px 8px;
+  }
+
+  .contributionGraph {
+    grid-template-rows: repeat(2, 3px);
+  }
+}
+
+/* The category cards form one repository topology on tablet and desktop. */
+:global(.skills-stage[data-skills-layout="desktop"])
+  :global(.skills-bento-grid)
+  > li:has(> .card) {
+  position: relative;
+}
+
+:global(.skills-stage[data-skills-layout="desktop"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):not(:nth-child(3n))::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: -24px;
+  width: 24px;
+  height: 7px;
+  transform: translateY(-50%);
+  background:
+    radial-gradient(
+      circle,
+      #2da44e 0 2px,
+      var(--page-panel) 2.5px 3.5px,
+      transparent 4px
+    ) center / 7px 7px no-repeat,
+    linear-gradient(
+      color-mix(in srgb, var(--page-text) 24%, transparent),
+      color-mix(in srgb, var(--page-text) 24%, transparent)
+    ) center / 100% 1px no-repeat;
+}
+
+:global(.skills-stage[data-skills-layout="desktop"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):nth-child(-n + 6)::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  bottom: -24px;
+  left: 50%;
+  width: 7px;
+  height: 24px;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(
+      circle,
+      #2da44e 0 2px,
+      var(--page-panel) 2.5px 3.5px,
+      transparent 4px
+    ) center / 7px 7px no-repeat,
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--page-text) 24%, transparent),
+      color-mix(in srgb, var(--page-text) 24%, transparent)
+    ) center / 1px 100% no-repeat;
+}
+
+:global(.skills-stage[data-skills-size="wide"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):not(:nth-child(3n))::after {
+  right: -14px;
+  width: 14px;
+}
+
+:global(.skills-stage[data-skills-size="wide"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):nth-child(-n + 6)::before {
+  bottom: -14px;
+  height: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none !important;
+  }
+
+  .card :global(.skills-icon-interaction) {
+    transform: none !important;
+    transition: none !important;
+  }
+}

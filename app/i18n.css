@@ -1,0 +1,71 @@
+/* Directional adaptations are isolated from the pixel-locked base theme. */
+html[dir="rtl"] body {
+  /* Keep the Latin brand face for words such as API/DevOps/Engineer and only
+     fall back to Arabic-capable system fonts for glyphs Urbanist lacks. */
+  font-family: var(--font-urbanist), Tahoma, Arial, sans-serif;
+}
+
+/* `dir=rtl` is semantically correct, but direction also changes the physical
+   order of CSS grid/flex tracks. Keep the established visual composition in
+   every locale and apply RTL only to localized copy below. */
+html[dir="rtl"] .site-header,
+html[dir="rtl"] .home-main,
+html[dir="rtl"] .projects-main,
+html[dir="rtl"] .journey-main,
+html[dir="rtl"] .skills-stage,
+html[dir="rtl"] .contact-main,
+html[dir="rtl"] [data-page="code-review"] {
+  direction: ltr;
+}
+
+html[dir="rtl"] .site-header-nav-label,
+html[dir="rtl"] .home-hero-copy,
+html[dir="rtl"] .projects-project-copy,
+html[dir="rtl"] .projects-repo-heading,
+html[dir="rtl"] .contact-form {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+html[dir="rtl"] .home-hero-actions,
+html[dir="rtl"] [data-home-capabilities] > div {
+  direction: ltr;
+}
+
+html[dir="rtl"] .home-hero-actions :where(span),
+html[dir="rtl"] [data-home-capability] > div:last-child {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="rtl"] .contact-form {
+  text-align: right;
+}
+
+html[dir="rtl"] .contact-form input[type="email"] {
+  direction: ltr;
+  text-align: right;
+}
+
+html[dir="rtl"] .projects-mobile-card-inner > span[aria-hidden],
+html[dir="rtl"] .commit-rail-port {
+  right: 0;
+  left: auto;
+}
+
+@media (min-width: 677px) and (max-width: 1250px) {
+  html[lang="sv"] .site-header,
+  html[lang="ar"] .site-header {
+    padding-inline: 3rem;
+  }
+
+  html[lang="sv"] .site-header-nav,
+  html[lang="ar"] .site-header-nav {
+    gap: 0.65rem;
+  }
+
+  html[lang="sv"] .site-header-nav-label,
+  html[lang="ar"] .site-header-nav-label {
+    font-size: 1rem;
+  }
+}
