@@ -15,7 +15,7 @@ describe("/api/ai/code-review", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     chatMock.mockResolvedValue({
-      model: "deepseek-ai/deepseek-v4-pro",
+      model: "poolside/laguna-xs-2.1",
       content: "## Summary\n\nLooks good.\n\n```typescript\nconst x = 1;\n```",
     });
   });
@@ -59,6 +59,10 @@ describe("/api/ai/code-review", () => {
     expect(systemPrompt).toContain("Never return JSON");
     expect(systemPrompt).toContain("fenced code block");
     expect(systemPrompt).toContain("No praise, filler, emojis, or capability commentary");
+    expect(systemPrompt).toContain("Separate syntax errors, certain runtime errors");
+    expect(systemPrompt).toContain("an undefined name is not a syntax error");
+    expect(systemPrompt).toContain("may be defined elsewhere");
+    expect(systemPrompt).toContain("print(hej) is syntactically valid and compiles");
     expect(systemPrompt).not.toMatch(/sources|citations|quotes|references|disclaimers|limitations/i);
     expect(systemPrompt).toContain("Arabic");
     expect(chatMock.mock.calls[0][0].messages[1].content).toContain("Review focus: security");

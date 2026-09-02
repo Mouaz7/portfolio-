@@ -84,7 +84,7 @@ The shared background uses a theme-aware WebGL ocean shader. Desktop rendering m
 
 The Code Review workspace supports review, optimization, and security-focused analysis across multiple programming languages. Follow-up discussion remains grounded in the active review.
 
-Its About mode uses Supabase pgvector retrieval over approved portfolio sources such as profile content, skills, journey entries, projects, and CV text. Weak and duplicate matches are filtered before bounded context reaches the configured NVIDIA-compatible model. Application code does not persist submitted code, review output, or chat conversations.
+Its About mode uses Supabase pgvector retrieval over approved portfolio sources such as profile content, skills, journey entries, projects, and CV text. Weak and duplicate matches are filtered before bounded context reaches the configured NVIDIA-compatible model. Standalone greetings are answered locally in Swedish, English, or Arabic without an irrelevant vector search. Application code does not persist submitted code, review output, or chat conversations.
 
 ### Protected Contact and CV delivery
 

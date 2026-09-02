@@ -29,16 +29,28 @@ export type ChatCompletionResult = {
 };
 
 const DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1";
-const DEFAULT_CV_MODEL = "deepseek-ai/deepseek-v4-flash";
-const DEFAULT_CODE_MODEL = "meta/llama-3.3-70b-instruct";
-const DEFAULT_FALLBACK_MODEL = "meta/llama-3.2-3b-instruct";
-const DEFAULT_STABLE_FALLBACK_MODEL = "meta/llama-3.1-8b-instruct";
-const DEFAULT_DEEPSEEK_PRO_MODEL = "deepseek-ai/deepseek-v4-pro";
-const DEFAULT_LLAMA_31_70B_MODEL = "meta/llama-3.1-70b-instruct";
-const DEFAULT_EMBEDDING_MODEL = "nvidia/llama-nemotron-embed-1b-v2";
-const LEGACY_EMBEDDING_MODEL = "nvidia/llama-3.2-nv-embedqa-1b-v2";
+const DEFAULT_CV_MODEL = "poolside/laguna-xs-2.1";
+const DEFAULT_CODE_MODEL = "poolside/laguna-xs-2.1";
+const DEFAULT_FALLBACK_MODEL = "nvidia/nemotron-3.5-lightning-30b-a3b";
+const DEFAULT_STABLE_FALLBACK_MODEL = "poolside/laguna-xs-2.1";
+const DEFAULT_DEEPSEEK_PRO_MODEL = "deepseek-ai/deepseek-v4-pro-0813";
+const DEFAULT_EMBEDDING_MODEL = "nvidia/nemotron-3-embed-1b";
 const EMBEDDING_DIMENSIONS = 2048;
 const CHAT_TIMEOUT_MS = 25000;
+
+const RETIRED_CHAT_MODEL_REPLACEMENTS: Readonly<Record<string, string>> = {
+  "deepseek-ai/deepseek-v4-flash": DEFAULT_CV_MODEL,
+  "deepseek-ai/deepseek-v4-pro": DEFAULT_DEEPSEEK_PRO_MODEL,
+  "meta/llama-3.1-8b-instruct": DEFAULT_STABLE_FALLBACK_MODEL,
+  "meta/llama-3.1-70b-instruct": DEFAULT_STABLE_FALLBACK_MODEL,
+  "meta/llama-3.2-3b-instruct": DEFAULT_FALLBACK_MODEL,
+  "meta/llama-3.3-70b-instruct": DEFAULT_CODE_MODEL,
+};
+
+const RETIRED_EMBEDDING_MODELS = new Set([
+  "nvidia/llama-3.2-nv-embedqa-1b-v2",
+  "nvidia/llama-nemotron-embed-1b-v2",
+]);
 
 function env(name: string): string | undefined {
   const value = process.env[name]?.trim();
@@ -53,6 +65,10 @@ function firstEnv(names: readonly string[]): string | undefined {
   return undefined;
 }
 
+function activeChatModel(configuredModel: string): string {
+  return RETIRED_CHAT_MODEL_REPLACEMENTS[configuredModel] ?? configuredModel;
+}
+
 function nvidiaUrl(path: string): string {
   const base = env("NVIDIA_API_BASE_URL") ?? DEFAULT_BASE_URL;
   return `${base.replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
@@ -62,11 +78,11 @@ function chatTargets(kind: ChatKind): Array<{ model: string; key?: string }> {
   const primary =
     kind === "cv"
       ? {
-          model: env("NVIDIA_CV_CHAT_MODEL") ?? DEFAULT_CV_MODEL,
+          model: activeChatModel(env("NVIDIA_CV_CHAT_MODEL") ?? DEFAULT_CV_MODEL),
           key: firstEnv(["NVIDIA_CV_CHAT_API_KEY", "NVIDIA_GLM_API_KEY", "NVIDIA_API_KEY"]),
         }
       : {
-          model: env("NVIDIA_CODE_REVIEW_MODEL") ?? DEFAULT_CODE_MODEL,
+          model: activeChatModel(env("NVIDIA_CODE_REVIEW_MODEL") ?? DEFAULT_CODE_MODEL),
           key: firstEnv([
             "NVIDIA_CODE_REVIEW_API_KEY",
             "NVIDIA_DEEPSEEK_API_KEY",
@@ -75,12 +91,14 @@ function chatTargets(kind: ChatKind): Array<{ model: string; key?: string }> {
         };
 
   const fallback = {
-    model: env("NVIDIA_FALLBACK_MODEL") ?? DEFAULT_FALLBACK_MODEL,
+    model: activeChatModel(env("NVIDIA_FALLBACK_MODEL") ?? DEFAULT_FALLBACK_MODEL),
     key: firstEnv(["NVIDIA_FALLBACK_API_KEY", "NVIDIA_QWEN_API_KEY", "NVIDIA_API_KEY"]),
   };
 
   const stableFallback = {
-    model: env("NVIDIA_STABLE_FALLBACK_MODEL") ?? DEFAULT_STABLE_FALLBACK_MODEL,
+    model: activeChatModel(
+      env("NVIDIA_STABLE_FALLBACK_MODEL") ?? DEFAULT_STABLE_FALLBACK_MODEL,
+    ),
     key: firstEnv([
       "NVIDIA_API_KEY",
       "NVIDIA_FALLBACK_API_KEY",
@@ -95,17 +113,15 @@ function chatTargets(kind: ChatKind): Array<{ model: string; key?: string }> {
 
   const extraFallbacks = [
     {
-      model: env("NVIDIA_DEEPSEEK_PRO_MODEL") ?? DEFAULT_DEEPSEEK_PRO_MODEL,
+      model: activeChatModel(
+        env("NVIDIA_DEEPSEEK_PRO_MODEL") ?? DEFAULT_DEEPSEEK_PRO_MODEL,
+      ),
       key: env("NVIDIA_DEEPSEEK_PRO_API_KEY"),
-    },
-    {
-      model: env("NVIDIA_LLAMA_31_70B_MODEL") ?? DEFAULT_LLAMA_31_70B_MODEL,
-      key: env("NVIDIA_LLAMA_31_70B_API_KEY"),
     },
   ];
 
   const seen = new Set<string>();
-  return [primary, fallback, ...extraFallbacks, stableFallback].filter((target) => {
+  return [primary, fallback, stableFallback, ...extraFallbacks].filter((target) => {
     const id = `${target.model}:${target.key ?? ""}`;
     if (seen.has(id)) return false;
     seen.add(id);
@@ -117,10 +133,16 @@ function embeddingTarget() {
   const configuredModel = env("NVIDIA_EMBEDDING_MODEL") ?? DEFAULT_EMBEDDING_MODEL;
 
   return {
-    // NVIDIA retired the previous model. Keep stale local/hosting env values working.
-    model: configuredModel === LEGACY_EMBEDDING_MODEL ? DEFAULT_EMBEDDING_MODEL : configuredModel,
+    // Keep stale local and hosting environment values working after provider EOL changes.
+    model: RETIRED_EMBEDDING_MODELS.has(configuredModel)
+      ? DEFAULT_EMBEDDING_MODEL
+      : configuredModel,
     key: firstEnv(["NVIDIA_EMBEDDING_API_KEY", "NVIDIA_API_KEY"]),
   };
+}
+
+export function embeddingModelId(): string {
+  return embeddingTarget().model;
 }
 
 async function postJson<T>(
@@ -179,11 +201,30 @@ function chatPayload(
     top_p: 0.95,
   };
 
-  if (model.includes("deepseek")) {
+  if (model === DEFAULT_CODE_MODEL) {
+    payload.chat_template_kwargs = { enable_thinking: false };
+  } else if (model.includes("deepseek")) {
     payload.chat_template_kwargs = { thinking: false };
+  } else if (model === DEFAULT_FALLBACK_MODEL) {
+    payload.chat_template_kwargs = { enable_thinking: false };
+  } else if (model.includes("minimax")) {
+    payload.chat_template_kwargs = { thinking_mode: "disabled" };
   }
 
   return payload;
+}
+
+function visibleChatContent(value: string | undefined): string {
+  let content = value?.trim() ?? "";
+  const lastThinkingEnd = content.toLowerCase().lastIndexOf("</think>");
+  if (lastThinkingEnd >= 0) {
+    content = content.slice(lastThinkingEnd + "</think>".length).trim();
+  }
+
+  return content
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .replace(/<\/?think>/gi, "")
+    .trim();
 }
 
 export async function createChatCompletion(params: {
@@ -219,7 +260,7 @@ export async function createChatCompletion(params: {
         params.deadlineMs,
       );
 
-      const content = json.choices?.[0]?.message?.content?.trim();
+      const content = visibleChatContent(json.choices?.[0]?.message?.content);
       if (!content) throw new NvidiaApiError("NVIDIA API returned empty chat response");
       return { content, model: target.model };
     } catch (error) {

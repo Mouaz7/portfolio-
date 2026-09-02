@@ -33,6 +33,18 @@ function localizedEmptyAnswer(language: "sv" | "en" | "ar"): string {
   return "I cannot find that in the current portfolio data.";
 }
 
+function isStandaloneGreeting(message: string): boolean {
+  return /^(?:hej|hejsan|hallå|hi|hello|hey|god morgon|god kväll|good morning|good evening|مرحبا|مرحبًا|أهلا|أهلًا|السلام عليكم)[\s!.,?…،؟]*$/iu.test(
+    message.trim(),
+  );
+}
+
+function localizedGreeting(language: "sv" | "en" | "ar"): string {
+  if (language === "sv") return "Hej! Vad vill du veta om Mouaz?";
+  if (language === "ar") return "مرحبًا! ماذا تريد أن تعرف عن معاذ؟";
+  return "Hello! What would you like to know about Mouaz?";
+}
+
 function buildContext(matches: RagSearchMatch[]): string {
   return matches
     .map((match, index) => {
@@ -77,6 +89,13 @@ export async function POST(req: Request) {
         { error: "Message is required.", code: "invalid_request" },
         { status: 400 },
       ));
+    }
+
+    if (isStandaloneGreeting(message)) {
+      return respond(NextResponse.json({
+        answer: localizedGreeting(language),
+        language,
+      }));
     }
 
     const retrievalQuery = buildRetrievalQuery(message, history);
