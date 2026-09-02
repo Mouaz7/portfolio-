@@ -81,12 +81,36 @@ describe("/api/ai/cv-chat", () => {
   it("does not expose RAG or provider details", async () => {
     searchMock.mockRejectedValueOnce(new Error("Supabase internal detail"));
     const response = await POST(new Request("http://localhost/api/ai/cv-chat", {
-      method: "POST", body: JSON.stringify({ message: "Hej" }),
+      method: "POST", body: JSON.stringify({ message: "Berätta om Mouaz erfarenhet" }),
     }));
     expect(await response.json()).toEqual({
       error: "Portfolio chatbot failed.",
       code: "ai_unavailable",
     });
+  });
+
+  it.each([
+    ["auto", "hej", "Hej! Vad vill du veta om Mouaz?", "sv"],
+    ["auto", "hello!", "Hello! What would you like to know about Mouaz?", "en"],
+    ["auto", "مرحبًا", "مرحبًا! ماذا تريد أن تعرف عن معاذ؟", "ar"],
+    ["en", "hej", "Hello! What would you like to know about Mouaz?", "en"],
+  ] as const)("answers a standalone greeting without RAG (%s, %s)", async (
+    preference,
+    message,
+    answer,
+    language,
+  ) => {
+    const response = await POST(
+      new Request("http://localhost/api/ai/cv-chat", {
+        method: "POST",
+        body: JSON.stringify({ message, language: preference }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ answer, language });
+    expect(searchMock).not.toHaveBeenCalled();
+    expect(chatMock).not.toHaveBeenCalled();
   });
 
   it("uses recent conversation context when retrieving a follow-up question", async () => {

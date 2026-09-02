@@ -1,6 +1,6 @@
 import { supabaseAdmin as supabase } from "@/lib/backend/supabaseAdminClient";
 import { detectRagLanguage } from "./language";
-import { createEmbeddings, vectorToSqlLiteral } from "./nvidia";
+import { createEmbeddings, embeddingModelId, vectorToSqlLiteral } from "./nvidia";
 import { chunkText, createSnapshot, createSourceHash, formatDbError, sourceKey, textLines } from "./rag/text";
 import { searchRagChunks } from "./rag/search";
 import type { ExistingSource, RagRefreshResult, RagSnapshot } from "./rag/types";
@@ -18,6 +18,10 @@ const TRACKED_SOURCE_TABLES = [
 
 const LEGACY_JOURNEY_TABLE = `${"road"}${"map"}_item`;
 const MISSING_TABLE_CODES = new Set(["42P01", "PGRST205"]);
+
+export function createRagIndexHash(contentHash: string, model = embeddingModelId()): string {
+  return createSourceHash({ contentHash, embeddingModel: model });
+}
 
 async function fetchJourneyRows() {
   const query = (table: string) => supabase
@@ -315,7 +319,11 @@ async function refreshRagIndexInner(): Promise<RagRefreshResult> {
     }
 
     runId = await insertRun();
-    const snapshots = await fetchSnapshots();
+    const activeEmbeddingModel = embeddingModelId();
+    const snapshots = (await fetchSnapshots()).map((snapshot) => ({
+      ...snapshot,
+      sourceHash: createRagIndexHash(snapshot.sourceHash, activeEmbeddingModel),
+    }));
     sourcesSeen = snapshots.length;
     const snapshotByKey = new Map(
       snapshots.map((snapshot) => [

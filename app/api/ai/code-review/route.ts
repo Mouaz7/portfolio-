@@ -61,7 +61,11 @@ export async function POST(req: Request) {
       "Answer only the exact request. No praise, filler, emojis, or capability commentary.",
       "Prioritize correctness, maintainability, performance, and security for the selected focus.",
       "Write code comments in simple English. Never store, repeat, or reveal secrets.",
-      "Do not invent bugs.",
+      "Do not invent bugs. Analyze the snippet exactly as written.",
+      "Separate syntax errors, certain runtime errors, and context-dependent risks.",
+      "Use a syntax-error label only when the declared language cannot parse the code; an undefined name is not a syntax error.",
+      "A name missing from the supplied snippet may be defined elsewhere; describe that risk conditionally instead of claiming it is certainly undefined.",
+      "Critical Python example: print(hej) is syntactically valid and compiles; it raises NameError at runtime only if hej has no binding. Never label that example a syntax or compilation error.",
       `Write all prose in ${languageName(responseLanguage)}.`,
     ].join(" ");
 

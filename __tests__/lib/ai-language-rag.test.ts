@@ -1,4 +1,4 @@
-import { createSourceHash, chunkText } from "@/lib/ai/rag";
+import { createRagIndexHash, createSourceHash, chunkText } from "@/lib/ai/rag";
 import { detectLanguage, normalizeLanguagePreference, resolveLanguage } from "@/lib/ai/language";
 
 jest.mock("@/lib/backend/supabaseAdminClient", () => ({
@@ -8,7 +8,9 @@ jest.mock("@/lib/backend/supabaseAdminClient", () => ({
 describe("AI language and RAG utilities", () => {
   it("detects Swedish, English, and Arabic", () => {
     expect(detectLanguage("Vilken erfarenhet har du av projekt?")).toBe("sv");
+    expect(detectLanguage("hej")).toBe("sv");
     expect(detectLanguage("What experience do you have with projects?")).toBe("en");
+    expect(detectLanguage("hello")).toBe("en");
     expect(detectLanguage("ما هي خبرتك في المشاريع؟")).toBe("ar");
   });
 
@@ -26,6 +28,9 @@ describe("AI language and RAG utilities", () => {
     expect(chunks.every((chunk) => chunk.length <= 900)).toBe(true);
     expect(createSourceHash({ b: 2, a: 1 })).toBe(createSourceHash({ a: 1, b: 2 }));
     expect(createSourceHash({ a: 1 })).not.toBe(createSourceHash({ a: 2 }));
+    expect(createRagIndexHash("same-content", "embedding-model-a")).not.toBe(
+      createRagIndexHash("same-content", "embedding-model-b"),
+    );
   });
 
   it("clamps oversized overlap and keeps every structured chunk within its limit", () => {

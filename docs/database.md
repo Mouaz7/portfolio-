@@ -71,7 +71,7 @@ Allowed entity types are `site_profile`, `home_role`, `home_capability`, `skill_
 
 ## RAG Refresh
 
-`/api/internal/rag/reindex` builds deterministic source snapshots from Home profile data, `site_cv`, active public `project` rows, active skills/categories, and active `journey_item` rows. A protected 04:00 UTC cron and the GitHub sync invoke it; chat requests only retrieve existing chunks. A database lease prevents overlapping runs, SHA-256 hashes skip unchanged sources, and each source replacement is atomic.
+`/api/internal/rag/reindex` builds deterministic source snapshots from Home profile data, `site_cv`, active public `project` rows, active skills/categories, and active `journey_item` rows. A protected 04:00 UTC cron and the GitHub sync invoke it; chat requests only retrieve existing chunks. A database lease prevents overlapping runs, SHA-256 hashes skip unchanged sources, and each source replacement is atomic. The active embedding model ID is part of the hash, so changing models automatically rebuilds every vector with a consistent embedding space.
 
 ## Storage
 
@@ -110,19 +110,17 @@ NVIDIA_CV_CHAT_API_KEY=
 NVIDIA_CODE_REVIEW_API_KEY=
 NVIDIA_FALLBACK_API_KEY=
 NVIDIA_EMBEDDING_API_KEY=
-NVIDIA_CV_CHAT_MODEL=deepseek-ai/deepseek-v4-flash
-NVIDIA_CODE_REVIEW_MODEL=meta/llama-3.3-70b-instruct
-NVIDIA_FALLBACK_MODEL=meta/llama-3.2-3b-instruct
-NVIDIA_STABLE_FALLBACK_MODEL=meta/llama-3.1-8b-instruct
-NVIDIA_EMBEDDING_MODEL=nvidia/llama-nemotron-embed-1b-v2
+NVIDIA_CV_CHAT_MODEL=poolside/laguna-xs-2.1
+NVIDIA_CODE_REVIEW_MODEL=poolside/laguna-xs-2.1
+NVIDIA_FALLBACK_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b
+NVIDIA_STABLE_FALLBACK_MODEL=poolside/laguna-xs-2.1
+NVIDIA_EMBEDDING_MODEL=nvidia/nemotron-3-embed-1b
 REVALIDATE_SECRET=
 CV_STORAGE_BUCKET=private-cv
 CV_STORAGE_OBJECT=cv/Mouaz-Naji-CV-2026-08.pdf
 # Optional extra fallback secrets, server-side only:
 # NVIDIA_DEEPSEEK_PRO_API_KEY=
-# NVIDIA_DEEPSEEK_PRO_MODEL=deepseek-ai/deepseek-v4-pro
-# NVIDIA_LLAMA_31_70B_API_KEY=
-# NVIDIA_LLAMA_31_70B_MODEL=meta/llama-3.1-70b-instruct
+# NVIDIA_DEEPSEEK_PRO_MODEL=deepseek-ai/deepseek-v4-pro-0813
 ```
 
 Use `SUPABASE_SECRET_KEY` only on the server or in CI. Do not expose it to client-side code.

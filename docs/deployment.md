@@ -39,6 +39,8 @@ AI requests already run through Next.js server routes:
 
 NVIDIA keys stay in server environment variables and are never sent to browser code. On Vercel, add them under Project Settings > Environment Variables. Do not use `NEXT_PUBLIC_` for AI keys. Rotate keys pasted into chat, logs, screenshots, or commits.
 
+Code submitted to the review tools is sent to the configured NVIDIA chat endpoint. Portfolio chatbot retrieval sends source chunks, including configured CV content, to the NVIDIA embedding endpoint during reindexing and sends only the retrieved context to the chat endpoint when answering. Changing `NVIDIA_EMBEDDING_MODEL` requires a protected RAG reindex; the model ID is included in the source hash so the next run rebuilds all vectors consistently.
+
 Free NVIDIA endpoints still have quotas and rate limits. For higher traffic, add provider-side rate limiting or an authenticated gateway before exposing these routes publicly.
 
 ## Vercel

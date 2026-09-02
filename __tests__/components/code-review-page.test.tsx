@@ -65,7 +65,7 @@ describe("CodeReviewPage", () => {
       json: async () => ({
         review: "## Summary\n\nUse const.",
         language: "sv",
-        model: "deepseek-ai/deepseek-v4-pro",
+        model: "poolside/laguna-xs-2.1",
       }),
     }) as typeof fetch;
 

@@ -16,7 +16,7 @@ describe("/api/ai/code-review/chat", () => {
     jest.clearAllMocks();
     chatMock.mockResolvedValue({
       content: "Use a null check before reading the property.",
-      model: "meta/llama-3.3-70b-instruct",
+      model: "poolside/laguna-xs-2.1",
     });
   });
 

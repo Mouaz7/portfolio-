@@ -4,6 +4,10 @@ export type ResolvedLanguage = Exclude<LanguagePreference, "auto">;
 export type RagLanguage = ResolvedLanguage | "und";
 
 const SWEDISH_HINTS = [
+  "hej",
+  "hejsan",
+  "hallå",
+  "tack",
   "och",
   "det",
   "jag",
@@ -17,6 +21,10 @@ const SWEDISH_HINTS = [
 ];
 
 const ENGLISH_HINTS = [
+  "hello",
+  "hey",
+  "hi",
+  "thanks",
   "and",
   "the",
   "what",
