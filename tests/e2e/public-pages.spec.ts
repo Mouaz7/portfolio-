@@ -1024,6 +1024,82 @@ test("contact exposes the canonical Beacons profile without tracking parameters"
   await expect(beacons).toHaveAttribute("rel", "noopener noreferrer");
 });
 
+test("journey and contact stay fully framed at audited laptop and tablet sizes", async ({ browser }) => {
+  test.setTimeout(120_000);
+
+  const contactProfiles = [
+    { name: "galaxy-tab-s4", width: 712, height: 1138 },
+    { name: "ipad-mini", width: 768, height: 1024 },
+    { name: "zenbook-fold", width: 853, height: 1280 },
+    { name: "nest-hub-max", width: 1280, height: 800 },
+  ] as const;
+
+  for (const profile of contactProfiles) {
+    const context = await browser.newContext({
+      viewport: { width: profile.width, height: profile.height },
+    });
+    const testPage = await context.newPage();
+    await testPage.emulateMedia({ reducedMotion: "reduce" });
+    await testPage.goto("/contact-page");
+
+    const layout = await testPage.evaluate(() => {
+      const shell = document.querySelector<HTMLElement>(".contact-repository-shell");
+      const send = document.querySelector<HTMLElement>(
+        ".contact-adaptive-layout .contact-send-button button",
+      );
+      const footer = document.querySelector<HTMLElement>(".contact-page .site-footer");
+      if (!shell || !send || !footer) throw new Error("Contact layout is incomplete");
+      const shellRect = shell.getBoundingClientRect();
+      const sendRect = send.getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+      return {
+        horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
+        shell: { top: shellRect.top, bottom: shellRect.bottom, height: shellRect.height },
+        send: { top: sendRect.top, bottom: sendRect.bottom },
+        footer: { top: footerRect.top, bottom: footerRect.bottom },
+        viewportHeight: window.innerHeight,
+      };
+    });
+
+    expect(layout.horizontalOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(layout.shell.top, profile.name).toBeGreaterThanOrEqual(0);
+    expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
+    expect(layout.send.top, profile.name).toBeGreaterThanOrEqual(layout.shell.top);
+    expect(layout.send.bottom, profile.name).toBeLessThanOrEqual(layout.shell.bottom + 1);
+    expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.footer.top + 1);
+    expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
+    if (profile.width < 900) {
+      expect(layout.shell.height, profile.name).toBeLessThanOrEqual(721);
+    }
+
+    await context.close();
+  }
+
+  const journeyContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const journeyPage = await journeyContext.newPage();
+  await journeyPage.emulateMedia({ reducedMotion: "reduce" });
+  await journeyPage.goto("/journey");
+  await expect(journeyPage.locator(".commit-row")).toHaveCount(6);
+
+  const journeyLayout = await journeyPage.evaluate(() => {
+    const main = document.querySelector<HTMLElement>(".journey-main");
+    const rows = [...document.querySelectorAll<HTMLElement>(".commit-row")];
+    if (!main || rows.length === 0) throw new Error("Journey layout is incomplete");
+    const lastRect = rows.at(-1)!.getBoundingClientRect();
+    return {
+      horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
+      mainOverflow: main.scrollHeight - main.clientHeight,
+      lastBottom: lastRect.bottom,
+      viewportHeight: window.innerHeight,
+    };
+  });
+
+  expect(journeyLayout.horizontalOverflow).toBeLessThanOrEqual(1);
+  expect(journeyLayout.mainOverflow).toBeLessThanOrEqual(1);
+  expect(journeyLayout.lastBottom).toBeLessThanOrEqual(journeyLayout.viewportHeight + 1);
+  await journeyContext.close();
+});
+
 test("Journey resolves its loader promptly and keeps its route", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/journey");
