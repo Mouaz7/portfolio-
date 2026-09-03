@@ -9,7 +9,7 @@ const lockedFiles = {
   "app/global.css": "d8df69c99265fa0e9854b266627f3bcf45075682f8ae8014cd6335bf16bc4df0",
   "app/home-page.module.css": "83455f1aa369470800482f106ac78996595d1d6b95670b0880230666e764cbd4",
   "app/i18n.css": "6356f72a0c2df5d2fa7d8d55af96bca38396cb7e6940fbfdec9b75988d9ea5f5",
-  "app/contact-page/contact-repository.css": "536c68d89c56b09757dde34fafa80983235fefb3d15dd545bfa36745a855b0aa",
+  "app/contact-page/contact-repository.css": "6a6f61eec11bceb9c1626f4c158d91ab1fd3e310aff6a7734c12285d6ab9ad3d",
   "components/brand/MouazPremiumLogo.module.css": "73202087229b69211bac4840d5634dfb557593c9e7441e1093754d0906fd3429",
   "components/code-editor.module.css": "d9bd87070ac92749047db5ce246ccb96c29e1d51eef743fc4d3366eceeb94383",
   "components/code-review-markdown.module.css": "0dae178097e3d13f0452b7c2d1d1ae2bc4e89fff67e76471b2a2ff53918704b5",
