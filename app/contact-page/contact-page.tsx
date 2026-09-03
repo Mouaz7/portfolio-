@@ -77,7 +77,7 @@ const ContactPage: NextPage<ContactPageProps> = ({ initialLinks }) => {
   );
 
   return (
-    <div className="contact-page w-full min-h-[100dvh] relative overflow-x-hidden min-[676px]:overflow-hidden flex flex-col">
+    <div className="contact-page w-full min-h-[100dvh] relative overflow-x-hidden flex flex-col">
       <Header />
 
       <main className="contact-main flex-1 min-h-0 px-2 min-[676px]:px-6 relative z-10">

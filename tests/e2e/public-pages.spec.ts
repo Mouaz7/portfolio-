@@ -1024,13 +1024,22 @@ test("contact exposes the canonical Beacons profile without tracking parameters"
   await expect(beacons).toHaveAttribute("rel", "noopener noreferrer");
 });
 
-test("journey and contact stay fully framed at audited laptop and tablet sizes", async ({ browser }) => {
-  test.setTimeout(120_000);
+test("journey and contact stay fully framed across compact laptops and portrait tablets", async ({ browser }) => {
+  test.setTimeout(180_000);
 
   const contactProfiles = [
+    { name: "compact-laptop-800", width: 800, height: 600 },
+    { name: "compact-laptop-900", width: 900, height: 600 },
+    { name: "compact-laptop-1024", width: 1024, height: 600 },
+    { name: "small-laptop", width: 1024, height: 768 },
+    { name: "short-desktop", width: 1280, height: 720 },
+    { name: "standard-laptop", width: 1366, height: 768 },
     { name: "galaxy-tab-s4", width: 712, height: 1138 },
     { name: "ipad-mini", width: 768, height: 1024 },
     { name: "zenbook-fold", width: 853, height: 1280 },
+    { name: "surface-pro-7", width: 912, height: 1368 },
+    { name: "surface-pro-10", width: 960, height: 1440 },
+    { name: "ipad-pro-13", width: 1032, height: 1376 },
     { name: "nest-hub-max", width: 1280, height: 800 },
   ] as const;
 
@@ -1048,28 +1057,71 @@ test("journey and contact stay fully framed at audited laptop and tablet sizes",
         ".contact-adaptive-layout .contact-send-button button",
       );
       const footer = document.querySelector<HTMLElement>(".contact-page .site-footer");
-      if (!shell || !send || !footer) throw new Error("Contact layout is incomplete");
+      const portraitRow = document.querySelector<HTMLElement>(".contact-profile-portrait-row");
+      const portrait = document.querySelector<HTMLElement>(".contact-portrait-frame");
+      if (!shell || !send || !footer || !portraitRow || !portrait) {
+        throw new Error("Contact layout is incomplete");
+      }
       const shellRect = shell.getBoundingClientRect();
       const sendRect = send.getBoundingClientRect();
       const footerRect = footer.getBoundingClientRect();
+      const portraitRowRect = portraitRow.getBoundingClientRect();
+      const portraitRect = portrait.getBoundingClientRect();
       return {
         horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
-        shell: { top: shellRect.top, bottom: shellRect.bottom, height: shellRect.height },
+        documentHeight: document.documentElement.scrollHeight,
+        shell: {
+          left: shellRect.left,
+          right: shellRect.right,
+          top: shellRect.top,
+          bottom: shellRect.bottom,
+          height: shellRect.height,
+        },
         send: { top: sendRect.top, bottom: sendRect.bottom },
         footer: { top: footerRect.top, bottom: footerRect.bottom },
+        portrait: {
+          width: portraitRect.width,
+          top: portraitRect.top,
+          bottom: portraitRect.bottom,
+          height: portraitRect.height,
+          rowWidth: portraitRowRect.width,
+          rowHeight: portraitRowRect.height,
+          centreDelta: Math.abs(
+            (portraitRect.top + portraitRect.bottom) / 2
+              - (portraitRowRect.top + portraitRowRect.bottom) / 2,
+          ),
+        },
         viewportHeight: window.innerHeight,
+        viewportWidth: window.innerWidth,
       };
     });
 
     expect(layout.horizontalOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(layout.shell.left, profile.name).toBeGreaterThanOrEqual(0);
+    expect(layout.shell.right, profile.name).toBeLessThanOrEqual(layout.viewportWidth + 1);
     expect(layout.shell.top, profile.name).toBeGreaterThanOrEqual(0);
-    expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
+    expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.documentHeight + 1);
     expect(layout.send.top, profile.name).toBeGreaterThanOrEqual(layout.shell.top);
     expect(layout.send.bottom, profile.name).toBeLessThanOrEqual(layout.shell.bottom + 1);
     expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.footer.top + 1);
-    expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
-    if (profile.width < 900) {
-      expect(layout.shell.height, profile.name).toBeLessThanOrEqual(721);
+    expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.documentHeight + 1);
+    expect(layout.portrait.top, profile.name).toBeGreaterThanOrEqual(layout.shell.top);
+    expect(layout.portrait.bottom, profile.name).toBeLessThanOrEqual(layout.shell.bottom + 1);
+    expect(layout.portrait.centreDelta, profile.name).toBeLessThanOrEqual(2);
+
+    if (profile.height <= 720) {
+      expect(layout.shell.height, profile.name).toBeGreaterThanOrEqual(589);
+      expect(layout.documentHeight, profile.name).toBeGreaterThan(layout.viewportHeight);
+    } else {
+      expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
+    }
+
+    if (profile.height >= 1024) {
+      expect(layout.shell.height, profile.name).toBeGreaterThanOrEqual(736);
+      expect(layout.shell.height, profile.name).toBeLessThanOrEqual(901);
+      expect(layout.portrait.height, profile.name).toBeGreaterThanOrEqual(275);
+      expect(Math.abs(layout.portrait.width - layout.portrait.rowWidth), profile.name).toBeLessThanOrEqual(1);
+      expect(Math.abs(layout.portrait.height - layout.portrait.rowHeight), profile.name).toBeLessThanOrEqual(1);
     }
 
     await context.close();
