@@ -121,6 +121,15 @@ const Header: NextPage<HeaderType> = ({
 
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
+    const desktopNavigation = window.matchMedia("(min-width: 900px)");
+    const closeAtDesktopWidth = (event: MediaQueryListEvent) => {
+      if (event.matches) setOpen(false);
+    };
+
+    desktopNavigation.addEventListener("change", closeAtDesktopWidth);
+    return () => desktopNavigation.removeEventListener("change", closeAtDesktopWidth);
+  }, []);
+  useEffect(() => {
     if (!open) return;
     const returnFocus = openerRef.current;
     closeRef.current?.focus();
@@ -166,7 +175,7 @@ const Header: NextPage<HeaderType> = ({
         "site-header relative z-[90]",
         "self-stretch flex flex-row items-center justify-between",
         "pt-2.5 px-[120px] pb-0",
-        "max-[676px]:pt-1.5 max-[676px]:px-3",
+        "max-[900px]:pt-1.5 max-[900px]:px-3",
         className,
       ].join(" ")}
       data-route-navigation={disableRouteNavigation ? "disabled" : "enabled"}
@@ -179,7 +188,7 @@ const Header: NextPage<HeaderType> = ({
       <nav
         className={[
           "site-header-nav m-0 self-start flex flex-row items-center justify-start gap-5",
-          "text-center text-xl text-white font-urbanist max-[676px]:hidden",
+          "text-center text-xl text-white font-urbanist max-[900px]:hidden",
         ].join(" ")}
       >
         <NavItem href={localizedPath("/", locale)} label={labels.home} active={basePathname === "/"} />
@@ -193,7 +202,7 @@ const Header: NextPage<HeaderType> = ({
       </nav>
 
       <div
-        className="site-header-mobile-controls hidden max-[676px]:flex items-center"
+        className="site-header-mobile-controls hidden max-[900px]:flex items-center"
       >
         <button
           ref={openerRef}
@@ -217,7 +226,7 @@ const Header: NextPage<HeaderType> = ({
       <div
         className={[
           "site-header-mobile-backdrop",
-          "hidden max-[676px]:block",
+          "hidden max-[900px]:block",
           "fixed inset-0 z-[70] bg-black/40 transition-opacity duration-300",
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         ].join(" ")}
@@ -228,7 +237,7 @@ const Header: NextPage<HeaderType> = ({
         ref={panelRef}
         className={[
           "site-header-mobile-panel",
-          "hidden max-[676px]:flex",
+          "hidden max-[900px]:flex",
           "fixed z-[80] top-0 right-0 h-dvh w-[78vw] max-w-[360px]",
           "bg-[rgba(var(--bg-rgb),0.95)] backdrop-blur-md border-l border-white/10",
           open ? "translate-x-0" : "translate-x-full",

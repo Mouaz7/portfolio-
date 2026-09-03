@@ -274,6 +274,58 @@ test("mobile menu traps focus, closes with Escape and returns focus", async ({ p
   await expect(page.locator('[role="dialog"][aria-hidden="true"]')).toHaveAttribute("inert", "");
 });
 
+test("header adapts before navigation becomes cramped at common browser zoom levels", async ({ page }) => {
+  const zoomProfiles = [
+    { name: "1280 at 125%", effectiveWidth: 1024, compact: false },
+    { name: "1280 at 150%", effectiveWidth: 853, compact: true },
+    { name: "1280 at 200%", effectiveWidth: 640, compact: true },
+    { name: "1366 at 150%", effectiveWidth: 911, compact: false },
+    { name: "compact boundary", effectiveWidth: 899, compact: true },
+    { name: "desktop boundary", effectiveWidth: 900, compact: false },
+  ] as const;
+
+  await page.goto("/contact-page");
+
+  for (const profile of zoomProfiles) {
+    await page.setViewportSize({ width: profile.effectiveWidth, height: 800 });
+    const desktopNav = page.locator(".site-header > .site-header-nav");
+    const menuButton = page.getByRole("button", { name: "Open menu" });
+
+    if (profile.compact) {
+      await expect(desktopNav, profile.name).toBeHidden();
+      await expect(menuButton, profile.name).toBeVisible();
+    } else {
+      await expect(desktopNav, profile.name).toBeVisible();
+      await expect(menuButton, profile.name).toBeHidden();
+    }
+
+    const geometry = await page.evaluate(() => {
+      const header = document.querySelector<HTMLElement>(".site-header");
+      if (!header) throw new Error("Header is missing");
+      const rect = header.getBoundingClientRect();
+      return {
+        documentOverflow: document.documentElement.scrollWidth - window.innerWidth,
+        headerOverflow: header.scrollWidth - header.clientWidth,
+        left: rect.left,
+        right: rect.right,
+      };
+    });
+
+    expect(geometry.documentOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(geometry.headerOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(geometry.left, profile.name).toBeGreaterThanOrEqual(0);
+    expect(geometry.right, profile.name).toBeLessThanOrEqual(profile.effectiveWidth + 1);
+  }
+
+  await page.setViewportSize({ width: 853, height: 800 });
+  const menuButton = page.getByRole("button", { name: "Open menu" });
+  await menuButton.click();
+  await expect(page.getByRole("dialog", { name: "Site navigation" })).toBeVisible();
+
+  await page.setViewportSize({ width: 1024, height: 800 });
+  await expect(page.locator('[role="dialog"][aria-hidden="true"]')).toHaveAttribute("inert", "");
+});
+
 test("Samsung browser viewport keeps visible geometry and theme chrome in sync", async ({ browser }) => {
   const context = await browser.newContext({
     viewport: { width: 360, height: 610 },
