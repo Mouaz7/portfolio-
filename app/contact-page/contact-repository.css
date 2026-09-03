@@ -2034,3 +2034,69 @@ html.light .contact-page {
     padding: 6px 9px;
   }
 }
+
+/*
+ * Viewport sizing guardrails.
+ *
+ * The repository shell used to grow to almost the full height of portrait
+ * tablets because the late 676–899px rule replaced (rather than preserved)
+ * the earlier 690px cap. Keep the editor comfortably sized and vertically
+ * centred on tall tablets, while giving short desktop viewports enough room
+ * for the commit action without clipping it.
+ */
+@media (min-width: 676px) and (max-width: 899px) {
+  .contact-page .contact-repository-shell {
+    height: min(720px, calc(100dvh - 170px));
+    min-height: min(500px, calc(100dvh - 170px));
+  }
+}
+
+@media (min-width: 900px) and (max-height: 850px) {
+  .contact-page .site-footer {
+    position: static;
+    flex: 0 0 auto;
+    margin-top: 0;
+  }
+
+  .contact-page .contact-repository-shell {
+    height: min(690px, calc(100dvh - 176px));
+    min-height: 0;
+    transform: none;
+  }
+
+  .contact-page .contact-commit-body {
+    padding: 12px 14px;
+  }
+
+  .contact-page .contact-commit-heading {
+    margin-bottom: 8px;
+  }
+
+  .contact-page .contact-message-control {
+    margin-top: 7px;
+  }
+
+  .contact-page .contact-message-field textarea,
+  .contact-page .contact-message-preview {
+    min-height: 92px;
+  }
+
+  .contact-page .contact-changed-files-heading,
+  .contact-page .contact-tracked-file,
+  .contact-page .contact-no-files {
+    min-height: 27px;
+  }
+
+  .contact-page .contact-attachment-toolbar {
+    min-height: 31px;
+    padding-block: 4px;
+  }
+
+  .contact-page .contact-commit-actions {
+    margin-top: 6px;
+  }
+
+  .contact-page .contact-command-strip {
+    margin-top: 8px;
+  }
+}

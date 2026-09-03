@@ -3017,6 +3017,44 @@ html.light .contact-page {
   }
 }
 
+/* Keep the complete six-entry Journey visible on short laptop displays. */
+@media (min-width: 676px) and (max-height: 850px) {
+  .journey-main {
+    padding-top: 10px;
+  }
+
+  .git-graph[data-journey-mode="desktop"] .git-head {
+    padding-block: 8px;
+  }
+
+  .git-graph[data-journey-mode="desktop"] .git-log {
+    gap: 0;
+    margin-top: 8px;
+    padding-bottom: 0;
+  }
+
+  .git-graph[data-journey-mode="desktop"] .commit-card {
+    gap: 10px;
+    margin-block: 2px;
+    padding: 7px 14px;
+  }
+
+  .git-graph[data-journey-mode="desktop"] .commit-card > .commit-rail-port + span {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .git-graph[data-journey-mode="desktop"] .commit-card h2 {
+    font-size: 14px;
+  }
+
+  .git-graph[data-journey-mode="desktop"] .commit-card p {
+    margin-top: 4px;
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+}
+
 /* GitHub repository index for tablet and desktop. Phone layout stays unchanged. */
 .projects-repository-toolbar {
   display: none;
