@@ -17,7 +17,7 @@ const lockedFiles = {
   "components/contact/ContactRepositoryHeader.tsx": "a6fcbd25d8ff9f02c15cbf31849dc2cf91965641b58f73c51866ffc89ddb84be",
   "components/contact/photo-social-container.tsx": "3a2624852585c57808b1d654848c0d8ced4b25eb56f29a9ecb0695c7ee4d3caf",
   "components/project/ProjectCard.tsx": "d09c8d30a53714ca0871e41b1b73caa797dd71a5faec9397c665438dcd2a130e",
-  "components/navigation/Header.tsx": "7b1c9cc01269bac0dd89ad3b018a417392fd10475d3183d732778e6e2e54b155",
+  "components/navigation/Header.tsx": "5ab8531d8efff725343e67b90689d421b300fd6bcd34d2803fd0b9c2da3ed733",
   "components/skills/SkillCard.module.css": "a0cffc84d3f94b84ba3a77f80c3409ffbcb42cc60977efbd3b6bd63150aea2e3",
   "components/skills/SkillCard.tsx": "bed15519c0a6a33d5be493cf1551ca779d49f62856b29809c56fc141895a465b",
   "components/skills/SkillIcon.tsx": "acc41e0402cf76e4b95e1b65978ee61ed513a3aefa3b00f4cee27374161fafe8",
