@@ -254,7 +254,7 @@ export default function CodeReviewPage() {
         {pageLoading ? (
           <PageLoadingStage text={copy.loading} noun={copy.title} />
         ) : (
-          <div className={styles.shell}>
+          <div className={styles.shell} data-code-review-shell>
           <div className={styles.toolbar}>
             <div className={styles.pageTitle}>
               <CodeIcon aria-hidden="true" />

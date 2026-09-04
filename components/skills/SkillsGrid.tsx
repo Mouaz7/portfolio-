@@ -123,7 +123,7 @@ export default function SkillsGrid({
   // platforms share the same three-column composition as desktop.
   const desktopComposition = useMediaQuery("(min-width: 640px)");
   const wideDesktopComposition = useMediaQuery(
-    "(min-width: 1000px) and (max-width: 2100px) and (min-aspect-ratio: 8/5)",
+    "(min-width: 1000px) and (min-aspect-ratio: 8/5)",
   );
   const spec = wideDesktopComposition
     ? WIDE_DESKTOP_SPEC

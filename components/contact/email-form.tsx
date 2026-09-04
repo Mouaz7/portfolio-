@@ -86,11 +86,15 @@ const EmailForm: NextPage<Props> = ({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [invalidField, setInvalidField] = useState<"name" | "email" | "message" | null>(null);
   const links = useContactLinks(showMobileIcons, initialLinks);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [editorMode, setEditorMode] = useState<"write" | "preview">("write");
 
   const inputFileRef = useRef<HTMLInputElement | null>(null);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { files, totalBytes, totalOk, addFiles, removeFile, clearFiles, fileKey } = useContactFiles(
     maxTotalMb,
@@ -107,10 +111,40 @@ const EmailForm: NextPage<Props> = ({
     if (fileError) setError(fileError);
   }
 
+  function focusInvalidField(field: "name" | "email" | "message") {
+    setInvalidField(field);
+    requestAnimationFrame(() => {
+      const target = field === "name"
+        ? nameRef.current
+        : field === "email"
+          ? emailRef.current
+          : messageRef.current;
+      target?.focus({ preventScroll: false });
+    });
+  }
+
+  function clearFieldError(field: "name" | "email" | "message") {
+    if (invalidField !== field) return;
+    setInvalidField(null);
+    setError(null);
+  }
+
   async function handleSendClick() {
     setError(null);
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    setInvalidField(null);
+    if (!name.trim()) {
       setError(copy.required);
+      focusInvalidField("name");
+      return;
+    }
+    if (!email.trim()) {
+      setError(copy.required);
+      focusInvalidField("email");
+      return;
+    }
+    if (!message.trim()) {
+      setError(copy.required);
+      focusInvalidField("message");
       return;
     }
     if (!totalOk) {
@@ -124,6 +158,7 @@ const EmailForm: NextPage<Props> = ({
     }
     if (!isValidEmail(email)) {
       setError(copy.invalidEmail);
+      focusInvalidField("email");
       return;
     }
 
@@ -155,6 +190,7 @@ const EmailForm: NextPage<Props> = ({
   return (
     <form
       aria-label={copy.form}
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         void handleSendClick();
@@ -196,6 +232,7 @@ const EmailForm: NextPage<Props> = ({
               <div className="contact-identity-grid">
                 <NameContainer
                   id={`${idPrefix}-name`}
+                  inputRef={nameRef}
                   titlePlaceholder={copy.yourName}
                   placeholder={copy.name}
                   required
@@ -203,8 +240,13 @@ const EmailForm: NextPage<Props> = ({
                   size="sm"
                   inputProps={{
                     value: name,
-                    onChange: (e) => setName(e.currentTarget.value.slice(0, NAME_MAX)),
+                    onChange: (e) => {
+                      setName(e.currentTarget.value.slice(0, NAME_MAX));
+                      clearFieldError("name");
+                    },
                     maxLength: NAME_MAX,
+                    "aria-invalid": invalidField === "name",
+                    "aria-describedby": invalidField === "name" ? `${idPrefix}-error` : undefined,
                     autoComplete: "name",
                     onKeyDown: stopSpaceBubble,
                     className: FIELD_INPUT_CLASS,
@@ -212,6 +254,7 @@ const EmailForm: NextPage<Props> = ({
                 />
                 <NameContainer
                   id={`${idPrefix}-email`}
+                  inputRef={emailRef}
                   titlePlaceholder={copy.yourEmail}
                   placeholder={copy.email}
                   required
@@ -220,8 +263,13 @@ const EmailForm: NextPage<Props> = ({
                   inputProps={{
                     type: "email",
                     value: email,
-                    onChange: (e) => setEmail(e.currentTarget.value.slice(0, EMAIL_MAX)),
+                    onChange: (e) => {
+                      setEmail(e.currentTarget.value.slice(0, EMAIL_MAX));
+                      clearFieldError("email");
+                    },
                     maxLength: EMAIL_MAX,
+                    "aria-invalid": invalidField === "email",
+                    "aria-describedby": invalidField === "email" ? `${idPrefix}-error` : undefined,
                     inputMode: "email",
                     autoComplete: "email",
                     onKeyDown: stopSpaceBubble,
@@ -264,13 +312,20 @@ const EmailForm: NextPage<Props> = ({
                   {editorMode === "write" ? (
                     <div id={`${idPrefix}-write-panel`} role="tabpanel" aria-labelledby={`${idPrefix}-write-tab`}>
                       <textarea
+                        ref={messageRef}
                         id={`${idPrefix}-message`}
                         className={MESSAGE_TEXTAREA_CLASS}
                         placeholder={copy.message}
                         value={message}
                         maxLength={MESSAGE_MAX}
-                        onChange={(e) => setMessage(e.currentTarget.value.slice(0, MESSAGE_MAX))}
+                        onChange={(e) => {
+                          setMessage(e.currentTarget.value.slice(0, MESSAGE_MAX));
+                          clearFieldError("message");
+                        }}
                         onKeyDown={stopSpaceBubble}
+                        required
+                        aria-invalid={invalidField === "message"}
+                        aria-describedby={invalidField === "message" ? `${idPrefix}-error` : undefined}
                       />
                     </div>
                   ) : (
@@ -337,8 +392,13 @@ const EmailForm: NextPage<Props> = ({
                   </div>
                 </div>
 
-                {!totalOk && <div className="contact-form-error">{format(copy.attachmentsTooLarge, { size: maxTotalMb })}</div>}
-                {error && totalOk && <div role="alert" className="contact-form-error">{error}</div>}
+                {!totalOk ? (
+                  <div id={`${idPrefix}-error`} role="alert" className="contact-form-error">
+                    {format(copy.attachmentsTooLarge, { size: maxTotalMb })}
+                  </div>
+                ) : error ? (
+                  <div id={`${idPrefix}-error`} role="alert" className="contact-form-error">{error}</div>
+                ) : null}
               </div>
             </div>
 
