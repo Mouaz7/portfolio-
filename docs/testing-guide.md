@@ -64,6 +64,6 @@ Run `npm run lint` too if your local Next version supports the configured comman
 - portrait tablets and foldables: 712×1138, 768×1024, 853×1280, 912×1368, 960×1440, 1032×1376;
 - compact display: 1280×800;
 - wide displays: 1920×1080, 2560×1440, 3440×1440, 3840×2160;
-- browser-zoom equivalents: 853 px at 150% and 640 px at 200%.
+- browser-zoom equivalents: 853 px at 150%, 640 px at 200%, and 320 px reflow at 400%.
 
-The matrix checks horizontal overflow, bounded and centered ultrawide content, light/dark theme stability, compact-header switching, and accessible contact-form validation focus.
+The matrix checks horizontal overflow, bounded and centered ultrawide content, light/dark theme stability, compact-header switching, accessible contact-form validation focus, and Windows High Contrast (`forced-colors`) focus visibility.

@@ -475,6 +475,7 @@ test("contact validation focuses and identifies every invalid field at high zoom
   const zoomProfiles = [
     { name: "150-percent", width: 853, height: 800 },
     { name: "200-percent", width: 640, height: 800 },
+    { name: "400-percent-reflow", width: 320, height: 800 },
   ] as const;
 
   for (const profile of zoomProfiles) {
@@ -531,6 +532,85 @@ test("contact validation focuses and identifies every invalid field at high zoom
 
     await context.close();
   }
+});
+
+test("Windows forced colors preserves keyboard focus and contact errors", async ({ browser }) => {
+  const profiles = [
+    { name: "400-percent-reflow", width: 320, height: 800 },
+    { name: "compact-laptop", width: 800, height: 600 },
+    { name: "desktop", width: 1366, height: 768 },
+  ] as const;
+
+  for (const profile of profiles) {
+    const context = await browser.newContext({
+      viewport: profile,
+      forcedColors: "active",
+    });
+    const testPage = await context.newPage();
+    await testPage.emulateMedia({ reducedMotion: "reduce" });
+    await testPage.goto("/contact-page?audit=performance");
+
+    const form = testPage.locator('form[aria-label="Contact form"]:visible');
+    const name = form.getByPlaceholder("Name");
+    const submit = form.getByRole("button", { name: /Commit & send|Send/ });
+    await submit.evaluate((button) => (button as HTMLButtonElement).click());
+    await expect(name, profile.name).toBeFocused();
+    await expect(name, profile.name).toHaveAttribute("aria-invalid", "true");
+
+    const state = await name.evaluate((element) => {
+      const input = element as HTMLInputElement;
+      const inputStyle = getComputedStyle(input);
+      const alert = input.form?.querySelector<HTMLElement>('[role="alert"]');
+      const alertStyle = alert ? getComputedStyle(alert) : null;
+      return {
+        forcedColors: matchMedia("(forced-colors: active)").matches,
+        horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+        inputOutlineStyle: inputStyle.outlineStyle,
+        inputOutlineWidth: parseFloat(inputStyle.outlineWidth),
+        alertBorderWidth: alertStyle ? parseFloat(alertStyle.borderTopWidth) : 0,
+      };
+    });
+    expect(state.forcedColors, profile.name).toBe(true);
+    expect(state.horizontalOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(state.inputOutlineStyle, profile.name).toBe("dashed");
+    expect(state.inputOutlineWidth, profile.name).toBeGreaterThanOrEqual(2);
+    expect(state.alertBorderWidth, profile.name).toBeGreaterThanOrEqual(2);
+
+    await submit.focus();
+    const buttonFocus = await submit.evaluate((button) => {
+      const style = getComputedStyle(button);
+      return {
+        outlineStyle: style.outlineStyle,
+        outlineWidth: parseFloat(style.outlineWidth),
+      };
+    });
+    expect(buttonFocus.outlineStyle, profile.name).toBe("solid");
+    expect(buttonFocus.outlineWidth, profile.name).toBeGreaterThanOrEqual(2);
+
+    await context.close();
+  }
+});
+
+test("all public pages reflow without horizontal scrolling at 400 percent", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 320, height: 800 } });
+  const testPage = await context.newPage();
+  await testPage.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const route of routes) {
+    await testPage.goto(`${route}${route.includes("?") ? "&" : "?"}audit=performance`);
+    await expect(testPage.locator("body"), route).toBeVisible();
+    await expect(testPage.getByRole("button", { name: "Open menu" }), route).toBeVisible();
+    const geometry = await testPage.evaluate(() => ({
+      documentOverflow: document.documentElement.scrollWidth - innerWidth,
+      bodyOverflow: document.body.scrollWidth - innerWidth,
+      viewportWidth: innerWidth,
+    }));
+    expect(geometry.viewportWidth, route).toBe(320);
+    expect(geometry.documentOverflow, route).toBeLessThanOrEqual(1);
+    expect(geometry.bodyOverflow, route).toBeLessThanOrEqual(1);
+  }
+
+  await context.close();
 });
 
 test("Samsung browser viewport keeps visible geometry and theme chrome in sync", async ({ browser }) => {
