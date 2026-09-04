@@ -16,6 +16,21 @@ const viewports = [
   { name: "tablet", width: 768, height: 1024 },
   { name: "desktop", width: 1440, height: 900 },
 ] as const;
+const adaptiveViewports = [
+  { name: "compact-laptop-800", width: 800, height: 600 },
+  { name: "compact-laptop-900", width: 900, height: 600 },
+  { name: "compact-laptop-1024", width: 1024, height: 600 },
+  { name: "small-laptop", width: 1024, height: 768 },
+  { name: "short-desktop", width: 1280, height: 720 },
+  { name: "standard-laptop", width: 1366, height: 768 },
+  { name: "galaxy-tab-s4", width: 712, height: 1138 },
+  { name: "ipad-mini", width: 768, height: 1024 },
+  { name: "zenbook-fold", width: 853, height: 1280 },
+  { name: "surface-pro-7", width: 912, height: 1368 },
+  { name: "surface-pro-10", width: 960, height: 1440 },
+  { name: "ipad-pro-13", width: 1032, height: 1376 },
+  { name: "nest-hub-max", width: 1280, height: 800 },
+] as const;
 const visualOutput = "test-results/visual-actual";
 
 // These color-contrast findings are part of the explicitly locked visual
@@ -324,6 +339,198 @@ test("header adapts before navigation becomes cramped at common browser zoom lev
 
   await page.setViewportSize({ width: 1024, height: 800 });
   await expect(page.locator('[role="dialog"][aria-hidden="true"]')).toHaveAttribute("inert", "");
+});
+
+test("all public pages remain bounded and centered on ultrawide displays", async ({ browser }) => {
+  test.setTimeout(240_000);
+  const profiles = [
+    { name: "full-hd", width: 1920, height: 1080 },
+    { name: "qhd", width: 2560, height: 1440 },
+    { name: "ultrawide", width: 3440, height: 1440 },
+    { name: "uhd", width: 3840, height: 2160 },
+  ] as const;
+  const surfaceSelectors: Record<(typeof routes)[number], string> = {
+    "/": ".home-main",
+    "/skills-page": ".skills-bento-grid",
+    "/journey": '[data-journey-fit="desktop"]',
+    "/projects-page": ".projects-shell",
+    "/code-review-page": "[data-code-review-shell]",
+    "/contact-page": ".contact-repository-shell",
+  };
+  const maximumSurfaceWidths: Record<(typeof routes)[number], number> = {
+    "/": 1600,
+    "/skills-page": 1800,
+    "/journey": 1600,
+    "/projects-page": 1800,
+    "/code-review-page": 1480,
+    "/contact-page": 1328,
+  };
+
+  for (const profile of profiles) {
+    const context = await browser.newContext({ viewport: profile });
+    const testPage = await context.newPage();
+    await testPage.emulateMedia({ reducedMotion: "reduce" });
+
+    for (const route of routes) {
+      const label = `${profile.name} ${route}`;
+      await testPage.goto(`${route}${route.includes("?") ? "&" : "?"}audit=performance`);
+      const surface = testPage.locator(surfaceSelectors[route]).first();
+      await expect(surface, label).toBeVisible();
+
+      const geometry = await surface.evaluate((element) => {
+        const header = document.querySelector<HTMLElement>(".site-header");
+        const surfaceRect = element.getBoundingClientRect();
+        const headerRect = header?.getBoundingClientRect();
+        return {
+          documentOverflow: document.documentElement.scrollWidth - window.innerWidth,
+          headerLeft: headerRect?.left ?? -1,
+          headerRight: headerRect?.right ?? -1,
+          headerWidth: headerRect?.width ?? -1,
+          surfaceLeft: surfaceRect.left,
+          surfaceRight: surfaceRect.right,
+          surfaceWidth: surfaceRect.width,
+          surfaceCentreDelta: Math.abs(
+            ((surfaceRect.left + surfaceRect.right) / 2) - (window.innerWidth / 2),
+          ),
+          viewportWidth: window.innerWidth,
+        };
+      });
+
+      expect(geometry.documentOverflow, label).toBeLessThanOrEqual(1);
+      expect(geometry.headerLeft, label).toBeGreaterThanOrEqual(0);
+      expect(geometry.headerRight, label).toBeLessThanOrEqual(profile.width + 1);
+      expect(geometry.headerWidth, label).toBeLessThanOrEqual(1560.5);
+      expect(geometry.surfaceLeft, label).toBeGreaterThanOrEqual(0);
+      expect(geometry.surfaceRight, label).toBeLessThanOrEqual(profile.width + 1);
+      expect(geometry.surfaceWidth, label).toBeLessThanOrEqual(maximumSurfaceWidths[route] + 1);
+      expect(geometry.surfaceCentreDelta, label).toBeLessThanOrEqual(2);
+    }
+
+    await context.close();
+  }
+});
+
+test("light and dark contact themes stay responsive across all adaptive viewports", async ({ browser }) => {
+  test.setTimeout(240_000);
+
+  for (const profile of adaptiveViewports) {
+    for (const theme of ["dark", "light"] as const) {
+      const context = await browser.newContext({ viewport: profile });
+      await context.addInitScript((selectedTheme) => {
+        localStorage.setItem("theme", selectedTheme);
+      }, theme);
+      const testPage = await context.newPage();
+      await testPage.emulateMedia({ reducedMotion: "reduce" });
+      const label = `${profile.name} ${theme}`;
+      await testPage.goto("/contact-page?audit=performance");
+      const shell = testPage.locator(".contact-repository-shell");
+      await expect(shell, label).toBeVisible();
+      const before = await shell.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
+          isLight: document.documentElement.classList.contains("light"),
+          themeColor: document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.content,
+          width: rect.width,
+          height: rect.height,
+        };
+      });
+
+      expect(before.horizontalOverflow, label).toBeLessThanOrEqual(1);
+      expect(before.isLight, label).toBe(theme === "light");
+      expect(before.themeColor, label).toBe(theme === "light" ? "#defaf5" : "#0a0b10");
+
+      const targetTheme = theme === "light" ? "dark" : "light";
+      const toggleLabel = `Switch to ${targetTheme} mode`;
+      let toggle = testPage.locator(`button[aria-label="${toggleLabel}"]:visible`);
+      if (await toggle.count() === 0) {
+        await testPage.getByRole("button", { name: "Open menu" }).click();
+        toggle = testPage.locator(`button[aria-label="${toggleLabel}"]:visible`);
+      }
+      await toggle.evaluate((button) => (button as HTMLButtonElement).click());
+
+      const after = await shell.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
+          isLight: document.documentElement.classList.contains("light"),
+          themeColor: document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.content,
+          width: rect.width,
+          height: rect.height,
+        };
+      });
+      expect(after.horizontalOverflow, label).toBeLessThanOrEqual(1);
+      expect(after.isLight, label).toBe(targetTheme === "light");
+      expect(after.themeColor, label).toBe(targetTheme === "light" ? "#defaf5" : "#0a0b10");
+      expect(after.width, label).toBeCloseTo(before.width, 0);
+      expect(after.height, label).toBeCloseTo(before.height, 0);
+
+      await context.close();
+    }
+  }
+});
+
+test("contact validation focuses and identifies every invalid field at high zoom", async ({ browser }) => {
+  test.setTimeout(90_000);
+  const zoomProfiles = [
+    { name: "150-percent", width: 853, height: 800 },
+    { name: "200-percent", width: 640, height: 800 },
+  ] as const;
+
+  for (const profile of zoomProfiles) {
+    const context = await browser.newContext({ viewport: profile });
+    const testPage = await context.newPage();
+    await testPage.emulateMedia({ reducedMotion: "reduce" });
+    await testPage.goto("/contact-page?audit=performance");
+
+    const form = testPage.locator('form[aria-label="Contact form"]:visible');
+    const name = form.getByPlaceholder("Name");
+    const email = form.getByPlaceholder("Email");
+    const message = form.getByPlaceholder("Message");
+    const submit = form.getByRole("button", { name: /Commit & send|Send/ });
+
+    await submit.click();
+    await expect(name, profile.name).toBeFocused();
+    await expect(name, profile.name).toHaveAttribute("aria-invalid", "true");
+    await expect(form.getByRole("alert"), profile.name).toBeVisible();
+
+    await name.fill("Zoom Test");
+    await submit.click();
+    await expect(email, profile.name).toBeFocused();
+    await expect(email, profile.name).toHaveAttribute("aria-invalid", "true");
+
+    await email.fill("not-an-email");
+    await message.fill("Validation must remain readable at high zoom.");
+    await submit.click();
+    await expect(email, profile.name).toBeFocused();
+    await expect(email, profile.name).toHaveAttribute("aria-invalid", "true");
+    await expect(form.getByRole("alert"), profile.name).toContainText("valid email");
+
+    await email.fill("zoom@example.com");
+    await message.fill("");
+    await submit.click();
+    await expect(message, profile.name).toBeFocused();
+    await expect(message, profile.name).toHaveAttribute("aria-invalid", "true");
+    await expect(message, profile.name).toHaveAttribute("aria-describedby", /-error$/);
+
+    const errorGeometry = await form.getByRole("alert").evaluate((alert) => {
+      const rect = alert.getBoundingClientRect();
+      return {
+        documentOverflow: document.documentElement.scrollWidth - window.innerWidth,
+        left: rect.left,
+        right: rect.right,
+        scrollWidth: alert.scrollWidth,
+        clientWidth: alert.clientWidth,
+        viewportWidth: window.innerWidth,
+      };
+    });
+    expect(errorGeometry.documentOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(errorGeometry.left, profile.name).toBeGreaterThanOrEqual(0);
+    expect(errorGeometry.right, profile.name).toBeLessThanOrEqual(errorGeometry.viewportWidth + 1);
+    expect(errorGeometry.scrollWidth, profile.name).toBeLessThanOrEqual(errorGeometry.clientWidth + 1);
+
+    await context.close();
+  }
 });
 
 test("Samsung browser viewport keeps visible geometry and theme chrome in sync", async ({ browser }) => {
@@ -1079,23 +1286,7 @@ test("contact exposes the canonical Beacons profile without tracking parameters"
 test("journey and contact stay fully framed across compact laptops and portrait tablets", async ({ browser }) => {
   test.setTimeout(180_000);
 
-  const contactProfiles = [
-    { name: "compact-laptop-800", width: 800, height: 600 },
-    { name: "compact-laptop-900", width: 900, height: 600 },
-    { name: "compact-laptop-1024", width: 1024, height: 600 },
-    { name: "small-laptop", width: 1024, height: 768 },
-    { name: "short-desktop", width: 1280, height: 720 },
-    { name: "standard-laptop", width: 1366, height: 768 },
-    { name: "galaxy-tab-s4", width: 712, height: 1138 },
-    { name: "ipad-mini", width: 768, height: 1024 },
-    { name: "zenbook-fold", width: 853, height: 1280 },
-    { name: "surface-pro-7", width: 912, height: 1368 },
-    { name: "surface-pro-10", width: 960, height: 1440 },
-    { name: "ipad-pro-13", width: 1032, height: 1376 },
-    { name: "nest-hub-max", width: 1280, height: 800 },
-  ] as const;
-
-  for (const profile of contactProfiles) {
+  for (const profile of adaptiveViewports) {
     const context = await browser.newContext({
       viewport: { width: profile.width, height: profile.height },
     });

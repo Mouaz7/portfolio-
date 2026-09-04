@@ -32,7 +32,40 @@ describe("contact page form", () => {
     fireEvent.submit(form!);
 
     expect(await screen.findByText("Please fill in Name, Email, and Message.")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(container.querySelector("#contact-mobile-name")).toHaveFocus();
+    });
+    expect(container.querySelector("#contact-mobile-name")).toHaveAttribute("aria-invalid", "true");
+    expect(container.querySelector("#contact-mobile-name")).toHaveAttribute(
+      "aria-describedby",
+      "contact-mobile-error",
+    );
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("moves validation focus through email and message errors", async () => {
+    const { container } = render(<ContactPage initialLinks={[]} />);
+    const form = container.querySelector<HTMLFormElement>('form[aria-label="Contact form"]')!;
+    const name = container.querySelector<HTMLInputElement>("#contact-mobile-name")!;
+    const email = container.querySelector<HTMLInputElement>("#contact-mobile-email")!;
+    const message = container.querySelector<HTMLTextAreaElement>("#contact-mobile-message")!;
+
+    fireEvent.change(name, { target: { value: "Mouaz Test" } });
+    fireEvent.submit(form);
+    await waitFor(() => expect(email).toHaveFocus());
+    expect(email).toHaveAttribute("aria-invalid", "true");
+
+    fireEvent.change(email, { target: { value: "invalid-email" } });
+    fireEvent.change(message, { target: { value: "Validation message" } });
+    fireEvent.submit(form);
+    await waitFor(() => expect(email).toHaveFocus());
+    expect(await screen.findByText("Please enter a valid email address.")).toBeInTheDocument();
+
+    fireEvent.change(email, { target: { value: "test@example.com" } });
+    fireEvent.change(message, { target: { value: "" } });
+    fireEvent.submit(form);
+    await waitFor(() => expect(message).toHaveFocus());
+    expect(message).toHaveAttribute("aria-invalid", "true");
   });
 
   it("presents the form as a GitHub repository workflow with a working preview", () => {

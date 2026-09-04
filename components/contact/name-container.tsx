@@ -8,6 +8,7 @@ type Props = {
   placeholder?: string;
   typeSectionBorder?: string;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+  inputRef?: React.Ref<HTMLInputElement>;
   id?: string;
   required?: boolean;
   valueForRequired?: string;
@@ -20,6 +21,7 @@ const NameContainer: NextPage<Props> = ({
   placeholder = "",
   typeSectionBorder,
   inputProps,
+  inputRef,
   id,
   required = false,
   valueForRequired = "",
@@ -58,6 +60,7 @@ const NameContainer: NextPage<Props> = ({
 
       <div className="relative min-w-0">
         <input
+          ref={inputRef}
           id={id}
           {...inputProps}
           required={required}

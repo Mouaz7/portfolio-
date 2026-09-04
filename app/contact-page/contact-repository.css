@@ -2169,3 +2169,15 @@ html.light .contact-page {
     margin-top: 8px;
   }
 }
+
+/* Validation remains obvious and readable at browser zoom levels. */
+.contact-page .contact-input[aria-invalid="true"],
+.contact-page .contact-message-field:has(textarea[aria-invalid="true"]) {
+  border-color: var(--contact-gh-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--contact-gh-danger) 18%, transparent);
+}
+
+.contact-page .contact-form-error {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
