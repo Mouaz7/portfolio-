@@ -3420,3 +3420,37 @@ html.light .contact-page {
     align-items: stretch;
   }
 }
+
+/* Preserve keyboard and validation affordances when Windows High Contrast
+   removes theme shadows and custom focus rings. */
+@media (forced-colors: active) {
+  :where(
+    a[href],
+    button,
+    input,
+    textarea,
+    select,
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 3px !important;
+    box-shadow: none !important;
+  }
+
+  :where(input, textarea, select)[aria-invalid="true"] {
+    border: 2px solid CanvasText !important;
+    outline: 2px dashed CanvasText !important;
+    outline-offset: 1px !important;
+  }
+
+  .contact-form-error {
+    border: 2px solid CanvasText !important;
+    background: Canvas !important;
+    color: CanvasText !important;
+  }
+
+  :where(button, input, textarea, select)[disabled],
+  [aria-disabled="true"] {
+    color: GrayText !important;
+  }
+}

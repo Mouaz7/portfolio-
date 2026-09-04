@@ -6,7 +6,7 @@ const lockedFiles = {
   "app/code-review-page.module.css": "a2b2a71343783eeaa51ed36aaacc19e57ed09e45b00db9d40ed93048ef158d42",
   "app/fonts.ts": "c6132ac9f3af551fefa720bab1edecff3dc8ccf05184e878e101979c7e5fac8c",
   "app/fonts/urbanist-latin.woff2": "ce6e0dd89c3ffa4de97bda85f9b08bcb775bea4df456b3dbb7e819c1c879be50",
-  "app/global.css": "d8df69c99265fa0e9854b266627f3bcf45075682f8ae8014cd6335bf16bc4df0",
+  "app/global.css": "e8c381078cb745bde250c24f36ac0a32ec7167994e4fbb39ec4dd2ad2b398e3c",
   "app/home-page.module.css": "83455f1aa369470800482f106ac78996595d1d6b95670b0880230666e764cbd4",
   "app/i18n.css": "6356f72a0c2df5d2fa7d8d55af96bca38396cb7e6940fbfdec9b75988d9ea5f5",
   "app/contact-page/contact-repository.css": "001cf8367804e83470ce52817c895ce6fdd566a685557b90f934af3000a4c632",
