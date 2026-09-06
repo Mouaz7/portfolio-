@@ -64,7 +64,7 @@ async function waitUntil(startedAt: number, elapsedMs: number) {
 async function expectedBackgroundFps(page: Page) {
   return page.evaluate(() => {
     const lowPowerViewport = window.matchMedia(
-      "(max-width: 675px), (hover: none), (pointer: coarse)",
+      "(max-width: 675px), (max-width: 960px) and (hover: none), (max-width: 960px) and (pointer: coarse)",
     ).matches || (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4);
     return lowPowerViewport ? "30" : "60";
   });
@@ -844,6 +844,50 @@ test("mobile background keeps moving with the soft fallback when WebGL is unavai
   await context.close();
 });
 
+test("touch laptops keep the desktop background while constrained desktops reduce GPU work", async ({ browser }) => {
+  const profiles = [
+    {
+      name: "touch-laptop",
+      cores: 8,
+      expectedTier: "desktop",
+      expectedScale: "0.52",
+      expectedFps: "60",
+    },
+    {
+      name: "constrained-touch-laptop",
+      cores: 4,
+      expectedTier: "low-power-desktop",
+      expectedScale: "0.42",
+      expectedFps: "30",
+    },
+  ] as const;
+
+  for (const profile of profiles) {
+    const context = await browser.newContext({
+      viewport: { width: 1366, height: 768 },
+      hasTouch: true,
+      isMobile: false,
+    });
+    await context.addInitScript((cores) => {
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        configurable: true,
+        value: cores,
+      });
+    }, profile.cores);
+    const page = await context.newPage();
+    await page.goto("/");
+
+    const canvas = page.locator("canvas[data-background-fps]");
+    await expect(canvas, profile.name).toHaveAttribute("data-background-renderer", "webgl");
+    await expect(canvas, profile.name).toHaveAttribute("data-background-profile", "layered-desktop");
+    await expect(canvas, profile.name).toHaveAttribute("data-background-device-tier", profile.expectedTier);
+    await expect(canvas, profile.name).toHaveAttribute("data-background-render-scale", profile.expectedScale);
+    await expect(canvas, profile.name).toHaveAttribute("data-background-fps", profile.expectedFps);
+
+    await context.close();
+  }
+});
+
 test("mobile background has no hard facet seams across sizes, themes and animation frames", async ({ browser }) => {
   test.setTimeout(120_000);
   const profiles = [
@@ -1483,15 +1527,22 @@ test("Journey resolves its loader promptly and keeps its route", async ({ page }
   expect(page.url()).toContain("/journey");
 });
 
-test("data and code routes keep the shared terminal loading architecture", async ({ page }) => {
+test("server-preloaded data and code routes do not add an artificial loading delay", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
+  const duplicateDataRequests: string[] = [];
+  page.on("request", (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (["/api/skills", "/api/skill-categories", "/api/journey", "/api/project"].includes(pathname)) {
+      duplicateDataRequests.push(pathname);
+    }
+  });
 
-  for (const route of [
-    "/skills-page",
-    "/journey",
-    "/projects-page",
-    "/code-review-page",
+  for (const { route, readySelector } of [
+    { route: "/skills-page", readySelector: ".skills-bento-grid" },
+    { route: "/journey", readySelector: ".commit-row" },
+    { route: "/projects-page", readySelector: ".projects-shell" },
+    { route: "/code-review-page", readySelector: "[data-code-review-shell]" },
   ]) {
     await page.goto("/");
     await Promise.all([
@@ -1499,9 +1550,10 @@ test("data and code routes keep the shared terminal loading architecture", async
       page.locator(`a[href="${route}"]`).first().click(),
     ]);
 
-    await expect(page.locator(".la-window")).toBeVisible({ timeout: 1_000 });
-    await expect(page.locator(".la-window")).toBeHidden({ timeout: 1_500 });
+    await expect(page.locator(readySelector).first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".la-window")).toHaveCount(0);
   }
+  expect(duplicateDataRequests).toEqual([]);
 });
 
 test("Arabic keeps the established home composition and reports no app errors", async ({ page }) => {

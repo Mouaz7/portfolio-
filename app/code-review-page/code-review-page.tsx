@@ -15,8 +15,6 @@ import type {
   ReviewChatContext,
   ReviewChatCopy,
 } from "@/components/code-review/ReviewChat";
-import PageLoadingStage from "@/components/ui/PageLoadingStage";
-import { useMinimumLoading } from "@/hooks/useMinimumLoading";
 import {
   languageDirection,
   resolveLanguage,
@@ -113,7 +111,6 @@ export default function CodeReviewPage() {
     option.focus();
     setListboxFocusTarget(null);
   }, [listboxFocusTarget]);
-  const { loading: pageLoading, finishLoading } = useMinimumLoading(400);
   const [mobilePane, setMobilePane] = useState<MobilePane>("editor");
   const [language, setLanguage] = useState<LanguagePreference>("auto");
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -126,10 +123,6 @@ export default function CodeReviewPage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    finishLoading();
-  }, [finishLoading]);
 
   async function submitReview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -251,10 +244,7 @@ export default function CodeReviewPage() {
     <div className={styles.root} data-page="code-review">
       <Header />
       <main className={styles.main}>
-        {pageLoading ? (
-          <PageLoadingStage text={copy.loading} noun={copy.title} />
-        ) : (
-          <div className={styles.shell} data-code-review-shell>
+        <div className={styles.shell} data-code-review-shell>
           <div className={styles.toolbar}>
             <div className={styles.pageTitle}>
               <CodeIcon aria-hidden="true" />
@@ -576,8 +566,7 @@ export default function CodeReviewPage() {
               </div>
             </section>
           </section>
-          </div>
-        )}
+        </div>
       </main>
     </div>
   );

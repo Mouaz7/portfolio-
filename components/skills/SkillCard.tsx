@@ -10,6 +10,7 @@ import {
   Star,
 } from "@phosphor-icons/react";
 import SkillIcon from "./SkillIcon";
+import { memo, useEffect, useRef } from "react";
 import styles from "./SkillCard.module.css";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -165,7 +166,7 @@ function contributionLevel(categoryKey: string, cardIndex: number, cell: number)
   return 4;
 }
 
-export function SkillCard({
+export const SkillCard = memo(function SkillCard({
   categoryKey,
   title,
   blurb,
@@ -185,6 +186,21 @@ export function SkillCard({
   largeContent?: boolean;
 }) {
   const { dictionary, format } = useI18n();
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    // The viewport-scaled stage needs a transform layer to retain its existing
+    // text rasterization. Only the temporary opacity/filter hints are released.
+    const reset = () => { card.style.willChange = "transform"; };
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    card.addEventListener("animationcancel", reset);
+    motion.addEventListener("change", reset);
+    return () => {
+      card.removeEventListener("animationcancel", reset);
+      motion.removeEventListener("change", reset);
+    };
+  }, []);
   const copy = dictionary.skills;
   // Determine grid layout based on item count
   const itemCount = items.length;
@@ -217,7 +233,14 @@ export function SkillCard({
   return (
     <div
       className={`skills-card-surface ${styles.card} relative border grid overflow-hidden animate-card`}
+      ref={cardRef}
       style={cardStyle}
+      onAnimationStart={(event) => {
+        if (event.target === event.currentTarget) event.currentTarget.style.willChange = "transform, opacity, filter";
+      }}
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget) event.currentTarget.style.willChange = "transform";
+      }}
       aria-label={title}
       data-skills-category={categoryKey}
       data-card-index={cardIndex}
@@ -352,4 +375,4 @@ export function SkillCard({
       </div>
     </div>
   );
-}
+});

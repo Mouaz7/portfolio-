@@ -57,6 +57,7 @@
     "test:design-lock": "node scripts/check-design-lock.mjs",
     "test:pixel-lock": "node scripts/check-pixel-lock.mjs",
     "test:lighthouse": "node scripts/run-lighthouse-ci.mjs",
+    "test:motion-performance": "node scripts/measure-motion-performance.mjs",
     "test:e2e": "playwright test"
   },
   "version": "0.1.0"

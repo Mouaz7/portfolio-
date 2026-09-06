@@ -6,7 +6,6 @@ import { useViewportStage } from "./useViewportStage";
 import { SkillCard } from "./SkillCard";
 import PageLoadingStage from "@/components/ui/PageLoadingStage";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useMinimumLoading } from "@/hooks/useMinimumLoading";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import type {
   SkillCategoryData,
@@ -61,15 +60,19 @@ export default function SkillsGrid({
   const { locale, dictionary } = useI18n();
   const [allSkills, setAllSkills] = useState<UISkill[]>(initialSkills ?? []);
   const [cats, setCats] = useState<CategoryMeta[]>(initialCategories ?? []);
-  const { loading, finishLoading } = useMinimumLoading(400);
+  const [categoriesLoading, setCategoriesLoading] = useState(initialCategories === undefined);
+  const [skillsLoading, setSkillsLoading] = useState(initialSkills === undefined);
+  const loading = categoriesLoading || skillsLoading;
 
   // Fetch categories (DB: skill_category with title/blurb)
   useEffect(() => {
     if (initialCategories) {
       setCats(initialCategories);
+      setCategoriesLoading(false);
       return;
     }
     let off = false;
+    setCategoriesLoading(true);
     (async () => {
       try {
         const r = await fetch(`/api/skill-categories?locale=${locale}`);
@@ -79,6 +82,8 @@ export default function SkillsGrid({
       } catch (e) {
         console.error("[SkillsGrid] fetch /api/skill-categories failed:", e);
         if (!off) setCats([]);
+      } finally {
+        if (!off) setCategoriesLoading(false);
       }
     })();
     return () => { off = true; };
@@ -88,10 +93,11 @@ export default function SkillsGrid({
   useEffect(() => {
     if (initialSkills) {
       setAllSkills(initialSkills);
-      finishLoading();
+      setSkillsLoading(false);
       return;
     }
     let off = false;
+    setSkillsLoading(true);
     (async () => {
       try {
         const r = await fetch("/api/skills");
@@ -102,11 +108,11 @@ export default function SkillsGrid({
         console.error("[SkillsGrid] fetch /api/skills failed:", e);
         if (!off) setAllSkills([]);
       } finally {
-        if (!off) finishLoading();
+        if (!off) setSkillsLoading(false);
       }
     })();
     return () => { off = true; };
-  }, [finishLoading, initialSkills]);
+  }, [initialSkills]);
 
   // Bucket skills by fetched categories
   const byCat = useMemo(() => {

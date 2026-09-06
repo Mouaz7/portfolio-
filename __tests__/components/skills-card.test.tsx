@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@/tests/test-utils";
+import { act, fireEvent, render, screen } from "@/tests/test-utils";
 import { SkillCard } from "@/components/skills/SkillCard";
 import SkillIcon from "@/components/skills/SkillIcon";
 import SkillsGrid from "@/components/skills/SkillsGrid";
@@ -35,11 +35,51 @@ const sampleItems = [
 ];
 
 describe("skills card contrast pass", () => {
+  it("releases temporary hints after completion and cancellation without changing the stagger", () => {
+    render(<SkillCard categoryKey="frontend" title="Frontend" blurb="Browser interfaces."
+      items={sampleItems} cardW={360} cardRatio={4 / 3} cardIndex={2} />);
+    const card = screen.getByLabelText("Frontend");
+    expect(card).toHaveStyle({ animationDelay: "240ms" });
+    fireEvent.animationStart(card);
+    expect(card).toHaveStyle({ willChange: "transform, opacity, filter" });
+    fireEvent.animationEnd(card);
+    expect(card).toHaveStyle({ willChange: "transform" });
+    fireEvent.animationStart(card);
+    fireEvent(card, new Event("animationcancel"));
+    expect(card).toHaveStyle({ willChange: "transform" });
+  });
+
+  it("waits for missing categories and removes loading immediately when they arrive", async () => {
+    jest.useFakeTimers();
+    const previousFetch = global.fetch;
+    let resolveResponse!: (value: Response) => void;
+    global.fetch = jest.fn(() => new Promise<Response>((resolve) => {
+      resolveResponse = resolve;
+    }));
+    try {
+      render(<SkillsGrid initialSkills={[]} />);
+      expect(screen.getByRole("status")).toHaveTextContent("Loading skills...");
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith("/api/skill-categories?locale=en");
+      await act(async () => {
+        resolveResponse({ ok: true, json: async () => [{
+          key: "frontend", title: "Frontend", blurb: "Browser interfaces.",
+        }] } as Response);
+      });
+      // No timers are advanced: settled data must be visible immediately.
+      expect(screen.queryByText("Loading skills...")).not.toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Frontend" })).toBeInTheDocument();
+    } finally {
+      global.fetch = previousFetch;
+      jest.useRealTimers();
+    }
+  });
+
   afterEach(() => {
     document.documentElement.classList.remove("light");
   });
 
-  it("shows the established terminal loader before server-preloaded skills", async () => {
+  it("renders server-preloaded skills without an artificial loading delay", () => {
     render(
       <SkillsGrid
         initialCategories={[{
@@ -59,10 +99,7 @@ describe("skills card contrast pass", () => {
       />,
     );
 
-    expect(screen.getByRole("status")).toHaveTextContent("Loading skills...");
-    await waitFor(() => {
-      expect(screen.queryByRole("status")).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText("Loading skills...")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Frontend" })).toBeInTheDocument();
   });
 

@@ -14,6 +14,8 @@ type ThemeColors = {
 type WorkerMessage =
   | {
       type: "init";
+      generation: number;
+      visible: boolean;
       canvas: OffscreenCanvas;
       width: number;
       height: number;
@@ -28,6 +30,7 @@ type WorkerMessage =
   | { type: "resize"; width: number; height: number }
   | { type: "pointer"; x: number; y: number; amount: number }
   | { type: "visibility"; visible: boolean }
+  | { type: "motion"; reduced: boolean }
   | { type: "dispose" };
 
 const scope = self as unknown as DedicatedWorkerGlobalScope;
@@ -47,6 +50,8 @@ let my = 0.5;
 let pointerAmount = 0;
 let raf = 0;
 let timer = 0;
+let generation = 0;
+let contextLost = false;
 
 function compileShader(type: number, source: string) {
   if (!gl) throw new Error("WebGL is unavailable");
@@ -74,7 +79,7 @@ function applyColors() {
 }
 
 function render(now: number) {
-  if (!gl || !program) return;
+  if (!gl || !program || contextLost) return;
   if (!reduced) {
     const maxDelta = (1000 / targetFps) * 2;
     animationElapsed += Math.min(Math.max(now - previousRender, 0), maxDelta);
@@ -136,7 +141,18 @@ function dispose() {
 }
 
 function initialize(message: Extract<WorkerMessage, { type: "init" }>) {
+  generation = message.generation;
   canvas = message.canvas;
+  canvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    contextLost = true;
+    running = false;
+    cancelFrame();
+    scope.postMessage({ type: "lost", generation });
+  });
+  canvas.addEventListener("webglcontextrestored", () => {
+    scope.postMessage({ type: "restored", generation });
+  });
   reduced = message.reduced;
   targetFps = message.targetFps;
   colors = message.colors;
@@ -187,7 +203,7 @@ function initialize(message: Extract<WorkerMessage, { type: "init" }>) {
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
   applyColors();
-  running = true;
+  running = message.visible;
   previousRender = performance.now();
   render(previousRender);
   // Complete the first GPU draw before telling the main thread that WebGL is
@@ -195,7 +211,7 @@ function initialize(message: Extract<WorkerMessage, { type: "init" }>) {
   // browser paint) can still contain the CSS fallback under heavy GPU load.
   gl.finish();
   scheduleFrame();
-  scope.postMessage({ type: "ready" });
+  scope.postMessage({ type: "ready", generation });
 }
 
 scope.onmessage = (event: MessageEvent<WorkerMessage>) => {
@@ -211,8 +227,13 @@ scope.onmessage = (event: MessageEvent<WorkerMessage>) => {
       mx = message.x;
       my = message.y;
       pointerAmount = message.amount;
+    } else if (message.type === "motion") {
+      reduced = message.reduced;
+      cancelFrame();
+      previousRender = performance.now();
+      if (running && !contextLost) scheduleFrame();
     } else if (message.type === "visibility") {
-      running = message.visible;
+      running = message.visible && !contextLost;
       cancelFrame();
       previousRender = performance.now();
       if (running) {
@@ -225,7 +246,7 @@ scope.onmessage = (event: MessageEvent<WorkerMessage>) => {
     }
   } catch {
     dispose();
-    scope.postMessage({ type: "error" });
+    scope.postMessage({ type: "error", generation });
   }
 };
 

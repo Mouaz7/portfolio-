@@ -8,6 +8,11 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["html", { open: "never" }], ["github"]] : "list",
+  projects: [
+    { name: "chromium", use: { browserName: "chromium" } },
+    { name: "firefox", testMatch: "browser-compatibility.spec.ts", use: { browserName: "firefox" } },
+    { name: "webkit", testMatch: "browser-compatibility.spec.ts", use: { browserName: "webkit" } },
+  ],
   use: {
     baseURL,
     browserName: "chromium",

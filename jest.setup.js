@@ -2,8 +2,7 @@
 import "@testing-library/jest-dom";
 import { configure } from "@testing-library/react";
 
-// Page loaders are intentionally visible for 1.5 seconds. Allow UI tests to
-// observe the final content without weakening the production timing contract.
+// Allow asynchronous network mocks to settle on slower CI runners.
 configure({ asyncUtilTimeout: 2_500 });
 
 // Mock environment variables for tests
@@ -16,6 +15,7 @@ jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: jest.fn(),
+      prefetch: jest.fn(),
     };
   },
   usePathname() {

@@ -33,10 +33,19 @@ type NavItemProps = {
 };
 
 function NavItem({ href, label, active = false, size = "md" }: NavItemProps) {
+  const router = useRouter();
+  const prefetchOnIntent = () => {
+    if (!active) router.prefetch(href);
+  };
+
   return (
     <Link
       href={href}
+      prefetch={false}
       aria-current={active ? "page" : undefined}
+      onPointerEnter={prefetchOnIntent}
+      onFocus={prefetchOnIntent}
+      onTouchStart={prefetchOnIntent}
       className={[
         "site-header-nav-item",
         "relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center",
@@ -79,7 +88,6 @@ const Header: NextPage<HeaderType> = ({
   disableRouteNavigation = false,
 }) => {
   const pathname = usePathname();
-  const router = useRouter();
   const { locale, dictionary } = useI18n();
   const basePathname = stripLocaleFromPathname(pathname ?? "/");
   const routes = useMemo(
@@ -92,32 +100,6 @@ const Header: NextPage<HeaderType> = ({
   const panelRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (typeof router.prefetch !== "function") return;
-
-    const currentIndex = routes.indexOf(pathname ?? "");
-    const adjacent = [routes[currentIndex - 1], routes[currentIndex + 1]]
-      .filter((route): route is string => Boolean(route));
-    adjacent.forEach((route) => router.prefetch(route));
-
-    const remaining = routes.filter(
-      (route) => route !== pathname && !adjacent.includes(route),
-    );
-    const warmRemainingRoutes = () => {
-      remaining.forEach((route) => router.prefetch(route));
-    };
-
-    if (typeof window.requestIdleCallback === "function") {
-      const idleId = window.requestIdleCallback(warmRemainingRoutes, {
-        timeout: 1_200,
-      });
-      return () => window.cancelIdleCallback(idleId);
-    }
-
-    const timer = window.setTimeout(warmRemainingRoutes, 250);
-    return () => window.clearTimeout(timer);
-  }, [pathname, router, routes]);
 
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {

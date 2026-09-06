@@ -119,13 +119,10 @@ describe("journey mobile layout", () => {
     offsetHeightSpy.mockRestore();
   });
 
-  it("shows the established terminal loader before server-preloaded journey data", async () => {
+  it("renders server-preloaded journey data without an artificial loading delay", () => {
     render(<JourneyPage initialItems={sampleItems} />);
 
-    expect(screen.getByText("Loading Journey...")).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.queryByText("Loading Journey...")).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText("Loading Journey...")).not.toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: /Software Engineering/i })).toHaveLength(2);
   });
 

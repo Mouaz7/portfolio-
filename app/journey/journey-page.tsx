@@ -14,7 +14,6 @@ import {
   computeFluidStageWidth,
   useViewportFitStage,
 } from "@/hooks/useViewportFitStage";
-import { useMinimumLoading } from "@/hooks/useMinimumLoading";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
 type ApiItem = {
@@ -37,7 +36,7 @@ type JourneyPageProps = {
 export default function JourneyPage({ initialItems, initialMobile = false }: JourneyPageProps) {
   const { locale, dictionary } = useI18n();
   const [items, setItems] = useState<JourneyItem[]>(initialItems ?? []);
-  const { loading, finishLoading } = useMinimumLoading(400);
+  const [loading, setLoading] = useState(initialItems === undefined);
   const mobile = useJourneyMobile(initialMobile);
   const mobileStageRows = Math.max(
     1,
@@ -71,10 +70,11 @@ export default function JourneyPage({ initialItems, initialMobile = false }: Jou
   useEffect(() => {
     if (initialItems) {
       setItems(initialItems);
-      finishLoading();
+      setLoading(false);
       return;
     }
     let off = false;
+    setLoading(true);
     (async () => {
       try {
         const r = await fetch(`/api/journey?locale=${locale}`);
@@ -84,13 +84,13 @@ export default function JourneyPage({ initialItems, initialMobile = false }: Jou
       } catch (e) {
         console.error("[JourneyPage] fetch failed:", e);
       } finally {
-        if (!off) finishLoading();
+        if (!off) setLoading(false);
       }
     })();
     return () => {
       off = true;
     };
-  }, [finishLoading, initialItems, locale]);
+  }, [initialItems, locale]);
 
   return (
     <div className="flex min-h-dvh flex-col overflow-hidden">

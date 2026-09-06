@@ -147,7 +147,7 @@ describe("projects page layout guards", () => {
     }) as typeof fetch;
   });
 
-  it("shows the established terminal loader before server-preloaded projects", async () => {
+  it("renders server-preloaded projects without an artificial loading delay", () => {
     render(
       <ProjectsPage
         initialProjects={sampleProjects.map((project) => ({
@@ -158,10 +158,7 @@ describe("projects page layout guards", () => {
       />,
     );
 
-    expect(screen.getByText("Loading projects...")).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.queryByText("Loading projects...")).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText("Loading projects...")).not.toBeInTheDocument();
     expect(screen.getByText("Move-Out: Moving Box System")).toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();
   });

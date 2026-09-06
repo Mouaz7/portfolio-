@@ -72,13 +72,17 @@ Approved presentation is protected by source-level design locks and **36 visual 
 
 ### Server-first, responsive navigation
 
-Skills, Journey, and Projects receive localized data directly from server-only loaders. When server preload is unavailable, the visible terminal stage accompanies a real client fallback request instead of hiding an artificial delay. Skills, Journey, Projects, and Code Review share the same readable Git terminal transition, while staged route prefetching keeps later navigation responsive.
+Skills, Journey, and Projects receive localized data directly from server-only loaders. Available SSR data, including empty results, is shown immediately without a duplicate primary-data request or minimum loading duration. The terminal loader appears only during a real client fallback request; Skills waits for both categories and skills. Code Review has no initial data dependency and opens immediately. Navigation prefetches on user intent rather than fetching every route at startup.
 
 Fixed visual stages are measured at most once per animation frame and scaled for the available viewport. Supported mobile views avoid unintended horizontal page overflow, preserve touch targets, and keep approved card and icon geometry intact.
 
 ### Animated background without blocking the interface
 
 The shared background uses a theme-aware WebGL ocean shader. Desktop rendering moves to an `OffscreenCanvas` worker where supported; mobile uses a lighter analytic shader and reduced frame rate. Rendering pauses when hidden, coalesces resize and pointer updates, respects reduced motion, and falls back to CSS when WebGL or workers are unavailable.
+
+Motion preferences and mobile/desktop profile changes are handled live. Worker startup has a five-second deadline, WebGL context loss activates the fallback, and recovery is bounded. Generations isolate stale worker messages; failed renderers release their resources. The CSS fallback also pauses in hidden tabs and follows reduced-motion changes. Touchscreen laptops retain the desktop profile at desktop widths.
+
+Skills cards are memoized while preserving their 900 ms entrance and 120 ms stagger. Temporary opacity/filter hints are released after animation; the transform layer remains to preserve text rendering in the scaled layout. Entrance animation never forces data to wait.
 
 ### AI review and portfolio-grounded assistance
 
@@ -154,7 +158,7 @@ Responsible disclosure instructions live in [`.github/SECURITY.md`](.github/SECU
 - Node.js 22 or newer
 - npm
 - A Supabase project for dynamic data, private files, and RAG
-- Chromium when running Playwright or Lighthouse locally
+- Playwright Chromium, Firefox and WebKit for the browser suite (`npx playwright install --with-deps chromium firefox webkit`); Lighthouse uses Chromium
 - Optional NVIDIA, Turnstile, and SMTP credentials for their related features
 
 ### Install and run
@@ -196,6 +200,7 @@ npm run test:e2e          Run Playwright behavior and accessibility tests
 npm run test:design-lock  Verify protected presentation source and assets
 npm run test:pixel-lock   Compare all 36 approved screenshots
 npm run test:lighthouse   Run three audits per public route and assert quality gates
+npm run test:motion-performance  Measure active animations on a constrained CPU/network
 npm run sync:projects     Synchronize allowlisted GitHub repositories
 ```
 
@@ -210,12 +215,15 @@ Every push and pull request targeting `main` runs the Quality workflow:
 3. Jest with coverage;
 4. an isolated Supabase database and pgTAP security-policy tests;
 5. a production build with independent CI-only security values;
-6. Playwright behavior, accessibility, responsive-layout, and loader tests;
+6. Chromium behavior, accessibility, responsive-layout, loading and background lifecycle tests, plus targeted Firefox/WebKit compatibility checks;
 7. the 36-image exact/perceptual pixel lock;
 8. three Lighthouse runs for each public route with category thresholds and median Web Vitals gates;
-9. whitespace verification and short-lived diagnostic artifacts.
+9. separate motion-enabled measurements with 4× CPU slowdown, 150 ms latency and 1.6 Mbit/s download throughput;
+10. whitespace verification and short-lived diagnostic artifacts.
 
 The Lighthouse gate requires performance ≥ 0.80, accessibility ≥ 0.90, best practices ≥ 0.90, SEO ≥ 0.90, median LCP ≤ 2.5 s, median TBT ≤ 250 ms, and median CLS ≤ 0.05. Vercel creates Production deployments from `main` and Preview deployments for non-production changes.
+
+Motion reports include LCP, layout shifts, long tasks and frame intervals across three runs. Supply `PERF_BASELINE` to compare against a same-machine report: median LCP/blocking regressions must exceed both 15% and 100 ms to fail. CI builds the PR base commit (or previous commit on `main`) and measures it on the same runner before measuring the candidate; it saves both reports and enforces CLS ≤ 0.05. These checks complement Lighthouse; viewport and CPU emulation do not certify physical Windows scaling or every GPU. See the [testing guide](docs/testing-guide.md) for commands and device-verification limits.
 
 A separate scheduled workflow synchronizes allowlisted GitHub repositories, revalidates project data, and refreshes the RAG index. Dependency updates are reviewed and applied manually. The SHA-pinned CodeQL workflow analyzes JavaScript and TypeScript when repository visibility supports code scanning.
 
@@ -229,7 +237,7 @@ components/      Feature UI, navigation, branding, loaders, and background
 hooks/           Shared loading, viewport, and browser-state hooks
 lib/             Data access, localization, AI, security, and integrations
 public/          Brand, page imagery, project icons, and Skills icons
-scripts/         Project sync, design lock, pixel lock, and Lighthouse tooling
+scripts/         Project sync, visual locks, Lighthouse and motion-performance tooling
 supabase/        Migrations, local configuration, seed data, and pgTAP tests
 __tests__/       Jest component, route, data, utility, and security tests
 tests/e2e/       Playwright behavior, accessibility, viewport, and visual tests

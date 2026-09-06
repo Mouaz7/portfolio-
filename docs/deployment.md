@@ -92,6 +92,8 @@ Official reference: https://nextjs.org/docs/app/guides/self-hosting
 
 ## Pre-Deploy Checks
 
+For background/loading changes, also run the lifecycle and cross-browser suites, the existing pixel lock, Lighthouse and the motion-enabled before/after performance comparison described in `testing-guide.md`. Keep screenshot references unchanged unless an intentional visual change has been approved. Create a PR, wait for Quality and CodeQL, and verify its Vercel preview before merging. Production is created by the existing Git integration; verify the deployed commit and public routes afterward without sending contact emails. Keep the previous successful deployment available for rollback.
+
 ```bash
 npm run test:ci
 npm run check:dead

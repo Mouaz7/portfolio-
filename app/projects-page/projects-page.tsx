@@ -11,7 +11,6 @@ import ProjectCard from "@/components/project/ProjectCard";
 import MobileGitGraph from "@/components/project/MobileGitGraph";
 import PageLoadingStage from "@/components/ui/PageLoadingStage";
 import { useMediaQuery, usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { useMinimumLoading } from "@/hooks/useMinimumLoading";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { localeTag } from "@/lib/i18n/config";
 import type { RepositoryStats } from "@/lib/projects/repository-stats.server";
@@ -85,7 +84,7 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
   const prefersReducedMotion = usePrefersReducedMotion();
   const hasInitialProjects = initialProjects !== undefined;
   const [projects, setProjects] = useState<Project[]>(initialProjects ?? []);
-  const { loading, finishLoading } = useMinimumLoading(400);
+  const [loading, setLoading] = useState(!hasInitialProjects);
   const [error, setError] = useState<string | null>(
     initialLoadFailed ? copy.loadError : null,
   );
@@ -108,9 +107,11 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
   // Fetch projects from API
   useEffect(() => {
     if (hasInitialProjects) {
-      finishLoading();
+      setLoading(false);
       return;
     }
+    let off = false;
+    setLoading(true);
     const fetchProjects = async () => {
       try {
         setError(null);
@@ -119,6 +120,7 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
           throw new Error("Failed to fetch projects");
         }
         const data = await res.json();
+        if (off) return;
         setProjects(data);
         
         // Set first category as open by default
@@ -127,15 +129,17 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
           setOpenCategory(firstCategory);
         }
       } catch (err) {
+        if (off) return;
         console.error("Error fetching projects:", err);
         setError(copy.loadError);
       } finally {
-        finishLoading();
+        if (!off) setLoading(false);
       }
     };
 
     fetchProjects();
-  }, [copy.loadError, finishLoading, hasInitialProjects, locale]);
+    return () => { off = true; };
+  }, [copy.loadError, hasInitialProjects, locale]);
 
   useEffect(() => {
     if (initialRepositoryStats) {

@@ -63,3 +63,5 @@ next-env.d.ts
 # test
 *.lcov
 .nyc_output
+.performance-results/
+.motion-baseline/

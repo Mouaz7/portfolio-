@@ -22,13 +22,10 @@ describe("CodeReviewPage", () => {
     await screen.findByRole("heading", { name: "Understand and improve your code" });
   }
 
-  it("shows the established terminal loader before the workspace", async () => {
+  it("renders the local workspace without an artificial loading delay", () => {
     render(<CodeReviewPage />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Loading code review…");
-    await waitFor(() => {
-      expect(screen.queryByRole("status")).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText("Loading code review…")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Understand and improve your code" })).toBeInTheDocument();
   });
 

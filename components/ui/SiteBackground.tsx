@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Single shared GPU backdrop for every page. A hand-written GLSL fragment
@@ -281,8 +281,10 @@ void main(){
 const VERT = `attribute vec2 a_pos; void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 
 const MOBILE_RENDER_SCALE = 0.82;
-const LOW_POWER_DESKTOP_RENDER_SCALE = 0.62;
+const LOW_POWER_DESKTOP_RENDER_SCALE = 0.42;
 const DESKTOP_RENDER_SCALE = 0.52;
+const MOBILE_RENDER_QUERY =
+  "(max-width: 675px), (max-width: 960px) and (hover: none), (max-width: 960px) and (pointer: coarse)";
 
 const CSS_FALLBACK =
   "radial-gradient(ellipse at 14% 18%, rgba(var(--wave-foam-rgb),0.66) 0%, transparent 46%)," +
@@ -334,6 +336,8 @@ function initializeWorkerBackground(
   lowPowerViewport: boolean,
   reduced: boolean,
   applyCssFallback: () => void,
+  generation: number,
+  restart: () => void,
 ) {
   if (
     process.env.NODE_ENV !== "production"
@@ -350,7 +354,9 @@ function initializeWorkerBackground(
     return null;
   }
 
-  const renderScale = lowPowerViewport ? MOBILE_RENDER_SCALE : DESKTOP_RENDER_SCALE;
+  const renderScale = lowPowerViewport
+    ? LOW_POWER_DESKTOP_RENDER_SCALE
+    : DESKTOP_RENDER_SCALE;
   const targetFps = lowPowerViewport ? 30 : 60;
   const size = () => ({
     width: Math.max(2, Math.floor(window.innerWidth * renderScale)),
@@ -367,42 +373,79 @@ function initializeWorkerBackground(
 
   canvas.dataset.backgroundRenderer = "css";
   canvas.dataset.backgroundMode = "static";
-  canvas.dataset.backgroundFps = String(targetFps);
+  canvas.dataset.backgroundFps = "0";
   canvas.dataset.backgroundThread = "worker";
   canvas.dataset.backgroundProfile = "layered-desktop";
+  canvas.dataset.backgroundDeviceTier = lowPowerViewport ? "low-power-desktop" : "desktop";
+  canvas.dataset.backgroundRenderScale = String(renderScale);
 
   let active = true;
+  let ready = false;
+  let cleanup = () => {};
+  let watchdog = window.setTimeout(() => failWorker(), 5_000);
   const failWorker = () => {
     if (!active) return;
-    active = false;
-    worker.terminate();
+    cleanup();
     delete canvas.dataset.backgroundThread;
     applyCssFallback();
   };
 
   const initialSize = size();
-  worker.postMessage({
+  try {
+    worker.postMessage({
     type: "init",
+    generation,
     canvas: offscreen,
     ...initialSize,
     vertexShader: VERT,
     fragmentShader: DESKTOP_FRAG,
     colors: readThemeColors(),
     reduced,
+    visible: !document.hidden,
     powerPreference: lowPowerViewport ? "low-power" : "high-performance",
     targetFps,
   }, [offscreen]);
+  } catch {
+    active = false;
+    window.clearTimeout(watchdog);
+    worker.terminate();
+    delete canvas.dataset.backgroundThread;
+    applyCssFallback();
+    return () => {};
+  }
 
-  worker.onmessage = (event: MessageEvent<{ type: "ready" | "error" }>) => {
+  worker.onmessage = (event: MessageEvent<{ type: "ready" | "error" | "lost" | "restored"; generation: number }>) => {
+    if (!active || event.data.generation !== generation) return;
     if (event.data.type === "ready") {
+      window.clearTimeout(watchdog);
+      ready = true;
       canvas.dataset.backgroundRenderer = "webgl";
       canvas.dataset.backgroundMode = reduced ? "static" : "animated";
       canvas.dataset.backgroundFps = reduced ? "0" : String(targetFps);
+    } else if (event.data.type === "lost") {
+      ready = false;
+      applyCssFallback();
+      window.clearTimeout(watchdog);
+      watchdog = window.setTimeout(failWorker, 5_000);
+    } else if (event.data.type === "restored") {
+      cleanup();
+      restart();
     } else {
       failWorker();
     }
   };
   worker.onerror = failWorker;
+  const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const audit = new URLSearchParams(location.search).get("audit") === "performance";
+  const onMotion = () => {
+    reduced = audit || motion.matches;
+    worker.postMessage({ type: "motion", reduced });
+    if (ready) {
+      canvas.dataset.backgroundMode = reduced ? "static" : "animated";
+      canvas.dataset.backgroundFps = reduced ? "0" : String(targetFps);
+    } else if (canvas.dataset.backgroundProfile === "css-soft") applyCssFallback();
+  };
+  motion.addEventListener("change", onMotion);
 
   const themeObserver = new MutationObserver(() => {
     worker.postMessage({ type: "colors", colors: readThemeColors() });
@@ -446,8 +489,13 @@ function initializeWorkerBackground(
   };
   document.addEventListener("visibilitychange", onVisibility);
 
-  return () => {
+  cleanup = () => {
+    if (!active) return;
     active = false;
+    window.clearTimeout(watchdog);
+    motion.removeEventListener("change", onMotion);
+    worker.onmessage = null;
+    worker.onerror = null;
     cancelAnimationFrame(resizeRaf);
     cancelAnimationFrame(pointerRaf);
     window.removeEventListener("resize", onResize);
@@ -459,9 +507,32 @@ function initializeWorkerBackground(
     themeObserver.disconnect();
     worker.terminate();
   };
+  return cleanup;
 }
 
 export default function SiteBackground() {
+  const [generation, setGeneration] = useState(0);
+  const [forceCss, setForceCss] = useState(false);
+  const recoveries = useRef(0);
+  const restart = useCallback(() => {
+    recoveries.current += 1;
+    if (recoveries.current > 1) setForceCss(true);
+    setGeneration((value) => value + 1);
+  }, []);
+  useEffect(() => {
+    const media = window.matchMedia(MOBILE_RENDER_QUERY);
+    const onProfileChange = () => {
+      recoveries.current = 0;
+      setForceCss(false);
+      setGeneration((value) => value + 1);
+    };
+    media.addEventListener("change", onProfileChange);
+    return () => media.removeEventListener("change", onProfileChange);
+  }, []);
+  return <BackgroundCanvas key={generation} generation={generation} restart={restart} forceCss={forceCss} />;
+}
+
+function BackgroundCanvas({ generation, restart, forceCss }: { generation: number; restart: () => void; forceCss: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -472,26 +543,50 @@ export default function SiteBackground() {
     let teardown: (() => void) | undefined;
     let idleId = 0;
     let fallbackTimer = 0;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const audit = new URLSearchParams(location.search).get("audit") === "performance";
+    let reduced = audit || motion.matches;
+    let updateMotion = () => {};
+    const onMotion = () => {
+      reduced = audit || motion.matches;
+      if (canvas.dataset.backgroundRenderer === "css") {
+        canvas.dataset.backgroundMode = reduced ? "static" : "animated";
+      }
+      updateMotion();
+    };
+    const onPageVisibility = () => {
+      canvas.style.animationPlayState = document.hidden ? "paused" : "running";
+    };
+    onPageVisibility();
+    motion.addEventListener("change", onMotion);
+    document.addEventListener("visibilitychange", onPageVisibility);
 
     const initialize = () => {
       if (disposed) return;
 
-      const mobileViewport = window.matchMedia(
-        "(max-width: 675px), (hover: none), (pointer: coarse)",
-      ).matches;
+      // A coarse pointer by itself is not a mobile signal: many Windows
+      // laptops expose a touchscreen alongside a full desktop viewport.
+      const mobileViewport = window.matchMedia(MOBILE_RENDER_QUERY).matches;
       const constrainedDevice = navigator.hardwareConcurrency > 0
         && navigator.hardwareConcurrency <= 4;
       const lowPowerViewport = mobileViewport || constrainedDevice;
-      const performanceAudit = new URLSearchParams(window.location.search).get("audit") === "performance";
-      const reduced = performanceAudit
-        || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       const applyCssFallback = () => {
         canvas.style.background = CSS_FALLBACK;
         canvas.dataset.backgroundRenderer = "css";
         canvas.dataset.backgroundMode = reduced ? "static" : "animated";
         canvas.dataset.backgroundFps = "0";
         canvas.dataset.backgroundProfile = "css-soft";
+        canvas.dataset.backgroundDeviceTier = mobileViewport
+          ? "mobile"
+          : constrainedDevice
+            ? "low-power-desktop"
+            : "desktop";
+        canvas.dataset.backgroundRenderScale = "0";
       };
+      if (forceCss) {
+        applyCssFallback();
+        return;
+      }
 
       // Samsung Internet can expose OffscreenCanvas transfer support while
       // failing to create WebGL inside the worker. Once transferred, the DOM
@@ -499,13 +594,15 @@ export default function SiteBackground() {
       // the visibly different static CSS fallback. Mobile already runs at a
       // capped 30 fps and reduced backing resolution, so keep its compatible
       // WebGL renderer on the main thread and reserve workers for desktop.
-      const workerTeardown = lowPowerViewport
+      const workerTeardown = mobileViewport
         ? null
         : initializeWorkerBackground(
             canvas,
-            lowPowerViewport,
+            constrainedDevice,
             reduced,
             applyCssFallback,
+            generation,
+            restart,
           );
       if (workerTeardown) {
         teardown = workerTeardown;
@@ -565,6 +662,11 @@ export default function SiteBackground() {
     canvas.dataset.backgroundProfile = mobileViewport
       ? "continuous-mobile"
       : "layered-desktop";
+    canvas.dataset.backgroundDeviceTier = mobileViewport
+      ? "mobile"
+      : constrainedDevice
+        ? "low-power-desktop"
+        : "desktop";
 
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -607,6 +709,7 @@ export default function SiteBackground() {
       : lowPowerViewport
         ? LOW_POWER_DESKTOP_RENDER_SCALE
         : DESKTOP_RENDER_SCALE;
+    canvas.dataset.backgroundRenderScale = String(RENDER_SCALE);
     let canvasSizeInitialized = false;
     const resize = () => {
       const width = Math.max(2, Math.floor(window.innerWidth * RENDER_SCALE));
@@ -650,11 +753,14 @@ export default function SiteBackground() {
     const FRAME_MS = 1000 / TARGET_FPS;
     let raf = 0;
     let requestedRaf = 0;
-    let running = true;
+    let running = !document.hidden;
+    let contextLost = false;
+    let recoveryTimer = 0;
     let animationElapsed = 0;
     let previousRender = performance.now();
 
     const render = (now: number) => {
+      if (contextLost) return;
       if (!reduced) {
         animationElapsed += Math.min(Math.max(now - previousRender, 0), FRAME_MS * 2);
       }
@@ -685,7 +791,36 @@ export default function SiteBackground() {
 
     syncColors();
     render(performance.now());
-    if (!reduced) raf = requestAnimationFrame(animate);
+    if (!reduced && running) raf = requestAnimationFrame(animate);
+    updateMotion = () => {
+      if (contextLost) return;
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(requestedRaf);
+      raf = 0;
+      requestedRaf = 0;
+      previousRender = performance.now();
+      canvas.dataset.backgroundMode = reduced ? "static" : "animated";
+      canvas.dataset.backgroundFps = reduced ? "0" : String(TARGET_FPS);
+      if (running && !reduced) raf = requestAnimationFrame(animate);
+    };
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      contextLost = true;
+      running = false;
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(requestedRaf);
+      raf = 0;
+      requestedRaf = 0;
+      applyCssFallback();
+      recoveryTimer = window.setTimeout(() => teardown?.(), 5_000);
+    };
+    const onContextRestored = () => {
+      if (disposed) return;
+      window.clearTimeout(recoveryTimer);
+      restart();
+    };
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    canvas.addEventListener("webglcontextrestored", onContextRestored);
 
     // Theme changes update immediately while the display-synchronized loop
     // keeps the same waves moving in both light and dark mode.
@@ -696,6 +831,7 @@ export default function SiteBackground() {
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
     const onVisibility = () => {
+      if (contextLost) return;
       if (document.hidden) {
         running = false;
         cancelAnimationFrame(raf);
@@ -712,6 +848,10 @@ export default function SiteBackground() {
     document.addEventListener("visibilitychange", onVisibility);
 
       teardown = () => {
+        updateMotion = () => {};
+        window.clearTimeout(recoveryTimer);
+        canvas.removeEventListener("webglcontextlost", onContextLost);
+        canvas.removeEventListener("webglcontextrestored", onContextRestored);
         running = false;
         cancelAnimationFrame(raf);
         cancelAnimationFrame(requestedRaf);
@@ -731,31 +871,40 @@ export default function SiteBackground() {
     const queueInitialization = () => {
       if (disposed) return;
       if (typeof window.requestIdleCallback === "function") {
-        idleId = window.requestIdleCallback(initialize, { timeout: 750 });
+        idleId = window.requestIdleCallback(initialize, { timeout: 250 });
       } else {
         fallbackTimer = window.setTimeout(initialize, 1);
       }
     };
 
-    if (document.readyState === "complete") queueInitialization();
-    else window.addEventListener("load", queueInitialization, { once: true });
+    // Start after React's first paint, but do not wait for every image and
+    // network request. Waiting for window.load made the fallback-to-WebGL
+    // change arrive conspicuously late on slower computers.
+    const startupRaf = window.requestAnimationFrame(queueInitialization);
 
     return () => {
       disposed = true;
-      window.removeEventListener("load", queueInitialization);
+      motion.removeEventListener("change", onMotion);
+      document.removeEventListener("visibilitychange", onPageVisibility);
+      window.cancelAnimationFrame(startupRaf);
       if (idleId) window.cancelIdleCallback(idleId);
       if (fallbackTimer) window.clearTimeout(fallbackTimer);
       teardown?.();
     };
-  }, []);
+  }, [generation, restart, forceCss]);
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden
-      data-background-fps="60"
+      data-background-generation={generation}
+      data-background-renderer="css"
+      data-background-mode="static"
+      data-background-fps="0"
       data-background-scale="adaptive"
       data-background-profile="css-soft"
+      data-background-device-tier="pending"
+      data-background-render-scale="0"
       style={{ background: CSS_FALLBACK }}
       className="site-background pointer-events-none fixed inset-0 -z-10 h-full w-full"
     />
