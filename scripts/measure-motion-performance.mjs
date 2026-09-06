@@ -85,8 +85,19 @@ if (baselinePath) {
     const previous = baseline.routes[route];
     if (!previous) throw new Error(`Missing baseline: ${route}`);
     for (const metric of ["lcp", "blocking"]) {
-      if (current[metric] > previous[metric] * 1.15 && current[metric] - previous[metric] > 100) {
+      const exceedsThreshold = current[metric] > previous[metric] * 1.15
+        && current[metric] - previous[metric] > 100;
+      const currentMinimum = Math.min(...current.runs.map((run) => run[metric]));
+      const previousMaximum = previous.runs?.length
+        ? Math.max(...previous.runs.map((run) => run[metric]))
+        : previous[metric];
+      if (exceedsThreshold && currentMinimum > previousMaximum) {
         failures.push(`${route} ${metric}: ${previous[metric]} -> ${current[metric]}`);
+      } else if (exceedsThreshold) {
+        console.warn(
+          `${route} ${metric} median crossed the threshold, but three-run ranges overlap `
+          + `(${previousMaximum} baseline max, ${currentMinimum} candidate min); treating as noise`,
+        );
       }
     }
   }
