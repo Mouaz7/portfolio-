@@ -25,7 +25,10 @@ type Spec = {
   padY?: number;
 };
 type CategoryMeta = SkillCategoryData;
-const DESKTOP_SPEC: Spec = { cols: 3, rows: 3 };
+// The media-query hooks intentionally start from their SSR-safe `false` value.
+// Clamp this intermediate desktop composition so an ultrawide client never
+// paints an enlarged grid before the wide profile is selected after hydration.
+const DESKTOP_SPEC: Spec = { cols: 3, rows: 3, maxScale: 1 };
 const WIDE_DESKTOP_SPEC: Spec = {
   cols: 3,
   rows: 3,
