@@ -208,7 +208,7 @@ npm run sync:projects     Synchronize allowlisted GitHub repositories
 
 ## Quality and delivery
 
-Every push and pull request targeting `main` runs the Quality workflow:
+Every push to `main` or a `fix/**` verification branch, plus every pull request targeting `main`, runs the Quality workflow:
 
 1. production and complete dependency audits;
 2. ESLint, TypeScript, Knip, and the design lock;
