@@ -359,7 +359,7 @@ test("all public pages remain bounded and centered on ultrawide displays", async
   };
   const maximumSurfaceWidths: Record<(typeof routes)[number], number> = {
     "/": 1600,
-    "/skills-page": 1800,
+    "/skills-page": 2750,
     "/journey": 1600,
     "/projects-page": 1800,
     "/code-review-page": 1480,
@@ -1216,9 +1216,22 @@ test("skills icons interact inside equal, clipped canvases without shadows", asy
   }
 
   for (const profile of [
-    { name: "desktop", width: 1440, height: 900 },
-    { name: "large-desktop", width: 1920, height: 1080 },
-    { name: "wide-desktop", width: 2560, height: 1440 },
+    {
+      name: "desktop", width: 1440, height: 900,
+      expectedSize: "wide", minimumCardWidth: 400, minimumIconWidth: 40,
+    },
+    {
+      name: "large-desktop", width: 1920, height: 1080,
+      expectedSize: "wide", minimumCardWidth: 590, minimumIconWidth: 60,
+    },
+    {
+      name: "wide-desktop", width: 2560, height: 1440,
+      expectedSize: "extra-wide", minimumCardWidth: 740, minimumIconWidth: 80,
+    },
+    {
+      name: "uhd", width: 3840, height: 2160,
+      expectedSize: "ultra-wide", minimumCardWidth: 880, minimumIconWidth: 90,
+    },
   ]) {
     const context = await browser.newContext({
       viewport: { width: profile.width, height: profile.height },
@@ -1227,6 +1240,12 @@ test("skills icons interact inside equal, clipped canvases without shadows", asy
     await testPage.goto("/skills-page?audit=performance");
     const grid = testPage.locator(".skills-bento-grid");
     await expect(grid, profile.name).toBeInViewport();
+    await expect(testPage.locator(".skills-stage"), profile.name).toHaveAttribute(
+      "data-skills-size",
+      profile.expectedSize,
+    );
+    const card = testPage.locator(".skills-card-surface").first();
+    const cardBox = await card.boundingBox();
     const icon = testPage.locator("[data-skill-interaction]").first();
     const before = await icon.boundingBox();
     const beforeStyles = await icon.evaluate((element) => {
@@ -1269,6 +1288,8 @@ test("skills icons interact inside equal, clipped canvases without shadows", asy
     expect(afterStyles.canvasTop, profile.name).toBeGreaterThanOrEqual(afterStyles.commitBottom);
     expect(Math.max(...iconSizes.map(({ width }) => width)) - Math.min(...iconSizes.map(({ width }) => width)), profile.name).toBeLessThan(0.1);
     expect(Math.max(...iconSizes.map(({ height }) => height)) - Math.min(...iconSizes.map(({ height }) => height)), profile.name).toBeLessThan(0.1);
+    expect(cardBox?.width ?? 0, profile.name).toBeGreaterThanOrEqual(profile.minimumCardWidth);
+    expect(Math.min(...iconSizes.map(({ width }) => width)), profile.name).toBeGreaterThanOrEqual(profile.minimumIconWidth);
     expect(after?.y ?? 0, profile.name).toBeLessThan(before?.y ?? 0);
     expect(after?.width ?? 0, profile.name).toBeGreaterThan(before?.width ?? 0);
     expect(after?.height ?? 0, profile.name).toBeGreaterThan(before?.height ?? 0);

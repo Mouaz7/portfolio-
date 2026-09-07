@@ -67,6 +67,9 @@ Run `npm run lint` to check the configured ESLint rules.
 - browser-zoom equivalents: 853 px at 150%, 640 px at 200%, and 320 px reflow at 400%.
 
 The matrix checks horizontal overflow, bounded and centered ultrawide content, light/dark theme stability, compact-header switching, accessible contact-form validation focus, and Windows High Contrast (`forced-colors`) focus visibility.
+
+Skills has explicit large-display assertions in addition to the shared matrix. The wide, extra-wide, and ultra-wide profiles require progressively larger cards and square icon canvases at 1440, 1920, 2560, and 3840 px, while the phone/tablet checks keep every icon canvas equal, clipped, interactive, and free from horizontal overflow.
+
 ## Loading and background regression checks
 
 Server-provided Skills, Journey and Projects data (including empty arrays) must render without a page loader or duplicate primary-data request. Code Review has no initial data dependency and renders immediately. Client fallback requests show the existing loader only while pending; Skills waits for both categories and skills. No minimum-duration loading timer is used.
@@ -87,7 +90,7 @@ CI builds the unchanged PR base (or previous main commit) in `.motion-baseline/`
 
 ### Pixel-reference audit
 
-An independently built worktree of unchanged `c3a7941` reproduced 14 failing references: ten tablet screenshots (earlier navigation changes) and four desktop Contact/Projects screenshots. Those references were reconciled from unchanged main, not candidate screenshots. Existing comparison algorithms and tolerances were retained. Desktop-light and tablet-dark Skills use the existing four-bit geometry allowance with signatures from unchanged main (each candidate differs by one bit through subpixel rasterization). The Skills transform hint is retained specifically to avoid accepting an implementation-induced text-rendering change.
+An independently built worktree of unchanged `c3a7941` reproduced 14 failing references: ten tablet screenshots (earlier navigation changes) and four desktop Contact/Projects screenshots. Those references were reconciled from unchanged main, not candidate screenshots. Existing comparison algorithms and tolerances were retained. Skills baselines were later refreshed only for the explicitly approved responsive card/icon enlargement; all six light/dark mobile, tablet, and desktop screenshots have exact, perceptual, and geometry signatures. The existing four-bit geometry allowance was not widened. The Skills transform hint remains specifically to prevent accidental text-rendering changes.
 
 The first Projects card has one independently fetched repository-statistics row. CI's isolated data can show its deterministic language/zero counts while a local run may capture live GitHub language/star/fork values. Pixel normalization masks only that 154×24 px metadata line at its desktop/tablet positions; project titles, descriptions, badges, cards and surrounding geometry remain locked.
 

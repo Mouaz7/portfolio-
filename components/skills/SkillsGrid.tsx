@@ -32,11 +32,32 @@ const DESKTOP_SPEC: Spec = { cols: 3, rows: 3, maxScale: 1 };
 const WIDE_DESKTOP_SPEC: Spec = {
   cols: 3,
   rows: 3,
-  cardW: 570,
-  gap: 14,
+  cardW: 620,
+  gap: 16,
   cardRatio: 2,
   maxScale: 1,
+  padX: 32,
   padY: 28,
+};
+const EXTRA_WIDE_DESKTOP_SPEC: Spec = {
+  cols: 3,
+  rows: 3,
+  cardW: 760,
+  gap: 18,
+  cardRatio: 2,
+  maxScale: 1,
+  padX: 32,
+  padY: 32,
+};
+const ULTRA_WIDE_DESKTOP_SPEC: Spec = {
+  cols: 3,
+  rows: 3,
+  cardW: 900,
+  gap: 22,
+  cardRatio: 2,
+  maxScale: 1,
+  padX: 40,
+  padY: 36,
 };
 const MOBILE_SPEC: Spec = {
   cols: 2,
@@ -134,11 +155,21 @@ export default function SkillsGrid({
   const wideDesktopComposition = useMediaQuery(
     "(min-width: 1000px) and (min-aspect-ratio: 8/5)",
   );
-  const spec = wideDesktopComposition
-    ? WIDE_DESKTOP_SPEC
-    : desktopComposition
-      ? DESKTOP_SPEC
-      : MOBILE_SPEC;
+  const extraWideDesktopComposition = useMediaQuery(
+    "(min-width: 2200px) and (min-height: 1100px)",
+  );
+  const ultraWideDesktopComposition = useMediaQuery(
+    "(min-width: 3200px) and (min-height: 1500px)",
+  );
+  const spec = ultraWideDesktopComposition
+    ? ULTRA_WIDE_DESKTOP_SPEC
+    : extraWideDesktopComposition
+      ? EXTRA_WIDE_DESKTOP_SPEC
+      : wideDesktopComposition
+        ? WIDE_DESKTOP_SPEC
+        : desktopComposition
+          ? DESKTOP_SPEC
+          : MOBILE_SPEC;
 
   const STAGE = {
     ...BASE,
@@ -167,7 +198,15 @@ export default function SkillsGrid({
         <main
           className="skills-stage page-fade-in flex items-center justify-center"
           data-skills-layout={desktopComposition ? "desktop" : "phone"}
-          data-skills-size={wideDesktopComposition ? "wide" : "default"}
+          data-skills-size={
+            ultraWideDesktopComposition
+              ? "ultra-wide"
+              : extraWideDesktopComposition
+                ? "extra-wide"
+                : wideDesktopComposition
+                  ? "wide"
+                  : "default"
+          }
           style={wrapperStyle(STAGE.padY, STAGE.padX)}
         >
           <div style={stageStyle}>
@@ -201,7 +240,11 @@ export default function SkillsGrid({
                       cardW={STAGE.cardW}
                       cardRatio={STAGE.cardRatio}
                       cardIndex={i}
-                      largeContent={wideDesktopComposition}
+                      largeContent={
+                        wideDesktopComposition
+                        || extraWideDesktopComposition
+                        || ultraWideDesktopComposition
+                      }
                     />
                   </li>
                 );

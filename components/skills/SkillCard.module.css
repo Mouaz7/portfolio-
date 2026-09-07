@@ -1,5 +1,5 @@
 .card {
-  --skill-icon-canvas: 52px;
+  --skill-icon-canvas: 53px;
   --git-canvas: rgba(13, 17, 23, 0.96);
   --git-canvas-subtle: rgba(22, 27, 34, 0.94);
   --git-canvas-inset: #010409;
@@ -33,6 +33,7 @@
 }
 
 .card[data-large-content="true"] {
+  --skill-icon-canvas: clamp(65px, 3.4vw, 88px);
   grid-template-rows: 31px 54px 24px minmax(0, 1fr) 22px;
 }
 
@@ -250,8 +251,10 @@
 }
 
 .skillIconScale {
-  width: min(100%, var(--skill-icon-canvas));
+  width: auto;
+  max-width: 100%;
   height: min(100%, var(--skill-icon-canvas));
+  aspect-ratio: 1;
   overflow: hidden;
 }
 
@@ -367,7 +370,7 @@
 
 @media (max-width: 675px) {
   .card {
-    --skill-icon-canvas: 63px;
+    --skill-icon-canvas: 69px;
     grid-template-rows: 30px 34px 24px minmax(0, 1fr) 18px;
   }
 
@@ -488,6 +491,38 @@
   > li:has(> .card):nth-child(-n + 6)::before {
   bottom: -14px;
   height: 14px;
+}
+
+:global(.skills-stage[data-skills-size="extra-wide"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):not(:nth-child(3n))::after {
+  right: -18px;
+  width: 18px;
+}
+
+:global(.skills-stage[data-skills-size="extra-wide"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):nth-child(-n + 6)::before {
+  bottom: -18px;
+  height: 18px;
+}
+
+:global(.skills-stage[data-skills-size="ultra-wide"]) .card {
+  --skill-icon-canvas: 96px;
+}
+
+:global(.skills-stage[data-skills-size="ultra-wide"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):not(:nth-child(3n))::after {
+  right: -22px;
+  width: 22px;
+}
+
+:global(.skills-stage[data-skills-size="ultra-wide"])
+  :global(.skills-bento-grid)
+  > li:has(> .card):nth-child(-n + 6)::before {
+  bottom: -22px;
+  height: 22px;
 }
 
 @media (prefers-reduced-motion: reduce) {

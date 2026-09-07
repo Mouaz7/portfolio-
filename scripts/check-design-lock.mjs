@@ -18,7 +18,7 @@ const lockedFiles = {
   "components/contact/photo-social-container.tsx": "3a2624852585c57808b1d654848c0d8ced4b25eb56f29a9ecb0695c7ee4d3caf",
   "components/project/ProjectCard.tsx": "d09c8d30a53714ca0871e41b1b73caa797dd71a5faec9397c665438dcd2a130e",
   "components/navigation/Header.tsx": "2bad29deb8018a5fc0f62264f166919ce74ec1e7be4724ece38655e51d74349d",
-  "components/skills/SkillCard.module.css": "a0cffc84d3f94b84ba3a77f80c3409ffbcb42cc60977efbd3b6bd63150aea2e3",
+  "components/skills/SkillCard.module.css": "d5e873324434778126ed8014960ef675513cc4d1b019a94c8dcaf5b796915edc",
   "components/skills/SkillCard.tsx": "c77c8e88c53693a4e73915c37496383c055fb534e478a2a52e2ba3745d61fbff",
   "components/skills/SkillIcon.tsx": "acc41e0402cf76e4b95e1b65978ee61ed513a3aefa3b00f4cee27374161fafe8",
   "public/brand/mouaz-logo-light-4k.png": "661f812a74cfbe5d86003f9b9662104e8df1082af3885e0cad3111a61763fb99",

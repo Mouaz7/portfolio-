@@ -74,7 +74,7 @@ Approved presentation is protected by source-level design locks and **36 visual 
 
 Skills, Journey, and Projects receive localized data directly from server-only loaders. Available SSR data, including empty results, is shown immediately without a duplicate primary-data request or minimum loading duration. The terminal loader appears only during a real client fallback request; Skills waits for both categories and skills. Code Review has no initial data dependency and opens immediately. Navigation prefetches on user intent rather than fetching every route at startup.
 
-Fixed visual stages are measured at most once per animation frame and scaled for the available viewport. Supported mobile views avoid unintended horizontal page overflow, preserve touch targets, and keep approved card and icon geometry intact.
+Fixed visual stages are measured at most once per animation frame and scaled for the available viewport. Supported mobile views avoid unintended horizontal page overflow, preserve touch targets, and keep approved card and icon geometry intact. Skills adds dedicated wide, extra-wide, and 4K profiles: cards grow from the compact layout to 620, 760, and 900 CSS-pixel design widths, while square icon canvases grow up to 96 px and remain bounded when the stage scales down.
 
 ### Animated background without blocking the interface
 
