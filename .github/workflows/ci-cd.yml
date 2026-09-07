@@ -160,7 +160,10 @@ jobs:
       - name: Checkout motion comparison baseline
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.base.sha || github.event.before }}
+          # A newly created push branch reports an all-zero `before` SHA.
+          # Compare that first run with main; later pushes use the preceding
+          # branch commit, while pull requests continue to use their base SHA.
+          ref: ${{ github.event.pull_request.base.sha || (github.event.created && 'main') || github.event.before }}
           path: .motion-baseline
           persist-credentials: false
 
