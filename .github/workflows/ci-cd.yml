@@ -171,7 +171,7 @@ jobs:
         run: |
           npm ci --prefix .motion-baseline
           npm run build --prefix .motion-baseline
-          PERF_SERVER_ROOT=.motion-baseline PERF_OUTPUT=.performance-results/baseline.json node scripts/run-motion-ci.mjs
+          PERF_RECORD_BASELINE=1 PERF_SERVER_ROOT=.motion-baseline PERF_OUTPUT=.performance-results/baseline.json node scripts/run-motion-ci.mjs
 
       - name: Motion-enabled constrained-device regression gate
         env:

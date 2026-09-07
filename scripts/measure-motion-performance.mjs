@@ -5,6 +5,10 @@ import { dirname } from "node:path";
 const baseURL = process.env.PERF_BASE_URL ?? "http://127.0.0.1:3000";
 const output = process.env.PERF_OUTPUT ?? ".performance-results/motion-performance.json";
 const baselinePath = process.env.PERF_BASELINE;
+const recordBaseline = process.env.PERF_RECORD_BASELINE === "1";
+if (recordBaseline && baselinePath) {
+  throw new Error("PERF_RECORD_BASELINE and PERF_BASELINE cannot be used together");
+}
 const routes = ["/", "/skills-page", "/code-review-page"];
 const median = (values) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
 const report = { profile: { cpu: 4, latency: 150, download: 200000, viewport: [1366, 768] }, routes: {} };
@@ -73,8 +77,10 @@ try {
 }
 await mkdir(dirname(output), { recursive: true });
 await writeFile(output, `${JSON.stringify(report, null, 2)}\n`);
-for (const route of routes) {
-  if (report.routes[route].cls > 0.05) throw new Error(`${route} CLS ${report.routes[route].cls}`);
+if (!recordBaseline) {
+  for (const route of routes) {
+    if (report.routes[route].cls > 0.05) throw new Error(`${route} CLS ${report.routes[route].cls}`);
+  }
 }
 if (baselinePath) {
   const baseline = JSON.parse(await readFile(baselinePath, "utf8"));

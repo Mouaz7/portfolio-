@@ -86,7 +86,7 @@ Run `PERF_BASE_URL=http://127.0.0.1:3000 npm run test:motion-performance` agains
 
 Physical Windows scaling (125–150%), native browser zoom and vendor-specific GPU behavior require a Windows/device check. CSS viewport emulation and CPU throttling are not substitutes for those checks. A friend-device visual discrepancy is not considered reproduced solely by these emulations.
 
-CI builds the unchanged PR base (or previous main commit) in `.motion-baseline/`, then measures baseline and candidate sequentially on the same runner against the same isolated test data. Both reports are retained. `PERF_SERVER_ROOT` selects an already-built baseline when using `node scripts/run-motion-ci.mjs` locally; it does not change which measurement script runs.
+CI builds the unchanged PR base (or previous main commit) in `.motion-baseline/`, then measures baseline and candidate sequentially on the same runner against the same isolated test data. `PERF_RECORD_BASELINE=1` records the historical reference without applying candidate-only absolute gates; the candidate still enforces CLS ≤ 0.05 and all regression limits. Both reports are retained. `PERF_SERVER_ROOT` selects an already-built baseline when using `node scripts/run-motion-ci.mjs` locally; it does not change which measurement script runs.
 
 ### Pixel-reference audit
 
