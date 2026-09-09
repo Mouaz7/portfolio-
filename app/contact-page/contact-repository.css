@@ -2181,3 +2181,59 @@ html.light .contact-page {
   max-width: 100%;
   overflow-wrap: anywhere;
 }
+
+/* Match the repository editor to genuinely large desktop viewports. The
+   portrait remains contained, but is no longer limited to a laptop-sized
+   360px frame inside a much larger profile pane. */
+@media (min-width: 2200px) and (min-height: 1000px) {
+  .contact-page .contact-main {
+    padding-inline: clamp(48px, 6vw, 150px);
+  }
+
+  .contact-page .contact-repository-shell {
+    width: min(82vw, 2200px);
+    height: min(78dvh, 1120px);
+    min-height: 760px;
+  }
+
+  .contact-page .contact-portrait-frame {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 3200px) and (min-height: 1400px) {
+  .contact-page .contact-main {
+    padding-inline: clamp(100px, 8vw, 320px);
+  }
+
+  .contact-page .contact-repository-shell {
+    width: min(78vw, 3000px);
+    height: min(78dvh, 1600px);
+    min-height: 1120px;
+  }
+
+  .contact-page .contact-premium-shell {
+    grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+  }
+
+  .contact-page .contact-profile-column {
+    padding: 20px 26px 18px;
+  }
+
+  .contact-page .contact-profile-heading {
+    margin-inline: -26px;
+    padding-inline: 26px;
+  }
+
+  .contact-page .contact-profile-details {
+    margin-inline: -26px;
+  }
+
+  .contact-page .contact-portrait-frame {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+}

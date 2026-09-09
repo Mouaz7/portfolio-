@@ -3454,3 +3454,62 @@ html.light .contact-page {
     color: GrayText !important;
   }
 }
+
+/*
+ * Large-display density profiles.
+ *
+ * A high-resolution monitor at 100% OS scaling exposes far more CSS pixels
+ * than a laptop, so the old fixed 1328-1800px caps made every repository
+ * surface look miniature. These profiles only activate when both width and
+ * height are genuinely large; 125-200% Windows scaling therefore continues
+ * to use the normal laptop/tablet rules.
+ */
+@media (min-width: 2200px) and (min-height: 1000px) {
+  html {
+    font-size: 17px;
+  }
+
+  .site-header {
+    width: calc(100% - clamp(72px, 7vw, 180px));
+    max-width: 2200px;
+  }
+
+  .journey-main [data-journey-fit="desktop"] {
+    width: min(100%, 2200px);
+    max-width: 2200px;
+  }
+
+  .projects-stage {
+    max-width: 2300px !important;
+  }
+
+  .projects-repository-toolbar,
+  .projects-project-grid {
+    max-width: 2100px;
+  }
+}
+
+@media (min-width: 3200px) and (min-height: 1400px) {
+  html {
+    font-size: 20px;
+  }
+
+  .site-header {
+    width: calc(100% - clamp(120px, 8vw, 320px));
+    max-width: 3000px;
+  }
+
+  .journey-main [data-journey-fit="desktop"] {
+    width: min(100%, 2800px);
+    max-width: 2800px;
+  }
+
+  .projects-stage {
+    max-width: 3000px !important;
+  }
+
+  .projects-repository-toolbar,
+  .projects-project-grid {
+    max-width: 2700px;
+  }
+}

@@ -546,3 +546,66 @@
     transition: none;
   }
 }
+
+/* High-resolution monitors need a wider composition than the laptop cap.
+   Height is part of the query so zoomed Full HD screens keep laptop sizing. */
+@media (min-width: 2200px) and (min-height: 1000px) {
+  .root .main {
+    width: min(calc(100% - clamp(96px, 8vw, 220px)), 2200px);
+    max-width: 2200px;
+    grid-template-columns: minmax(0, 43fr) minmax(0, 57fr);
+    gap: clamp(48px, 4vw, 90px);
+  }
+
+  .root .copy,
+  .root .titleBlock {
+    max-width: 920px;
+  }
+
+  .root .capabilityGrid {
+    max-width: 880px;
+  }
+
+  .root .portraitArtbox {
+    width: clamp(700px, 39vw, 940px);
+    height: 94%;
+    transform: translateX(-5%);
+  }
+}
+
+@media (min-width: 3200px) and (min-height: 1400px) {
+  .root .main {
+    width: min(calc(100% - clamp(180px, 9vw, 360px)), 3000px);
+    max-width: 3000px;
+    gap: clamp(72px, 4vw, 140px);
+  }
+
+  .root .copy,
+  .root .titleBlock {
+    max-width: 1180px;
+  }
+
+  .root .capabilityGrid {
+    max-width: 1100px;
+  }
+
+  .root .capabilityCard {
+    min-height: 108px;
+    border-radius: 18px;
+  }
+
+  .root .capabilityIconWrap {
+    width: 64px;
+    height: 64px;
+  }
+
+  .root .capabilityIcon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .root .portraitArtbox {
+    width: clamp(940px, 38vw, 1240px);
+    height: 96%;
+  }
+}

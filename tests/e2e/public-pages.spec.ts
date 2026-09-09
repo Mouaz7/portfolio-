@@ -11,6 +11,14 @@ const routes = [
   "/code-review-page",
   "/contact-page",
 ] as const;
+const publicSurfaceSelectors: Record<(typeof routes)[number], string> = {
+  "/": ".home-main",
+  "/skills-page": ".skills-bento-grid",
+  "/journey": '[data-journey-fit="desktop"]',
+  "/projects-page": ".projects-shell",
+  "/code-review-page": "[data-code-review-shell]",
+  "/contact-page": ".contact-repository-shell",
+};
 const viewports = [
   { name: "mobile", width: 390, height: 844 },
   { name: "tablet", width: 768, height: 1024 },
@@ -349,21 +357,13 @@ test("all public pages remain bounded and centered on ultrawide displays", async
     { name: "ultrawide", width: 3440, height: 1440 },
     { name: "uhd", width: 3840, height: 2160 },
   ] as const;
-  const surfaceSelectors: Record<(typeof routes)[number], string> = {
-    "/": ".home-main",
-    "/skills-page": ".skills-bento-grid",
-    "/journey": '[data-journey-fit="desktop"]',
-    "/projects-page": ".projects-shell",
-    "/code-review-page": "[data-code-review-shell]",
-    "/contact-page": ".contact-repository-shell",
-  };
   const maximumSurfaceWidths: Record<(typeof routes)[number], number> = {
-    "/": 1600,
+    "/": 3000,
     "/skills-page": 2750,
-    "/journey": 1600,
-    "/projects-page": 1800,
-    "/code-review-page": 1480,
-    "/contact-page": 1328,
+    "/journey": 2800,
+    "/projects-page": 3000,
+    "/code-review-page": 2800,
+    "/contact-page": 3000,
   };
 
   for (const profile of profiles) {
@@ -374,7 +374,7 @@ test("all public pages remain bounded and centered on ultrawide displays", async
     for (const route of routes) {
       const label = `${profile.name} ${route}`;
       await testPage.goto(`${route}${route.includes("?") ? "&" : "?"}audit=performance`);
-      const surface = testPage.locator(surfaceSelectors[route]).first();
+      const surface = testPage.locator(publicSurfaceSelectors[route]).first();
       await expect(surface, label).toBeVisible();
 
       const geometry = await surface.evaluate((element) => {
@@ -399,14 +399,74 @@ test("all public pages remain bounded and centered on ultrawide displays", async
       expect(geometry.documentOverflow, label).toBeLessThanOrEqual(1);
       expect(geometry.headerLeft, label).toBeGreaterThanOrEqual(0);
       expect(geometry.headerRight, label).toBeLessThanOrEqual(profile.width + 1);
-      expect(geometry.headerWidth, label).toBeLessThanOrEqual(1560.5);
+      const maximumHeaderWidth = profile.width >= 3200
+        ? 3000
+        : profile.width >= 2200
+          ? 2200
+          : 1560;
+      expect(geometry.headerWidth, label).toBeLessThanOrEqual(maximumHeaderWidth + 1);
       expect(geometry.surfaceLeft, label).toBeGreaterThanOrEqual(0);
       expect(geometry.surfaceRight, label).toBeLessThanOrEqual(profile.width + 1);
       expect(geometry.surfaceWidth, label).toBeLessThanOrEqual(maximumSurfaceWidths[route] + 1);
+      if (profile.width >= 2200) {
+        expect(geometry.headerWidth / profile.width, label).toBeGreaterThanOrEqual(0.64);
+        expect(geometry.surfaceWidth / profile.width, label).toBeGreaterThanOrEqual(0.65);
+
+        if (route === "/contact-page") {
+          const portraitCoverage = await testPage.evaluate(() => {
+            const panel = document.querySelector<HTMLElement>(".contact-profile-portrait-row")
+              ?.getBoundingClientRect();
+            const portrait = document.querySelector<HTMLImageElement>(".contact-portrait-frame img")
+              ?.getBoundingClientRect();
+            if (!panel || !portrait) throw new Error("Contact portrait geometry is missing");
+            return {
+              width: portrait.width / panel.width,
+              height: portrait.height / panel.height,
+            };
+          });
+          expect(portraitCoverage.width, label).toBeGreaterThanOrEqual(0.65);
+          expect(portraitCoverage.height, label).toBeGreaterThanOrEqual(1);
+        }
+      }
       expect(geometry.surfaceCentreDelta, label).toBeLessThanOrEqual(2);
     }
 
     await context.close();
+  }
+});
+
+test("layout follows CSS viewport size instead of physical pixel density", async ({ browser }) => {
+  const layouts: Array<Record<string, { width: number; left: number }>> = [];
+
+  for (const deviceScaleFactor of [1, 2]) {
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 720 },
+      screen: { width: 2560, height: 1440 },
+      deviceScaleFactor,
+    });
+    const testPage = await context.newPage();
+    await testPage.emulateMedia({ reducedMotion: "reduce" });
+    const layout: Record<string, { width: number; left: number }> = {};
+
+    for (const route of routes) {
+      await testPage.goto(`${route}?audit=performance`);
+      const selector = publicSurfaceSelectors[route];
+      const box = await testPage.locator(selector).first().boundingBox();
+      expect(box, `${route} at DPR ${deviceScaleFactor}`).not.toBeNull();
+      layout[route] = { width: box!.width, left: box!.x };
+      expect(
+        await testPage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+        `${route} at DPR ${deviceScaleFactor}`,
+      ).toBeLessThanOrEqual(1);
+    }
+
+    layouts.push(layout);
+    await context.close();
+  }
+
+  for (const route of routes) {
+    expect(Math.abs(layouts[0][route].width - layouts[1][route].width), route).toBeLessThanOrEqual(1);
+    expect(Math.abs(layouts[0][route].left - layouts[1][route].left), route).toBeLessThanOrEqual(1);
   }
 });
 

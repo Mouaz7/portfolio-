@@ -304,7 +304,7 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
       <main className="projects-main relative flex-1 min-h-0 overflow-hidden px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 flex flex-col">
         <h1 className="sr-only">{copy.title}</h1>
         {/* Content - NO SCROLLING */}
-        <div className="relative z-10 flex flex-col h-full max-w-[1800px] mx-auto w-full overflow-hidden">
+        <div className="projects-stage relative z-10 flex flex-col h-full max-w-[1800px] mx-auto w-full overflow-hidden">
         {/* Loading State */}
         {loading && (
           <PageLoadingStage text={copy.loading} noun={copy.title} />

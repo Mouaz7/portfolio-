@@ -850,3 +850,29 @@
     padding-inline: 2px;
   }
 }
+
+@media (min-width: 2200px) and (min-height: 1000px) {
+  .main {
+    padding-inline: clamp(36px, 5vw, 120px);
+  }
+
+  .shell {
+    width: min(100%, 2200px);
+    gap: 18px;
+  }
+}
+
+@media (min-width: 3200px) and (min-height: 1400px) {
+  .main {
+    padding-inline: clamp(80px, 7vw, 260px);
+  }
+
+  .shell {
+    width: min(100%, 2800px);
+    gap: 22px;
+  }
+
+  .intro {
+    padding: 16px 20px;
+  }
+}

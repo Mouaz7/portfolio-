@@ -66,7 +66,9 @@ Run `npm run lint` to check the configured ESLint rules.
 - wide displays: 1920×1080, 2560×1440, 3440×1440, 3840×2160;
 - browser-zoom equivalents: 853 px at 150%, 640 px at 200%, and 320 px reflow at 400%.
 
-The matrix checks horizontal overflow, bounded and centered ultrawide content, light/dark theme stability, compact-header switching, accessible contact-form validation focus, and Windows High Contrast (`forced-colors`) focus visibility.
+The matrix checks horizontal overflow, bounded and centered ultrawide content, light/dark theme stability, compact-header switching, accessible contact-form validation focus, and Windows High Contrast (`forced-colors`) focus visibility. QHD, ultrawide and 4K surfaces must also occupy at least 65% of the CSS viewport, preventing laptop-sized maximum widths from shrinking the design visually on larger computers. A paired DPR 1/DPR 2 test verifies that physical pixel density does not change layout when the CSS viewport is identical.
+
+Large-display density profiles require both substantial width and height. They activate at 2200×1000 CSS pixels and step up again at 3200×1400. This keeps QHD/4K monitors at 100% scaling readable while a 4K monitor at 200% scaling (roughly a 1920 CSS-pixel viewport) correctly receives the standard desktop composition.
 
 Skills has explicit large-display assertions in addition to the shared matrix. The wide, extra-wide, and ultra-wide profiles require progressively larger cards and square icon canvases at 1440, 1920, 2560, and 3840 px, while the phone/tablet checks keep every icon canvas equal, clipped, interactive, and free from horizontal overflow.
 
