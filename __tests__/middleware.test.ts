@@ -33,4 +33,18 @@ describe("locale middleware", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBe("https://portfolio.test/");
     expect(response.cookies.get("portfolio-locale")?.value).toBe("ar");
   });
+
+  it.each([
+    ["/skills-page?from=old", "/skills?from=old"],
+    ["/projects-page", "/projects"],
+    ["/code-review-page", "/code-review"],
+    ["/contact-page", "/contact"],
+    ["/sv/skills-page", "/sv/skills"],
+  ])("permanently redirects %s to canonical %s", (legacy, canonical) => {
+    const response = middleware(new NextRequest(`https://portfolio.test${legacy}`));
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(`https://portfolio.test${canonical}`);
+    expect(response.headers.get("content-security-policy")).toContain("default-src 'self'");
+  });
 });

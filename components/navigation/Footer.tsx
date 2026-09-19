@@ -1,6 +1,8 @@
 "use client";
 import MouazPremiumLogo from "@/components/brand/MouazPremiumLogo";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { localizedPath } from "@/lib/i18n/config";
+import Link from "next/link";
 
 type Props = {
   className?: string;
@@ -13,7 +15,7 @@ export default function Footer({
   year = 2026,
   owner = "Mouaz Naji",
 }: Props) {
-  const { dictionary } = useI18n();
+  const { dictionary, locale } = useI18n();
   return (
     <footer
       className={[
@@ -32,6 +34,13 @@ export default function Footer({
         ].join(" ")}
       >
         © {year} {owner}. {dictionary.footer.rights}
+        {" · "}
+        <Link
+          href={localizedPath("/privacy", locale)}
+          className="underline decoration-current/60 underline-offset-4 hover:text-[var(--fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cornflowerblue-100/70"
+        >
+          {dictionary.footer.privacy}
+        </Link>
       </div>
 
       <MouazPremiumLogo size="sm" />

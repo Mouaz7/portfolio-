@@ -37,7 +37,7 @@ AI requests already run through Next.js server routes:
 - `/api/ai/code-review`
 - `/api/ai/code-review/chat`
 
-NVIDIA keys stay in server environment variables and are never sent to browser code. On Vercel, add them under Project Settings > Environment Variables. Do not use `NEXT_PUBLIC_` for AI keys. Rotate keys pasted into chat, logs, screenshots, or commits.
+NVIDIA-compatible API keys stay in server environment variables and are never sent to browser code. On Vercel, add them under Project Settings > Environment Variables. Do not use `NEXT_PUBLIC_` for AI keys. Treat any credential found in Git, logs, screenshots, chats, or another verified exposure surface as compromised; revoke it before installing a fresh replacement.
 
 Code submitted to the review tools is sent to the configured NVIDIA chat endpoint. Portfolio chatbot retrieval sends source chunks, including configured CV content, to the NVIDIA embedding endpoint during reindexing and sends only the retrieved context to the chat endpoint when answering. Changing `NVIDIA_EMBEDDING_MODEL` requires a protected RAG reindex; the model ID is included in the source hash so the next run rebuilds all vectors consistently.
 
@@ -50,9 +50,9 @@ Vercel is the main deployment path and is connected directly to this GitHub repo
 1. Import the GitHub repo into Vercel.
 2. Add environment variables in Vercel project settings.
 3. Link the GitHub repository through Vercel's Git integration.
-4. Push to `main` after Quality and CodeQL pass.
+4. Merge an approved pull request to `main` only after Quality, the independent pgTAP job, visual review and exact-commit preview pass. Do not push directly to `main`. Require CodeQL on the pull request only when repository visibility, licensing and GitHub configuration make it available; this release also requires separate owner approval before merge.
 
-Vercel's Git integration creates production deployments for pushes to `main` and preview deployments for pull requests. GitHub Actions independently runs the full quality gate; branch protection should require that check before pull requests are merged.
+Vercel's Git integration creates production deployments for updates to `main` and preview deployments for pull requests. GitHub Actions runs Quality and isolated pgTAP separately. Branch protection should require the verified check names before pull requests are merged; the present `main` protection does not yet require these checks.
 
 Official reference: https://vercel.com/docs/frameworks/full-stack/nextjs
 
@@ -92,7 +92,36 @@ Official reference: https://nextjs.org/docs/app/guides/self-hosting
 
 ## Pre-Deploy Checks
 
-For background/loading changes, also run the lifecycle and cross-browser suites, the existing pixel lock, Lighthouse and the motion-enabled before/after performance comparison described in `testing-guide.md`. Keep screenshot references unchanged unless an intentional visual change has been approved. Create a PR, wait for Quality and CodeQL, and verify its Vercel preview before merging. Production is created by the existing Git integration; verify the deployed commit and public routes afterward without sending contact emails. Keep the previous successful deployment available for rollback.
+For background/loading changes, also run the lifecycle and cross-browser suites, the existing pixel lock, Lighthouse and the motion-enabled before/after performance comparison described in `testing-guide.md`. Keep screenshot references unchanged unless an intentional visual change has been approved. Create a PR, wait for Quality (and CodeQL when it is genuinely available), and verify its Vercel preview before merging. Production is created by the existing Git integration; verify the deployed commit and public routes afterward without sending contact emails. Keep the previous successful deployment available for rollback.
+
+The low-power Skills entrance change has passed a local production build,
+132/132 Chromium/Firefox/WebKit browser tests, five navigation clicks per
+destination, 18/18 Lighthouse lab runs and a four-core/4 GB motion run. Skills
+measured 3,100 ms LCP/437 ms blocking/0 CLS in that motion run, versus an older
+same-profile pre-fix observation of 3,624 ms/583 ms/0 CLS. This is not a
+controlled same-run comparison, a passing production Core Web Vital, or a
+deployed-preview result. Lighthouse uses a static performance-audit background
+for Skills, so its score does not replace the normal-motion measurement.
+
+The change is **not release-verified**: 24/36 pixel comparisons (all six Skills
+references pass) and three design-lock files require manual visual review.
+Intermittently clipped low-tier card content in headless Chromium screenshots
+needs a physical-device and deployed-preview check. The artifact also appeared with the original card
+animation, so its cause and real-device impact are not established. Do not
+replace approved screenshot images or hashes automatically. The protected-main
+history rewrite and fresh remote scan are complete. Isolated pgTAP passed on
+validation SHA `efcc12d5a95cedeb9a417f2e5d57e4b642a7028a`, but Quality
+still fails design-lock and credential/licence approvals and the other release
+gates in `implementation-status.md` remain blockers.
+
+The connected Vercel account returned 403 when listing this project's
+deployments on 2026-09-19 and listed no accessible teams. GitHub also denied
+creation of the validation PR despite the authenticated owner account showing
+Admin access; no exact-commit preview is verified. Do not treat an access error
+as a failed preview test or deploy the unreviewed working tree to compensate.
+The intended access and a reviewed candidate PR's exact preview URL and commit
+SHA must be verified before remote release checks proceed. An older deployment
+cannot verify the candidate branch.
 
 ```bash
 npm run test:ci

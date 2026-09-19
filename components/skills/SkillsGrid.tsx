@@ -183,7 +183,7 @@ export default function SkillsGrid({
     padX: spec.padX,
     padY: spec.padY ?? BASE.padY,
   };
-  const { stageStyle, wrapperStyle } = useViewportStage(STAGE);
+  const { profile, scale, stageStyle, wrapperStyle } = useViewportStage(STAGE);
 
   return (
     <>
@@ -197,6 +197,9 @@ export default function SkillsGrid({
       ) : (
         <main
           className="skills-stage page-fade-in flex items-center justify-center"
+          data-viewport-content
+          data-viewport-profile={profile}
+          data-viewport-scale={scale.toFixed(3)}
           data-skills-layout={desktopComposition ? "desktop" : "phone"}
           data-skills-size={
             ultraWideDesktopComposition

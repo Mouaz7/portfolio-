@@ -23,12 +23,12 @@ export function useViewportStage(spec: StageSpec) {
     gap,
     padY,
     padX = 16,
-    minScale = 0.5,
+    minScale = 0.3,
     maxScale = Number.POSITIVE_INFINITY,
   } = spec;
   const baseW = cols * cardW + (cols - 1) * gap;
   const baseH = rows * (cardW / cardRatio) + (rows - 1) * gap;
-  const { availableHeight, stageStyle } = useViewportFitStage({
+  const { availableHeight, profile, scale, stageStyle } = useViewportFitStage({
     baseWidth: baseW,
     baseHeight: baseH,
     minScale,
@@ -39,6 +39,8 @@ export function useViewportStage(spec: StageSpec) {
   });
 
   return {
+    profile,
+    scale,
     stageStyle,
     wrapperStyle: (headerAwarePadY?: number, headerAwarePadX?: number) =>
       ({

@@ -2,6 +2,7 @@ import SkillsPage from "./skills-page";
 import { localizedPageMetadata } from "@/lib/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getSkillCategories, getSkills } from "@/lib/skills/data.server";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const generateMetadata = () => localizedPageMetadata("skills", "/skills-page");
 
@@ -16,7 +17,9 @@ export default async function Page({ searchParams }: PageProps) {
     getSkillCategories(locale),
     getSkills(),
   ]).catch((error) => {
-    console.error("[skills-page] initial data failed:", error);
+    logServerError("page.skills_legacy.initial_data_failed", error, {
+      route: "/skills-page",
+    });
     return undefined;
   });
 

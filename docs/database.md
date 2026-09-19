@@ -124,7 +124,9 @@ CV_STORAGE_OBJECT=cv/Mouaz-Naji-CV-2026-08.pdf
 ```
 
 Use `SUPABASE_SECRET_KEY` only on the server or in CI. Do not expose it to client-side code.
-Rotate any NVIDIA key that was pasted into chat, logs, screenshots, or committed files.
+Treat any credential found in Git, logs, screenshots, chats, or another verified
+exposure surface as compromised. Revoke it at the provider before installing a
+fresh replacement in the affected server-side environments.
 
 ## Project Sync
 
@@ -132,9 +134,9 @@ Rotate any NVIDIA key that was pasted into chat, logs, screenshots, or committed
 
 It fetches public repositories for `Mouaz7` and inserts newly discovered projects. Existing project title, description, category, order, visibility and icon fields remain owned by Supabase. `GITHUB_TOKEN` is optional but helps avoid GitHub rate limits.
 
-`.github/workflows/sync-projects.yml` runs the same sync daily and supports manual dispatch. Configure `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `REVALIDATE_SECRET`, and `RAG_JOB_SECRET` as repository secrets. GitHub supplies `GITHUB_TOKEN` automatically. Configure the public Production origin once as the non-sensitive repository variable `CANONICAL_SITE_URL`; the workflow uses it for synchronization, project-cache revalidation, and the protected RAG refresh.
+`.github/workflows/sync-projects.yml` currently supports manual dispatch only; its schedule remains paused until the deployed end-to-end run passes. Projects sync, cache revalidation, and RAG refresh are separate jobs with separate fail-fast validation and result reporting.
 
-The GitHub `REVALIDATE_SECRET` and `RAG_JOB_SECRET` values must match the separately scoped Vercel Production values. Preview keeps different values and is never used by this scheduled Production synchronization.
+Inventory the variables read by the workflow and invoked program immediately before configuring secrets. That verified inventory is normative. With the current implementation, Projects sync uses its Supabase settings, GitHub token and canonical site URL; revalidation and RAG each use only their own URL and matching bearer secret. Preview keeps different values and is never used by this Production synchronization.
 
 ## Cache updates after Studio edits
 

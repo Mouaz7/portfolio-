@@ -18,6 +18,8 @@ import {
   secureResponse,
   type ProtectionContext,
 } from "@/lib/security/request-protection";
+import { contactAttachmentsAvailable } from "@/lib/contact/malware-scanner.server";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -44,6 +46,17 @@ export async function POST(req: Request) {
     }
 
     const metadata = files as ContactFileMetadata[];
+    if (metadata.length > 0 && !contactAttachmentsAvailable()) {
+      return respond(NextResponse.json(
+        {
+          ok: false,
+          error: "Attachments are temporarily unavailable.",
+          code: "attachments_unavailable",
+          attachmentStatus: "scan_failed",
+        },
+        { status: 503 },
+      ));
+    }
     const totalBytes = metadata.reduce((total, file) => total + file.size, 0);
     if (totalBytes > CONTACT_MAX_TOTAL_BYTES) {
       return respond(NextResponse.json({ ok: false, error: "Attachments exceed 10 MB." }, { status: 400 }));
@@ -101,7 +114,9 @@ export async function POST(req: Request) {
       );
       return securityContext ? secureResponse(response, securityContext) : response;
     }
-    console.error("contact/prepare error:", error);
+    logServerError("api.contact.prepare.failed", error, {
+      route: "/api/contact/prepare",
+    });
     const response = NextResponse.json({ ok: false, error: "Server error." }, { status: 500 });
     return securityContext ? secureResponse(response, securityContext) : response;
   } finally {

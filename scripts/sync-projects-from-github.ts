@@ -80,8 +80,14 @@ async function syncProjects() {
         `https://api.github.com/repos/${repo.full_name}/languages`,
       );
       return [repo.full_name, languages] as const;
-    } catch (error) {
-      console.warn(`Skipping languages for ${repo.full_name}:`, error);
+    } catch {
+      console.warn(JSON.stringify({
+        level: "warn",
+        operation: "sync_project_languages",
+        provider: "github",
+        code: "languages_unavailable",
+        status: "skipped",
+      }));
       return [repo.full_name, {}] as const;
     }
   });
@@ -109,10 +115,22 @@ async function syncProjects() {
     p_seen_full_names: seen,
   });
   if (error) throw error;
-  console.log(`Synchronised ${data ?? 0} project records atomically.`);
+  console.log(JSON.stringify({
+    level: "info",
+    operation: "sync_projects",
+    provider: "github_supabase",
+    status: "complete",
+    count: data ?? 0,
+  }));
 }
 
-syncProjects().catch((error) => {
-  console.error("Project sync failed:", error);
+syncProjects().catch(() => {
+  console.error(JSON.stringify({
+    level: "error",
+    operation: "sync_projects",
+    provider: "github_supabase",
+    code: "sync_failed",
+    status: "failed",
+  }));
   process.exitCode = 1;
 });

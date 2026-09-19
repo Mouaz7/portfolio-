@@ -14,8 +14,24 @@ for (const [width, height] of sizes) {
       for (const route of pages) {
         await page.goto(route);
         await expect(page.locator("main").first()).toBeVisible();
+        const viewportRoot = page.locator("[data-viewport-page]").first();
+        await expect(viewportRoot).toBeVisible();
         await expect(page.locator(".la-window")).toHaveCount(0);
-        expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), route).toBeLessThanOrEqual(1);
+        const viewportGeometry = await page.evaluate(() => {
+          const root = document.querySelector<HTMLElement>("[data-viewport-page]");
+          const rect = root?.getBoundingClientRect();
+          return {
+            horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+            documentHeight: document.documentElement.scrollHeight,
+            rootTop: rect?.top ?? -1,
+            rootBottom: rect?.bottom ?? -1,
+            viewportHeight: innerHeight,
+          };
+        });
+        expect(viewportGeometry.horizontalOverflow, route).toBeLessThanOrEqual(1);
+        expect(viewportGeometry.documentHeight, route).toBeLessThanOrEqual(viewportGeometry.viewportHeight + 1);
+        expect(viewportGeometry.rootTop, route).toBeGreaterThanOrEqual(0);
+        expect(viewportGeometry.rootBottom, route).toBeLessThanOrEqual(viewportGeometry.viewportHeight + 1);
         const controls = page.locator('main button:visible:not([disabled]), main input:visible:not([disabled]), main textarea:visible:not([disabled])');
         if (await controls.count()) {
           const last = controls.last();

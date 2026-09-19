@@ -40,6 +40,10 @@ describe("lazy Turnstile client", () => {
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "test-site-key";
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it("returns ordinary responses without loading Turnstile", async () => {
     const fetchMock = jest.mocked(global.fetch).mockResolvedValue(testResponse("ok", 200));
     const response = await fetchWithTurnstile("/api/test", { method: "POST" }, "cv_chat");
@@ -78,5 +82,25 @@ describe("lazy Turnstile client", () => {
     delete process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     jest.mocked(global.fetch).mockResolvedValue(testResponse(JSON.stringify({ code: "captcha_required" }), 428));
     await expect(fetchWithTurnstile("/api/test", {}, "contact")).rejects.toThrow("not configured");
+  });
+
+  it("stops a challenge that never calls back instead of loading forever", async () => {
+    jest.useFakeTimers();
+    window.turnstile = {
+      render: jest.fn(() => "stuck-widget"),
+      execute: jest.fn(),
+      remove: jest.fn(),
+    };
+    jest.mocked(global.fetch).mockResolvedValue(
+      testResponse(JSON.stringify({ code: "captcha_required" }), 428),
+    );
+
+    const request = fetchWithTurnstile("/api/test", {}, "code_review");
+    const rejection = expect(request).rejects.toThrow("verification timed out");
+    await jest.advanceTimersByTimeAsync(10_000);
+
+    await rejection;
+    expect(window.turnstile.remove).toHaveBeenCalledWith("stuck-widget");
+    expect(document.body.children).toHaveLength(0);
   });
 });

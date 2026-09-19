@@ -4,7 +4,7 @@ import { getRequestLocale } from "./i18n/request-locale";
 import { getDictionary } from "./i18n/get-dictionary";
 import { localizedPath, locales } from "./i18n/config";
 
-type MetadataPage = "home" | "skills" | "journey" | "projects" | "codeReview" | "contact";
+type MetadataPage = "home" | "skills" | "journey" | "projects" | "codeReview" | "contact" | "privacy";
 
 export async function localizedPageMetadata(page: MetadataPage, path: string): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -16,7 +16,7 @@ export async function localizedPageMetadata(page: MetadataPage, path: string): P
   const localizedUrl = (targetLocale: (typeof locales)[number]) =>
     new URL(localizedPath(path, targetLocale), baseUrl).toString();
   const url = localizedUrl(locale);
-  const image = "/brand/mouaz-logo-light-4k.png";
+  const image = "/brand/mouaz-logo-light-1200.png";
 
   return {
     title,
@@ -30,7 +30,13 @@ export async function localizedPageMetadata(page: MetadataPage, path: string): P
         "x-default": localizedUrl("en"),
       },
     },
-    openGraph: { title, description, type: "website", url, images: [image] },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url,
+      images: [{ url: image, width: 1200, height: 1200, alt: "Mouaz Naji" }],
+    },
     twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }

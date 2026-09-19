@@ -10,13 +10,15 @@ The `quality` job performs, in order:
 
 1. deterministic `npm ci` installation;
 2. production and complete dependency audits;
-3. lint, TypeScript, dead-code, and design-lock checks;
-4. Jest coverage;
-5. a clean Supabase reset and SQL policy tests;
-6. a production build;
-7. Playwright browser, accessibility, and pixel-lock checks;
-8. Lighthouse CI with actual Chromium (`provided` throttling), three runs per route, and median gates: performance ≥0.80, LCP ≤2.5 s, TBT ≤250 ms, and CLS ≤0.05;
-9. `git diff --check`.
+3. full reachable-history scanning with pinned Gitleaks and the complementary project-specific scanner;
+4. dependency-license inventory;
+5. lint, TypeScript, dead-code, and design-lock checks;
+6. Jest coverage;
+7. a clean Supabase reset and SQL policy tests;
+8. a production build;
+9. Playwright browser, accessibility, and pixel-lock checks;
+10. Lighthouse CI with actual Chromium (`provided` throttling), three runs per route, and median gates: performance ≥0.80, LCP ≤2.5 s, TBT ≤250 ms, and CLS ≤0.05;
+11. `git diff --check`.
 
 The Lighthouse CLI version and GitHub Actions are pinned to reviewed versions. Browser, pixel, Playwright, coverage, and Lighthouse reports are retained as private workflow artifacts for seven days.
 
@@ -30,9 +32,9 @@ Vercel's Git integration owns deployments: pushes to `main` create production de
 
 ## Project synchronization
 
-`sync-projects.yml` runs daily and can also be dispatched manually. It synchronizes public GitHub projects to Supabase, revalidates the project cache, and refreshes the RAG index. Its concurrency group prevents two database synchronization jobs from running together.
+`sync-projects.yml` is intentionally paused as a scheduled job and can be dispatched manually. It reports three jobs separately: Projects sync, project-cache revalidation, and RAG refresh. The latter two depend on a successful sync but do not share each other's secrets. Its concurrency group prevents two synchronization runs from overlapping.
 
-The public production origin is stored once as the non-sensitive repository variable `CANONICAL_SITE_URL`. The synchronization script and both protected follow-up requests derive their URLs from that value. `REVALIDATE_SECRET` and `RAG_JOB_SECRET` are repository secrets synchronized with their separately scoped Vercel Production values.
+Immediately before configuring the workflow, inventory the environment variables read by each workflow step and each invoked program. That inventory is the normative mapping. In the current code, the sync step reads Supabase configuration and the canonical site URL, while the protected revalidation and RAG steps read their own bearer secret and URL. Each job validates only names and never prints values.
 
 ## Required secrets
 
@@ -40,4 +42,6 @@ The workflows use Supabase, rate-limit, cache-revalidation, and RAG-job secrets.
 
 ## Code scanning and dependency updates
 
-`codeql.yml` is registered for `main`, pull requests, and a weekly schedule. The analysis job stays skipped while the repository is private because CodeQL upload requires eligible private-repository GitHub Code Security; it runs automatically once repository metadata reports public visibility. CodeQL actions are pinned to one reviewed full commit SHA. Dependency updates are reviewed and applied manually, with major upgrades treated as explicit compatibility projects. Repository rules should require Quality and a genuinely green CodeQL run only after the repository is public, and should then block force-push and branch deletion.
+`codeql.yml` is an advanced-workflow candidate registered for `main`, pull requests, and a weekly schedule. Before treating it as the intended configuration, verify both the workflow and GitHub Code Security settings. The analysis job stays skipped while the repository is private because CodeQL upload requires eligible private-repository GitHub Code Security; it runs automatically once repository metadata reports public visibility. CodeQL actions are pinned to one reviewed full commit SHA.
+
+After publication, keep exactly one CodeQL setup: disable GitHub Default setup when the reviewed advanced workflow is selected, then confirm one JavaScript/TypeScript analysis per commit. Read the exact Quality and CodeQL check names from their first successful public run and prove them with a test pull request before locking the `main` ruleset. Dependency updates are reviewed and applied manually, with major upgrades treated as explicit compatibility projects.

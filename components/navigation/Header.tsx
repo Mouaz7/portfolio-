@@ -9,6 +9,7 @@ import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { localizedPath, stripLocaleFromPathname } from "@/lib/i18n/config";
+import { useNavigationExperience } from "./NavigationExperienceProvider";
 
 type HeaderType = {
   className?: string;
@@ -18,11 +19,11 @@ type HeaderType = {
 
 const BASE_ROUTES = [
   "/",
-  "/skills-page",
+  "/skills",
   "/journey",
-  "/projects-page",
-  "/code-review-page",
-  "/contact-page",
+  "/projects",
+  "/code-review",
+  "/contact",
 ];
 
 type NavItemProps = {
@@ -34,6 +35,7 @@ type NavItemProps = {
 
 function NavItem({ href, label, active = false, size = "md" }: NavItemProps) {
   const router = useRouter();
+  const { markInternalNavigation } = useNavigationExperience();
   const prefetchOnIntent = () => {
     if (!active) router.prefetch(href);
   };
@@ -41,8 +43,10 @@ function NavItem({ href, label, active = false, size = "md" }: NavItemProps) {
   return (
     <Link
       href={href}
-      prefetch={false}
       aria-current={active ? "page" : undefined}
+      onClick={() => {
+        if (!active) markInternalNavigation(href);
+      }}
       onPointerEnter={prefetchOnIntent}
       onFocus={prefetchOnIntent}
       onTouchStart={prefetchOnIntent}
@@ -174,11 +178,11 @@ const Header: NextPage<HeaderType> = ({
         ].join(" ")}
       >
         <NavItem href={localizedPath("/", locale)} label={labels.home} active={basePathname === "/"} />
-        <NavItem href={localizedPath("/skills-page", locale)} label={labels.skills} active={basePathname === "/skills-page"} />
+        <NavItem href={localizedPath("/skills", locale)} label={labels.skills} active={basePathname === "/skills"} />
         <NavItem href={localizedPath("/journey", locale)} label={labels.journey} active={basePathname === "/journey"} />
-        <NavItem href={localizedPath("/projects-page", locale)} label={labels.projects} active={basePathname === "/projects-page"} />
-        <NavItem href={localizedPath("/code-review-page", locale)} label={labels.codeReview} active={basePathname === "/code-review-page"} />
-        <NavItem href={localizedPath("/contact-page", locale)} label={labels.contact} active={basePathname === "/contact-page"} />
+        <NavItem href={localizedPath("/projects", locale)} label={labels.projects} active={basePathname === "/projects"} />
+        <NavItem href={localizedPath("/code-review", locale)} label={labels.codeReview} active={basePathname === "/code-review"} />
+        <NavItem href={localizedPath("/contact", locale)} label={labels.contact} active={basePathname === "/contact"} />
         <LanguageSwitcher />
         <ThemeToggle className="ml-1" />
       </nav>
@@ -261,11 +265,11 @@ const Header: NextPage<HeaderType> = ({
         <nav className="mt-2 px-2 text-white font-urbanist">
           <ul className="flex flex-col">
             <li><NavItem href={localizedPath("/", locale)} label={labels.home} size="sm" active={basePathname === "/"} /></li>
-            <li><NavItem href={localizedPath("/skills-page", locale)} label={labels.skills} size="sm" active={basePathname === "/skills-page"} /></li>
+            <li><NavItem href={localizedPath("/skills", locale)} label={labels.skills} size="sm" active={basePathname === "/skills"} /></li>
             <li><NavItem href={localizedPath("/journey", locale)} label={labels.journey} size="sm" active={basePathname === "/journey"} /></li>
-            <li><NavItem href={localizedPath("/projects-page", locale)} label={labels.projects} size="sm" active={basePathname === "/projects-page"} /></li>
-            <li><NavItem href={localizedPath("/code-review-page", locale)} label={labels.codeReview} size="sm" active={basePathname === "/code-review-page"} /></li>
-            <li><NavItem href={localizedPath("/contact-page", locale)} label={labels.contact} size="sm" active={basePathname === "/contact-page"} /></li>
+            <li><NavItem href={localizedPath("/projects", locale)} label={labels.projects} size="sm" active={basePathname === "/projects"} /></li>
+            <li><NavItem href={localizedPath("/code-review", locale)} label={labels.codeReview} size="sm" active={basePathname === "/code-review"} /></li>
+            <li><NavItem href={localizedPath("/contact", locale)} label={labels.contact} size="sm" active={basePathname === "/contact"} /></li>
           </ul>
         </nav>
 

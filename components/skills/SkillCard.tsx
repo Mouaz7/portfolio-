@@ -1,14 +1,15 @@
 // components/skills/SkillCard.tsx
 "use client";
 
-import {
-  CheckCircle,
-  GitBranch,
-  GitCommit,
-  GitFork,
-  GithubLogo,
-  Star,
-} from "@phosphor-icons/react";
+// Import each icon module directly. Importing Phosphor's root barrel makes the
+// webpack dev server traverse thousands of unused icon modules on the first
+// visit to Skills, which is visible as a multi-second frozen navigation.
+import { CheckCircleIcon as CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
+import { GitBranchIcon as GitBranch } from "@phosphor-icons/react/dist/csr/GitBranch";
+import { GitCommitIcon as GitCommit } from "@phosphor-icons/react/dist/csr/GitCommit";
+import { GitForkIcon as GitFork } from "@phosphor-icons/react/dist/csr/GitFork";
+import { GithubLogoIcon as GithubLogo } from "@phosphor-icons/react/dist/csr/GithubLogo";
+import { StarIcon as Star } from "@phosphor-icons/react/dist/csr/Star";
 import SkillIcon from "./SkillIcon";
 import { memo, useEffect, useRef } from "react";
 import styles from "./SkillCard.module.css";

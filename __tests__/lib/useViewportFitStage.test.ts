@@ -1,6 +1,7 @@
 import {
   computeFluidStageWidth,
   computeViewportFitScale,
+  selectViewportLayoutProfile,
 } from "@/hooks/useViewportFitStage";
 
 describe("computeViewportFitScale", () => {
@@ -24,5 +25,19 @@ describe("computeFluidStageWidth", () => {
 
   it("uses the fallback before viewport measurements are available", () => {
     expect(computeFluidStageWidth(0, 1, 332)).toBe(332);
+  });
+});
+
+describe("selectViewportLayoutProfile", () => {
+  it("keeps a full-size layout in a roomy viewport", () => {
+    expect(selectViewportLayoutProfile(1, 1440, 900)).toBe("fit");
+  });
+
+  it("uses the compact profile for short laptops", () => {
+    expect(selectViewportLayoutProfile(0.8, 1366, 600)).toBe("compact");
+  });
+
+  it("protects readable overflow at extreme zoom sizes", () => {
+    expect(selectViewportLayoutProfile(0.5, 390, 320)).toBe("accessible-overflow");
   });
 });

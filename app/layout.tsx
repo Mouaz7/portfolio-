@@ -1,4 +1,7 @@
 import "./global.css";
+import "./styles/home-and-skills.css";
+import "./styles/projects-and-contact.css";
+import "./styles/adaptive-and-motion.css";
 import "./i18n.css";
 import { urbanist } from "./fonts";
 import SiteBackground from "@/components/ui/SiteBackground";
@@ -10,66 +13,12 @@ import { I18nProvider } from "@/components/i18n/I18nProvider";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { localeDirection } from "@/lib/i18n/config";
-
-// Runs before first paint to apply the saved (or default light) theme and avoid a
-// flash of the wrong colors. Adds `light` class to <html> when appropriate.
-const themeInitScript = `
-(function() {
-  try {
-    var t = localStorage.getItem('theme');
-    if (!t) t = 'light';
-    if (t === 'light') document.documentElement.classList.add('light');
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'theme-color');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', t === 'light' ? '#defaf5' : '#0a0b10');
-  } catch (e) {}
-})();
-`;
-
-// Bitdefender TrafficLight can add this marker while the streamed HTML is
-// still being parsed. Removing only that inert extension attribute before
-// React hydrates prevents a false mismatch without hiding application errors.
-const browserExtensionCompatibilityScript = `
-(function() {
-  var attribute = 'bis_skin_checked';
-
-  function cleanElement(element) {
-    if (element && element.nodeType === 1 && element.hasAttribute(attribute)) {
-      element.removeAttribute(attribute);
-    }
-  }
-
-  function cleanCurrentTree() {
-    cleanElement(document.documentElement);
-    var descendants = document.querySelectorAll('[' + attribute + ']');
-    for (var i = 0; i < descendants.length; i += 1) {
-      descendants[i].removeAttribute(attribute);
-    }
-  }
-
-  cleanCurrentTree();
-  var observer = new MutationObserver(function(records) {
-    for (var i = 0; i < records.length; i += 1) {
-      cleanElement(records[i].target);
-    }
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: [attribute],
-    subtree: true
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    cleanCurrentTree();
-    window.setTimeout(function() { observer.disconnect(); }, 1000);
-  }, { once: true });
-})();
-`;
+import { NavigationExperienceProvider } from "@/components/navigation/NavigationExperienceProvider";
+import {
+  browserExtensionCompatibilityScript,
+  performanceTierInitScript,
+  themeInitScript,
+} from "@/lib/security/inline-scripts.cjs";
 
 function publicSupabaseOrigin() {
   const value = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
@@ -177,6 +126,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: browserExtensionCompatibilityScript }}
         />
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: performanceTierInitScript }}
+        />
       </head>
       <body
         suppressHydrationWarning
@@ -184,9 +138,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       >
         {/* Single shared WebGL nebula backdrop behind every page (dark + light) */}
         <I18nProvider locale={locale} dictionary={dictionary}>
-          <SiteBackground />
-          {children}
-          {process.env.VERCEL === "1" && <SpeedInsights />}
+          <NavigationExperienceProvider>
+            <SiteBackground />
+            {children}
+            {process.env.VERCEL === "1" && <SpeedInsights />}
+          </NavigationExperienceProvider>
         </I18nProvider>
       </body>
     </html>

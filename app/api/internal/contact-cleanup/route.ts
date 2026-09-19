@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/backend/supabaseAdminClient";
 import { hasValidBearerSecret } from "@/lib/security/request-protection";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,7 +21,9 @@ export async function GET(req: Request) {
     .neq("status", "sending")
     .limit(100);
   if (error) {
-    console.error("contact cleanup query error:", error);
+    logServerError("api.internal.contact_cleanup.query_failed", error, {
+      route: "/api/internal/contact-cleanup",
+    });
     return NextResponse.json({ error: "Cleanup failed" }, { status: 500 });
   }
 
@@ -34,7 +37,9 @@ export async function GET(req: Request) {
   if (paths.length > 0) {
     const { error: storageError } = await supabaseAdmin.storage.from("contact-uploads").remove(paths);
     if (storageError) {
-      console.error("contact cleanup storage error:", storageError);
+      logServerError("api.internal.contact_cleanup.storage_failed", storageError, {
+        route: "/api/internal/contact-cleanup",
+      });
       return NextResponse.json({ error: "Cleanup failed" }, { status: 500 });
     }
   }
@@ -43,7 +48,9 @@ export async function GET(req: Request) {
   if (ids.length > 0) {
     const { error: deleteError } = await supabaseAdmin.from("contact_submission").delete().in("id", ids);
     if (deleteError) {
-      console.error("contact cleanup delete error:", deleteError);
+      logServerError("api.internal.contact_cleanup.delete_failed", deleteError, {
+        route: "/api/internal/contact-cleanup",
+      });
       return NextResponse.json({ error: "Cleanup failed" }, { status: 500 });
     }
   }

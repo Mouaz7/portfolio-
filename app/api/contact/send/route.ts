@@ -8,6 +8,10 @@ import {
 } from "@/lib/contact/file-policy";
 import { sendContactMail } from "@/lib/contact/mailer";
 import {
+  scanAttachment,
+  type MalwareScanStatus,
+} from "@/lib/contact/malware-scanner.server";
+import {
   acquireConcurrency,
   identifyApiRequest,
   readLimitedJson,
@@ -15,6 +19,7 @@ import {
   RequestBodyError,
   secureResponse,
 } from "@/lib/security/request-protection";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,6 +35,7 @@ type Submission = {
 type UploadRow = {
   declared_mime: string;
   declared_size: number;
+  id: string;
   object_path: string;
   original_name: string;
 };
@@ -40,7 +46,12 @@ type StorageObject = {
 };
 
 class ContactSubmissionError extends Error {
-  constructor(readonly status: number, readonly publicMessage: string) {
+  constructor(
+    readonly status: number,
+    readonly publicMessage: string,
+    readonly code?: string,
+    readonly attachmentStatus?: MalwareScanStatus,
+  ) {
     super(publicMessage);
   }
 }
@@ -108,10 +119,24 @@ async function pendingSubmission(
 async function submissionUploads(submissionId: string): Promise<UploadRow[]> {
   const { data, error } = await supabaseAdmin
     .from("contact_upload")
-    .select("object_path,original_name,declared_mime,declared_size")
+    .select("id,object_path,original_name,declared_mime,declared_size")
     .eq("submission_id", submissionId);
   if (error) throw error;
   return (data ?? []) as UploadRow[];
+}
+
+async function recordScanStatus(
+  uploadId: string,
+  status: MalwareScanStatus,
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("contact_upload")
+    .update({
+      scan_status: status,
+      scanned_at: status === "pending_scan" ? null : new Date().toISOString(),
+    })
+    .eq("id", uploadId);
+  if (error) throw error;
 }
 
 async function markClaimFailed(submissionId: string): Promise<void> {
@@ -120,7 +145,11 @@ async function markClaimFailed(submissionId: string): Promise<void> {
     .update({ status: "failed" })
     .eq("id", submissionId)
     .eq("status", "sending");
-  if (error) console.error("contact/send status error:", error);
+  if (error) {
+    logServerError("api.contact.send.status_update_failed", error, {
+      route: "/api/contact/send",
+    });
+  }
 }
 
 export async function POST(req: Request) {
@@ -197,6 +226,29 @@ export async function POST(req: Request) {
       if (!validateContactFileBytes(metadata, buffer)) {
         throw new ContactSubmissionError(400, "Invalid attachments.");
       }
+
+      const scan = await scanAttachment({
+        data: buffer,
+        mediaType: upload.declared_mime,
+        name: sanitizeAttachmentName(upload.original_name),
+      });
+      await recordScanStatus(upload.id, scan.status);
+      if (scan.status === "infected") {
+        throw new ContactSubmissionError(
+          422,
+          "An attachment could not be accepted.",
+          "attachment_infected",
+          "infected",
+        );
+      }
+      if (scan.status !== "clean") {
+        throw new ContactSubmissionError(
+          503,
+          "Attachment scanning is temporarily unavailable.",
+          "attachment_scan_failed",
+          "scan_failed",
+        );
+      }
       attachments.push({
         data: buffer,
         name: sanitizeAttachmentName(upload.original_name),
@@ -239,14 +291,23 @@ export async function POST(req: Request) {
       if (claimed && submissionId) await markClaimFailed(submissionId);
       return secureResponse(
         NextResponse.json(
-          { ok: false, error: error.publicMessage },
+          {
+            ok: false,
+            error: error.publicMessage,
+            ...(error.code ? { code: error.code } : {}),
+            ...(error.attachmentStatus
+              ? { attachmentStatus: error.attachmentStatus }
+              : {}),
+          },
           { status: error.status },
         ),
         securityContext,
       );
     }
 
-    console.error("contact/send error:", error);
+    logServerError("api.contact.send.failed", error, {
+      route: "/api/contact/send",
+    });
     if (claimed && submissionId) await markClaimFailed(submissionId);
     return secureResponse(
       NextResponse.json(
@@ -260,7 +321,11 @@ export async function POST(req: Request) {
       const { error } = await supabaseAdmin.storage
         .from("contact-uploads")
         .remove(cleanupPaths);
-      if (error) console.error("contact/send cleanup error:", error);
+      if (error) {
+        logServerError("api.contact.send.cleanup_failed", error, {
+          route: "/api/contact/send",
+        });
+      }
     }
     await releaseProtection(securityContext);
   }

@@ -4,6 +4,7 @@ import { defaultLocale, isLocale } from "@/lib/i18n/config";
 import {
   getSkillCategories,
 } from "@/lib/skills/data.server";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 // Cache skill categories for 1 hour (static data)
 export const revalidate = 3600;
@@ -18,7 +19,9 @@ export async function GET(request: Request) {
     const categories = await getSkillCategories(locale);
     return NextResponse.json(categories, { headers: sharedCacheHeaders(revalidate) });
   } catch (error) {
-    console.error("[/api/skill-categories] db error:", error);
+    logServerError("api.skill_categories.database_failed", error, {
+      route: "/api/skill-categories",
+    });
     return NextResponse.json({ error: "db" }, { status: 500 });
   }
 }

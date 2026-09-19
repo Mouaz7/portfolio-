@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useNavigationExperience } from "./NavigationExperienceProvider";
 
 type Props = {
   routes: string[];           // ordered list the paths to navigate
@@ -109,6 +110,7 @@ export default function RouteScrollNavigator({
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
+  const { markInternalNavigation } = useNavigationExperience();
 
   const index = useMemo(() => routes.indexOf(pathname ?? ""), [pathname, routes]);
   // The first deliberate gesture must work immediately. Starting at zero
@@ -138,13 +140,14 @@ export default function RouteScrollNavigator({
     const destination = routes[i];
     if (!destination || i === index || navigationTargetRef.current) return;
     navigationTargetRef.current = destination;
+    markInternalNavigation(destination);
     router.prefetch?.(destination);
     router.push(destination);
     navigationTimerRef.current = window.setTimeout(() => {
       navigationTargetRef.current = null;
       navigationTimerRef.current = null;
     }, 2_000);
-  }, [index, routes, router]);
+  }, [index, markInternalNavigation, routes, router]);
 
   const cooldown = useCallback(() => {
     const now = performance.now();

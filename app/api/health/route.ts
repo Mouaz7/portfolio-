@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertProductionSecurityConfig } from "@/lib/security/production-config";
+import { logServerError, safeLog } from "@/lib/security/safe-logger.server";
 
 const REQUIRED_PRODUCTION_SETTINGS = [
   "CONTACT_TO",
@@ -21,7 +22,12 @@ export async function GET() {
         (name) => !process.env[name]?.trim(),
       );
       if (missing.length > 0) {
-        console.error(`[health] invalid production settings: ${missing.map((name) => `${name}:missing`).join(", ")}`);
+        safeLog("error", "api.health.settings_missing", {
+          code: "production_settings_missing",
+          count: missing.length,
+          route: "/api/health",
+          status: 503,
+        });
         return NextResponse.json(
           { ok: false },
           { status: 503, headers: { "Cache-Control": "no-store" } },
@@ -34,7 +40,10 @@ export async function GET() {
       { headers: { "Cache-Control": HEALTH_CACHE } },
     );
   } catch (error) {
-    console.error("[health] invalid production configuration", error);
+    logServerError("api.health.configuration_invalid", error, {
+      route: "/api/health",
+      status: 503,
+    });
     return NextResponse.json(
       { ok: false },
       { status: 503, headers: { "Cache-Control": "no-store" } },

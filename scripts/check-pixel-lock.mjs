@@ -3,25 +3,26 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
-// Reconcile fourteen stale references against independently built, unchanged
-// c3a7941 (not this implementation branch). See docs/testing-guide.md.
+// Approved responsive references. They are refreshed only after the complete
+// light/dark viewport set has passed accessibility checks and been reviewed at
+// native resolution; see docs/testing-guide.md.
 const expected = {
   "desktop-code-review-page-dark.png": "0af882fda0ec1be3af2173b079eb0547900e68652f0aa9c258007adf9528021f",
   "desktop-code-review-page-light.png": "635bb7941b36d8fe23762b066f4bc1026062110bc78e077aca0f0e6792644266",
-  "desktop-contact-page-dark.png": "013adf7915a6672aad0d12e0c6214fa8a94384970896137902bd41e6aa180b0a",
-  "desktop-contact-page-light.png": "30b3e94dc6004d39c2961dd2e2705be88ee19942ad0db88adfce7245b1a487c9",
+  "desktop-contact-page-dark.png": "efe038292821e98ad6db10aa75c365207f7c4dd505fe25360d4083da5418ed99",
+  "desktop-contact-page-light.png": "38c3b44b7cbcd56be37e95ae12f8f36f02f5e49ec229d0dc9905a9fff0af880a",
   "desktop-home-dark.png": "1cd1ecbc60d883d1b7b4641e7c58554078c4c04b2e864b50faba6a069fe572ee",
   "desktop-home-light.png": "9f70f14fd784e9181ce77860195ef13d67ae3b8987ff301b7cfb2ea20e45bb92",
   "desktop-projects-page-dark.png": "e490932f3ba734099242ecc2b4c5ac048227ff7c0cc0e5fbc0333067c2aa3707",
   "desktop-projects-page-light.png": "c6b4aa7bc5bb890fb4bb7905297c52ce9f789c9fc7b4e0f9f09efc86f3da905c",
-  "desktop-journey-dark.png": "f46d6c49713a9104164ceb218300784b8e0366a983a74d14af4165063992a0a0",
-  "desktop-journey-light.png": "f43cd0947a58f0ba79eed6ae40606560b8579654b9849d796b17d36dcb386a19",
-  "desktop-skills-page-dark.png": "d247c163912c19ce391ca818a0e0bf36e30d941b4476c09967b0d4c4f1505f33",
-  "desktop-skills-page-light.png": "d8bff2a6d0ec800b797603f3f90bd335a9c32ed8040e92494425bf6ead498fb3",
+  "desktop-journey-dark.png": "72ca5b588d26828f1172de43a744a5e154234cf952cb2a875107eb7abf98f9a1",
+  "desktop-journey-light.png": "85c9b6d63b63678ee8ac97adf39c7ac9526d455c20a45f76fab06473c21febe7",
+  "desktop-skills-page-dark.png": "3cfa10f1646ab4a1bff0dc7e8577a2204f3a1fb3e627b99fa2ad02d31699373d",
+  "desktop-skills-page-light.png": "15cde48c9779dbafb20cff5818578849e87c5bc4525b2c9d8c568f4ad36b8e7e",
   "mobile-code-review-page-dark.png": "88dd0d65ceaa6ce89d608dab79de8e38364d82ecb1c0574e074f585e224b7b7a",
   "mobile-code-review-page-light.png": "6069cd071709f6d1d8fba33fbdb205ccca20f33721c8ce7aa44ab84bb5ecb79e",
-  "mobile-contact-page-dark.png": "982bee0c146104f38340c47c46f3f3d911c585a1ffeb919d2bf44a2781c758b3",
-  "mobile-contact-page-light.png": "6e05812ccf32bc538119a627248030bee44f9e4912ba77f51dc1ebd51c13ae01",
+  "mobile-contact-page-dark.png": "29b07c59098cd99621a0be1f77777040381921dd037dfde97ffa4350b0953342",
+  "mobile-contact-page-light.png": "f65e907f64b7a358305e6c520fcc8de8069fc1a158644f1d2ba42be2ba7c2b20",
   "mobile-home-dark.png": "63a53e1a42dc476a70c0ccd9944035c94a9ecf231a8da1a95f0aa91ecf14f834",
   "mobile-home-light.png": "217964636954ec5ed40d2fd0e27c353082a79fcf989274d3bf26469b18b4d50f",
   "mobile-projects-page-dark.png": "405860cf818e49eccb0027d6b31e507fe2bfc9d0c3d488895e11096ffaad94dc",
@@ -32,16 +33,16 @@ const expected = {
   "mobile-skills-page-light.png": "97cadf537a4c1296c0a3a8debc580c12bca777e4e354d9361fbc93d7fdb1ea93",
   "tablet-code-review-page-dark.png": "6582e6d61b3631a47ca71fefd7b475dd87c277e7fd61e62fb73acd29938ff582",
   "tablet-code-review-page-light.png": "80ec3e354d7ba1da627d804e321e73d211bff9659f0ecff23703221ffdabc981",
-  "tablet-contact-page-dark.png": "d2b1a78e7e80df8b72f015ed8f1f9bebee10e076b326c76a05bcb5de175e6cd4",
-  "tablet-contact-page-light.png": "0e9feb505ada947d1924a7e791dc268679fbd7faa7ecd4b89fb007da20c6226c",
+  "tablet-contact-page-dark.png": "eeaff83d7e477a0b128c93177a1544ee92f00c06d5ba1e275359224d5222f57d",
+  "tablet-contact-page-light.png": "a0268f7b4cd735b2e44cc079b31239bf17dd1d22e48c6747f1d171e47eafc3b9",
   "tablet-home-dark.png": "f941c5b11c3681ddfef363dda406b9b7f76bf4a80312188ea5de453936bb6a32",
   "tablet-home-light.png": "2a98b4471ece03cec0d263c5c1e0e5981ae474e828e562f9fae65f7a1a098811",
   "tablet-projects-page-dark.png": "2c7512425d682c60fd6d2de796f04d998c97ee810674dc912ae387adaae34658",
   "tablet-projects-page-light.png": "7998a477c78d5c7d4164b500db7b97d55b37178f90f5614cd1a3cad58ddcef70",
-  "tablet-journey-dark.png": "b8972bee4b4c3765a21436ae9bf5dca5b0c8a320553982907772493aac0e8864",
-  "tablet-journey-light.png": "6aa5553061cbb95989094feb482fa72896ecc39125f685371980d9c361f0bed5",
-  "tablet-skills-page-dark.png": "a927ff749b1197290700c194264458a1de22f8409c342f519c5b70a2fa037195",
-  "tablet-skills-page-light.png": "fefdf3573d15f417c38675dc2928154a236027d0e4a66eaffd11c6047a025b11",
+  "tablet-journey-dark.png": "fceb5284d6fcf4854af700e746faa0bfa6695f36692fd6243790d81f6556800f",
+  "tablet-journey-light.png": "7dfcba7d003da3e7307c1b5d7df00249022a06df26481701bc1597d81f951168",
+  "tablet-skills-page-dark.png": "4397d40c6cf2a367ddb29e4392e01dd4e657cd53731cf68919e621abfd9ab80d",
+  "tablet-skills-page-light.png": "de3987c25ab0f082bba313ed53f1bdc22d3b9eb4d3f84ebe61555056791b7947",
 };
 
 // The exact hash remains the primary lock. This edge signature is a fallback
@@ -50,20 +51,20 @@ const expected = {
 const expectedPerceptual = {
   "desktop-code-review-page-dark.png": "4090277d1a174abc421c76453991c104873cb171af97df1791441cc71889ca67",
   "desktop-code-review-page-light.png": "9b20911e650599b7e4dfbadc22de528b6c0672b3a493ac6a11bb323ae4a75152",
-  "desktop-contact-page-dark.png": "c01c5b15804b5a068e11698f9d511a7d69d963e088393471e5fce9ef8537403e",
-  "desktop-contact-page-light.png": "8861d0a7a27f77ee7d33dd7b67f69b1eb852646ec4235011ee339fe20814cd1b",
+  "desktop-contact-page-dark.png": "25bb292263cb96d322e61719ae549a76b1673b09dfc35bfd6d569b99008463a1",
+  "desktop-contact-page-light.png": "8e2d7ea5a686f08d06ffa97f62945796f63145b6d7d5c02f1ba4b88d7b3707d6",
   "desktop-home-dark.png": "5cdca9209207047a8382ec90bdf53a73f27a130d16aca93b1f85bda5de29665c",
   "desktop-home-light.png": "9014704426711b85f95d26e3828b0eb9b657c33e9bc5db5e06c87a2c28855f75",
-  "desktop-journey-dark.png": "1ed472e3a60b9332b7a4abe739a71d08d1a01fc3955a983fa2ad6942b8aba910",
-  "desktop-journey-light.png": "fb8f49acb65ea8b3d022b2c3b7d2f9592ad8ac8f88e0ae673d49c31249535c6e",
+  "desktop-journey-dark.png": "0173e5a092c944bbdfb9eb2585aa9a377a1f2ce2d586c8045eb66c7ae1590aa9",
+  "desktop-journey-light.png": "c7316fa36fdb3aa2bcf0fbbac9cffdeda5e93b52f94688133433959c42f86939",
   "desktop-projects-page-dark.png": "25848e42ac4f424e40a2fc8c2b75fe1e861b8ab695f0e399f8c6784138d6d6cf",
   "desktop-projects-page-light.png": "eb8f47d01bb9987a914e66a65f5061b9d034e52a757fcdd97d4e57c4dde9a9bc",
-  "desktop-skills-page-dark.png": "22e0eab1d2dba85cac9767d7d706565ed9a235c34a6e5018eb0dd2f2f6da71a6",
-  "desktop-skills-page-light.png": "f1d1e8f84e42c8a9221c5f564651b542979b7b539aa2e902df4a3e0180ed7887",
+  "desktop-skills-page-dark.png": "dd6bba3c9b2d7e2b94d84b7d5b0ed078b30ce6002df4bf3f818614c0a83eb0f9",
+  "desktop-skills-page-light.png": "af0e40bf91fcc6603b520568418e99bc8d26b6eba2ea44979bee7cbcc80e7d16",
   "mobile-code-review-page-dark.png": "b8fbd91fa138e06af27aa5fe6601345201d5369415f4b11b2e90725afe17fdcb",
   "mobile-code-review-page-light.png": "47557ec0721d32f3c02348fea8dc643c45cde6d7894ea7daaa1f6b110636847f",
-  "mobile-contact-page-dark.png": "e61dddfb47397c03fda839f9e325ea21bd593390896fa837d60566f50808525f",
-  "mobile-contact-page-light.png": "190012aef6ee7116c011a4e933ca2192c25e1b0047cee500f38ffbb2a9e9111b",
+  "mobile-contact-page-dark.png": "15a2f2cf68c0d00d9ab468f97e5a3dd10e7c8316ed5faff9114788fb986d3e72",
+  "mobile-contact-page-light.png": "c2f91d1207453a0deba30ebcf619f271fb0d4098dd1ceae5c9fea1b9fdb7c1e2",
   "mobile-home-dark.png": "2ac36504d4954a626301809000094104ba35d993424bcc6abfd5a7efa2f3ba8c",
   "mobile-home-light.png": "4c9d8fcbea2f5ff5d23718fcb9163e3c976257138ff66d403a1285fba21ee36d",
   "mobile-journey-dark.png": "3d25d084f1e188c20241b43657706c0775ea4fb619508e067d09764f004bc6dc",
@@ -74,28 +75,28 @@ const expectedPerceptual = {
   "mobile-skills-page-light.png": "1291daaa05666d4eeb445e107a3cd0b41ed570ab94132a18e592538e46996648",
   "tablet-code-review-page-dark.png": "cbb9c253d157c9dadf76a4b4babc76363b550849130243bd206a138fcf436704",
   "tablet-code-review-page-light.png": "6bfd2cb9a4bfa333156165fbc40ba6feb402240738663d38c77f3b98f83ca232",
-  "tablet-contact-page-dark.png": "7a3bb3fba8bc419d0bf158fe7dc8aaeecd013fe82106a59a1cea0b6dd7073536",
-  "tablet-contact-page-light.png": "28aab76004940b8d4121874b29d6c6e5d52e0b8b8f80eff9528dca65874c6e32",
+  "tablet-contact-page-dark.png": "60326066b97f2044fb1bd7681750527519dfc2db315eb5df2823021e04fd1ebd",
+  "tablet-contact-page-light.png": "8df22e5050f7cd8d0acd5d8f034fc4d2fe9c744fd7f634e61bf855f1ece3cf2f",
   "tablet-home-dark.png": "c7b90bada807e90c5ecda8d4efc8f4c9bdedaf240291606457f1e898331aa160",
   "tablet-home-light.png": "3195864c223e56cb480c9557c366b09d5048ebcacb49e956659d1f35f61fbceb",
-  "tablet-journey-dark.png": "f933ad7ffb160520f7316b6b78c9248b4779ecbe0660b1a0fb86b8931604fc67",
-  "tablet-journey-light.png": "9de05eb0ebf4ae91177a9490192dee206092dd8da0198cb6c1ba694079daa26f",
+  "tablet-journey-dark.png": "9899f6d3c85a5e80a88e2d80b84f5e54130ccff314073d2130decf5b4c544d64",
+  "tablet-journey-light.png": "a4ea49b60ad24d7109f7a2cfe8da66109f1eb5ad10f093da107ad42e41720eec",
   "tablet-projects-page-dark.png": "29365685281814cf1771394e38519aeb999423769298b66b413747da9e71a370",
   "tablet-projects-page-light.png": "afeb3bc4e6fc1a0269cbcfd657337a9c6734be0fa85081e202ed1b88e42b95c8",
-  "tablet-skills-page-dark.png": "75c79aaa3bd9649a6fc5652fff09f89bbb32abd2c7f67b224eab8eb9c8e37c87",
-  "tablet-skills-page-light.png": "a217f84ff22169d399bb232e9e48569d4cb5af5303e9201fdec077126c9db041",
+  "tablet-skills-page-dark.png": "52b882a349cda66c70656eaf9b8f61d8657c2a53f6d228ff7a182e94836c2f1b",
+  "tablet-skills-page-light.png": "dcaf59aaa64091411d6286b06ed33238b821ce148adca8761b2303bc8d6c256b",
 };
 
-// Skills signatures come from the intentionally enlarged, responsive card and
-// icon profiles. Keep the existing four-bit Chromium rasterization allowance;
-// all non-Skills references remain unchanged.
+// Skills also keep edge-only signatures because their many SVG logos are the
+// most sensitive to subpixel Chromium rasterization. The four-bit allowance
+// accepts that rendering noise without weakening the exact locks elsewhere.
 const expectedGeometrySignatures = {
-  "desktop-skills-page-dark.png": "IAJTSygCU0sgAZGgwABMSCgRAsFyTMuZA+DYH1OMKg02ZNmTNmTdkzZk2ZM2ZNmTNGTYK1wOK+FjbOsbQ6BwHzZM2sU2ZNmTNk7ZkzZE2ZM2RNmzJGNJw2NMa5kD4H4fcEa5lTJE3ZM2RN2TNiTJszak2ZM2ZNmzSGEobKIAABI=",
-  "desktop-skills-page-light.png": "0AGMgNABrLTQAGRKIACQgIJIlBKIoRRmbC8J4Y5jDOPJmyJtSZsmbUm7ImzJmyJsy5sk5KPw1BIYowDlPG+J4cm7JBtJuyZtTbEibUm5Jm1Juy4N2RQ2HIyjlGZ8L4nhjalOa0m7Im1JuyJtSVs2RUlbJm3RGyJsphSWoggpCEU=",
+  "desktop-skills-page-dark.png": "IAJTSygCU0sgAZGgghBEVHwNA+FyTMuZA/D8HTaMi+M2ZN2TNmTdkzZk2ZM2ZNmTNGTaK3gOC4EjYPgfY6lwHTZE2mU2ZNmTMk7ZkzZE2ZM2RNllbEtJw2NMa5kD4HofMEaZkzZE3ZM2RNmTNiTJszYk2ZMCZRkziBCAAAAAAAA=",
+  "desktop-skills-page-light.png": "0AGMgNABrLTQAGRKZAkSgIKg1BaMoTRmbE8J48NzXhPJmyJtSbsmbcmbImzJmyJsy5shxIPw1B4crwnhnGaNY0m7JBtJuyZtTbEmbUm7Jm1JuyARkbQWPJyjlGZ8T4nhybkmbUm7Im1JqyJtSVsmTUlbJm33GKKMyREmIBBAEAA=",
   "mobile-skills-page-dark.png": "WAAAEloAkxNhJ2RtYOk4YRjGnOYZxpzGGMacxhyLHOdJaWEZMGcyXRimGOec5phnHMYcZhSvHMdDGVG5IpcxPZzKHNM8ppznHOYc5xzFXQFjOWMdGjcIfRjmnGcY5BjDONocwxltHOfGYTWIEhj1ggKYx4ACONaAAhjHgAJYw4A=",
   "mobile-skills-page-light.png": "pACSDKSkQGySAZqTzpbHlsc5YxnnGWMZ4zljGWN0YxiSBZ5nzp7NIkN5YxhjGWOdZzljmWsQYzmc54xH3WjMwmM1Yw1DGWMYQxnjGGM6Ilycxpxj7Yj3gmcZY5jnOWc95ydjPOYSYxkRnkfGAsYIiAJjGYACRzmAAmcZgAGnPAA=",
-  "tablet-skills-page-dark.png": "cAAaCXQAGglwAOQGgAAYASAAAAAAAAAAAAAAAExJAGBGSNkbQ2hpHTZk2bM2xNyTNuTZkzRk2ZNNSWltSelpLzZsmWU2xJiTNsTZkzbk2O1cS4lTS8h5LypkiZk2xNyTNuTZkzdk2JNMayiToBDBTAAAAAAAAAAAAAAAAAAAAAA=",
-  "tablet-skills-page-light.png": "iAHkBogB5BaAABgJIACAAoAAAAAAAAAAAAAAAIMi5BypNyTEPKcB48mbIkzJGyJsyRsjbMsbI2yytgSSdlaW0MkTJpJJO2NsSTkmbEk7IRKjNHYMNCeM0dmbNmRJOyNsyVsibclbI2y2FMMMCEMAAQAAAAAAAAAAAAAAAAAAAAA=",
+  "tablet-skills-page-dark.png": "cAAaCXQAGglwAOQGgAAYASAAAAAAAAAAgRAkBFxLCWFGSNkbQ2hpHTZk2LM2xNyTNuTZkzRk2ZNFSaktSelpLzZumWE2xJiTNsTZkzbk2OVMS+kzS+h5LzJk2ZM2xNyTNuTZkzZk2JNIayJBIgCAAAAAAAAAAAAAAAAAAAAAAAA=",
+  "tablet-skills-page-light.png": "iAHkBogB5BaAABgJIACAAoAAAAAAAAAAUAIAAKM0Zgy5NyTEPMcQ48mbIkzJGyNsyRsjbMubImyyNgSQdlaW0Mm5JppJuyNsSTkmbckbIRKyNCaMNDaE08mbNmxJOyNsyVsibclbI2y2FMGQCIMAQQAAAAAAAAAAAAAAAAAAAAA=",
 };
 
 function hammingDistance(left, right) {

@@ -1,7 +1,7 @@
 import { normalizeContactSocial } from "@/lib/contact/social-links.server";
 
 describe("contact social icon normalization", () => {
-  it("keeps a safe SVG path and HTTPS URL", () => {
+  it("keeps a safe SVG path and rejects a legacy external icon URL", () => {
     const path = normalizeContactSocial({
       id: 1, name: "GitHub", href: "https://github.com/mouaz", svg_path: "M12 2L2 12", viewbox: "0 0 24 24",
     });
@@ -9,7 +9,7 @@ describe("contact social icon normalization", () => {
       id: 2, name: "LinkedIn", href: "https://linkedin.com/in/mouaz", svg_path: "https://cdn.simpleicons.org/linkedin", viewbox: null,
     });
     expect(path?.svgPath).toBe("M12 2L2 12");
-    expect(image?.svgPath).toBe("https://cdn.simpleicons.org/linkedin");
+    expect(image?.svgPath).toBe("");
   });
 
   it("allows the canonical Beacons profile and sanitizes its inline icon", () => {

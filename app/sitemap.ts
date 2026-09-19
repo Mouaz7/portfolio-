@@ -6,11 +6,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getSiteUrl();
   const pages = [
     { path: "/", changeFrequency: "monthly", priority: 1 },
-    { path: "/skills-page", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/skills", changeFrequency: "monthly", priority: 0.8 },
     { path: "/journey", changeFrequency: "monthly", priority: 0.8 },
-    { path: "/projects-page", changeFrequency: "weekly", priority: 0.9 },
-    { path: "/code-review-page", changeFrequency: "monthly", priority: 0.8 },
-    { path: "/contact-page", changeFrequency: "yearly", priority: 0.7 },
+    { path: "/projects", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/code-review", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/contact", changeFrequency: "yearly", priority: 0.7 },
+    { path: "/privacy", changeFrequency: "yearly", priority: 0.5 },
   ] as const;
 
   const absoluteUrl = (path: string) => new URL(path, baseUrl).toString();

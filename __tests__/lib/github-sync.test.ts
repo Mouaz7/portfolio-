@@ -99,7 +99,7 @@ describe("github project sync mapping", () => {
     expect(row.is_active).toBe(true);
     expect(row.sort_order).toBe(7);
     expect(row.languages).toEqual(["Python", "Jenkins", "Docker", "JSON", "AI"]);
-    expect(row.cover_image_href).toBe("/project-icons/python.svg");
+    expect(row.cover_image_href).toBe("/skill-icons/backend-python.svg");
   });
 
   it("falls back to category icon when no exact repo icon match exists", () => {
@@ -181,16 +181,16 @@ describe("github project sync mapping", () => {
     );
 
     expect(campusRow.languages).toEqual(["Kotlin", "Java", "Firebase", "Android"]);
-    expect(campusRow.cover_image_href).toBe("/project-icons/android.svg");
+    expect(campusRow.cover_image_href).toBe("/skill-icons/mobile-android.svg");
     expect(campusRow.category).toBe("Mobile");
 
     expect(pongPalRow.languages).toEqual(["TypeScript", "JavaScript"]);
     expect(pongPalRow.description).toContain("not source code");
-    expect(pongPalRow.cover_image_href).toBe("/project-icons/typescript.svg");
+    expect(pongPalRow.cover_image_href).toBe("/skill-icons/frontend-typescript.svg");
     expect(pongPalRow.category).toBe("Full-Stack");
 
     expect(quizRow.languages).toEqual(["C++", "OOP", "Algorithms"]);
-    expect(quizRow.cover_image_href).toBe("/project-icons/cplusplus.svg");
+    expect(quizRow.cover_image_href).toBe("/skill-icons/backend-c-plus-plus.svg");
     expect(quizRow.category).toBe("Systems");
   });
 
@@ -244,7 +244,7 @@ describe("github project sync mapping", () => {
     expect(moveOutRow.category).toBe("Full-Stack");
 
     expect(teamTempRow.languages).toEqual(["React", "React Native", "TypeScript", "AI", "Express"]);
-    expect(teamTempRow.cover_image_href).toBe("/project-icons/react.svg");
+    expect(teamTempRow.cover_image_href).toBe("/project-icons/category-full-stack.svg");
     expect(teamTempRow.category).toBe("Full-Stack");
   });
 

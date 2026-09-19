@@ -80,7 +80,7 @@ function BranchChip({ commit, compact = false }: { commit: Commit; compact?: boo
       aria-label={format(dictionary.journey.branch, { name: commit.branch.ref })}
       title={commit.branch.ref}
       style={{
-        color: commit.branch.color,
+        color: `var(--journey-branch-text, ${commit.branch.color})`,
         background: `color-mix(in srgb, ${commit.branch.color} ${compact ? 16 : 14}%, transparent)`,
         border: `1px solid color-mix(in srgb, ${commit.branch.color} ${compact ? 34 : 28}%, transparent)`,
       }}

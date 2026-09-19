@@ -2,6 +2,7 @@ import ProjectsPage from "./projects-page";
 import { localizedPageMetadata } from "@/lib/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getProjects } from "@/lib/projects/data.server";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const generateMetadata = () => localizedPageMetadata("projects", "/projects-page");
 
@@ -15,7 +16,9 @@ export default async function Page() {
     // hold the route transition for up to the API timeout.
     return <ProjectsPage initialProjects={initialProjects} />;
   } catch (error) {
-    console.error("[projects-page] initial data failed:", error);
+    logServerError("page.projects_legacy.initial_data_failed", error, {
+      route: "/projects-page",
+    });
     return <ProjectsPage initialLoadFailed />;
   }
 }

@@ -9,6 +9,7 @@ import {
   translatedFields,
 } from "@/lib/i18n/content-translations.server";
 import type { Project } from "@/components/project/types";
+import { canonicalProjectIconHref } from "./icon-assets";
 
 const PROJECTS_REVALIDATE_SECONDS = 1800;
 
@@ -76,7 +77,9 @@ export async function getProjects(
         category: project.category ?? "Build",
         github_url: safeProjectUrl(project.github_url),
         languages: (project.languages as string[]) ?? [],
-        cover_image_url: project.cover_image_href ?? undefined,
+        cover_image_url: project.cover_image_href
+          ? canonicalProjectIconHref(project.cover_image_href)
+          : undefined,
         visibility: project.visibility === "private"
           ? ("private" as const)
           : ("public" as const),

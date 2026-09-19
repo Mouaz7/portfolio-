@@ -3,6 +3,7 @@ import Header from "@/components/navigation/Header";
 import SkillsGrid from "@/components/skills/SkillsGrid";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import type { SkillCategoryData, SkillData } from "@/lib/skills/data.server";
+import { useRouteEntrance } from "@/components/navigation/NavigationExperienceProvider";
 
 type SkillsPageProps = {
   initialCategories?: SkillCategoryData[];
@@ -16,8 +17,13 @@ export default function Page({
   performanceAudit = false,
 }: SkillsPageProps) {
   const { dictionary } = useI18n();
+  const routeEntrance = useRouteEntrance();
   return (
-    <div className="flex min-h-[100dvh] w-full flex-col overflow-hidden text-white relative">
+    <div
+      className="relative flex h-dvh min-h-0 w-full flex-col overflow-hidden text-white"
+      data-viewport-page="skills"
+      data-route-entrance={routeEntrance}
+    >
       {performanceAudit ? (
         <style>{`.animate-card,.animate-icon{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}`}</style>
       ) : null}

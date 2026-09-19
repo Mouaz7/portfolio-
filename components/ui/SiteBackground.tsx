@@ -293,6 +293,20 @@ const CSS_FALLBACK =
   "radial-gradient(ellipse at 88% 90%, rgba(var(--wave-teal-rgb),0.52) 0%, transparent 46%)," +
   "linear-gradient(132deg, rgba(var(--wave-teal-rgb),0.28), rgba(var(--wave-foam-rgb),0.18) 48%, var(--bg))";
 
+type NavigatorWithPowerHints = Navigator & {
+  deviceMemory?: number;
+  connection?: { saveData?: boolean };
+};
+
+function isConstrainedDevice() {
+  const powerNavigator = navigator as NavigatorWithPowerHints;
+  const lowCoreCount = navigator.hardwareConcurrency > 0
+    && navigator.hardwareConcurrency <= 4;
+  const memory = powerNavigator.deviceMemory ?? 0;
+  const lowMemory = memory > 0 && memory <= 4;
+  return lowCoreCount || lowMemory || powerNavigator.connection?.saveData === true;
+}
+
 function readRgb(
   styles: CSSStyleDeclaration,
   name: string,
@@ -567,8 +581,7 @@ function BackgroundCanvas({ generation, restart, forceCss }: { generation: numbe
       // A coarse pointer by itself is not a mobile signal: many Windows
       // laptops expose a touchscreen alongside a full desktop viewport.
       const mobileViewport = window.matchMedia(MOBILE_RENDER_QUERY).matches;
-      const constrainedDevice = navigator.hardwareConcurrency > 0
-        && navigator.hardwareConcurrency <= 4;
+      const constrainedDevice = isConstrainedDevice();
       const lowPowerViewport = mobileViewport || constrainedDevice;
       const applyCssFallback = () => {
         canvas.style.background = CSS_FALLBACK;
@@ -629,7 +642,7 @@ function BackgroundCanvas({ generation, restart, forceCss }: { generation: numbe
     const vertexShader = compile(gl.VERTEX_SHADER, VERT);
     const fragmentShader = compile(
       gl.FRAGMENT_SHADER,
-      mobileViewport ? MOBILE_FRAG : DESKTOP_FRAG,
+      mobileViewport || constrainedDevice ? MOBILE_FRAG : DESKTOP_FRAG,
     );
     if (
       !gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)

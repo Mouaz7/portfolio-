@@ -18,6 +18,7 @@ import {
   secureResponse,
   type ProtectionContext,
 } from "@/lib/security/request-protection";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -155,7 +156,10 @@ export async function POST(req: Request) {
       );
       return securityContext ? secureResponse(response, securityContext) : response;
     }
-    console.error("[/api/ai/cv-chat] error:", error);
+    logServerError("api.ai.cv_chat.failed", error, {
+      provider: "nvidia",
+      route: "/api/ai/cv-chat",
+    });
     const timedOut = securityContext != null && Date.now() >= securityContext.deadline;
     const response = NextResponse.json(
       {

@@ -3,7 +3,7 @@
 import type { NextPage } from "next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Icon } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react/dist/lib/types";
 import { BrainIcon } from "@phosphor-icons/react/dist/csr/Brain";
 import { CloudArrowUpIcon } from "@phosphor-icons/react/dist/csr/CloudArrowUp";
 import { DatabaseIcon } from "@phosphor-icons/react/dist/csr/Database";
@@ -25,6 +25,10 @@ import TypeText from "@/components/home/TypeText";
 import styles from "./home-page.module.css";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { localizedPath } from "@/lib/i18n/config";
+import {
+  useNavigationExperience,
+  useRouteEntrance,
+} from "@/components/navigation/NavigationExperienceProvider";
 
 const HOME_CAPABILITY_ICONS: Record<HomeCapability["iconKey"], Icon> = {
   backend: DatabaseIcon,
@@ -80,6 +84,8 @@ type HomePageProps = {
 
 const HomePage: NextPage<HomePageProps> = ({ content = FALLBACK_HOME_CONTENT }) => {
   const { locale, dictionary } = useI18n();
+  const { markInternalNavigation } = useNavigationExperience();
+  const routeEntrance = useRouteEntrance();
   const [showHello, setShowHello] = useState(false);
   const [startIntro, setStartIntro] = useState(false);
   const [startName, setStartName] = useState(false);
@@ -100,13 +106,16 @@ const HomePage: NextPage<HomePageProps> = ({ content = FALLBACK_HOME_CONTENT }) 
     <div
       className={`home-page ${styles.root}`}
       data-home-layout="asymmetric-profile"
+      data-viewport-page="home"
+      data-viewport-profile="fit"
+      data-route-entrance={routeEntrance}
       suppressHydrationWarning
     >
       <div className={`home-slide ${styles.slide}`} data-home-viewport="adaptive">
         <div className={`home-shell ${styles.shell}`}>
           <Header disableRouteNavigation />
 
-          <main className={`home-main ${styles.main}`}>
+          <main className={`home-main ${styles.main}`} data-viewport-content>
             <section
               className={`home-hero-copy ${styles.copy}`}
               aria-labelledby="home-title"
@@ -171,7 +180,8 @@ const HomePage: NextPage<HomePageProps> = ({ content = FALLBACK_HOME_CONTENT }) 
                 data-home-actions
               >
                 <Link
-                  href={localizedPath("/projects-page", locale)}
+                  href={localizedPath("/projects", locale)}
+                  onClick={() => markInternalNavigation(localizedPath("/projects", locale))}
                   className="home-projects-cta"
                 >
                   <span>{dictionary.home.viewProjects}</span>

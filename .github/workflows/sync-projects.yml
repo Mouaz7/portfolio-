@@ -1,8 +1,8 @@
 name: Sync GitHub projects
 
+# The daily schedule stays paused until one complete manual run is green in
+# the deployed environment. Keep workflow_dispatch available for that gate.
 on:
-  schedule:
-    - cron: "17 3 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -10,7 +10,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  sync:
+  sync-projects:
+    name: Synchronize project records
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -25,31 +26,73 @@ jobs:
           node-version: "22.x"
           cache: npm
       - run: npm ci
-      - run: npm run sync:projects
+      - name: Validate configuration and synchronize projects
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CANONICAL_SITE_URL: ${{ vars.CANONICAL_SITE_URL }}
-      - name: Revalidate portfolio data
-        env:
-          REVALIDATE_URL: ${{ vars.CANONICAL_SITE_URL }}
-          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
-          test -n "$REVALIDATE_URL"
-          test -n "$REVALIDATE_SECRET"
+          missing=0
+          for name in CANONICAL_SITE_URL SUPABASE_SECRET_KEY SUPABASE_URL; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error title=Missing configuration::$name is not configured"
+              missing=1
+            fi
+          done
+          test "$missing" -eq 0
+          npm run sync:projects
+
+  revalidate-projects:
+    name: Revalidate project data
+    needs: sync-projects
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Validate configuration and revalidate
+        env:
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          REVALIDATE_URL: ${{ vars.CANONICAL_SITE_URL }}
+        run: |
+          missing=0
+          for name in REVALIDATE_SECRET REVALIDATE_URL; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error title=Missing configuration::$name is not configured"
+              missing=1
+            fi
+          done
+          test "$missing" -eq 0
           curl --fail --silent --show-error \
             --request POST "$REVALIDATE_URL/api/internal/revalidate" \
             --header "Authorization: Bearer $REVALIDATE_SECRET" \
             --header "Content-Type: application/json" \
             --data '{"tags":["projects"]}'
-      - name: Refresh RAG index
+
+  refresh-rag:
+    name: Refresh RAG index
+    needs: sync-projects
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Validate configuration and refresh index
         env:
-          RAG_REINDEX_URL: ${{ vars.CANONICAL_SITE_URL }}
           RAG_JOB_SECRET: ${{ secrets.RAG_JOB_SECRET }}
+          RAG_REINDEX_URL: ${{ vars.CANONICAL_SITE_URL }}
         run: |
-          test -n "$RAG_REINDEX_URL"
-          test -n "$RAG_JOB_SECRET"
+          missing=0
+          for name in RAG_JOB_SECRET RAG_REINDEX_URL; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error title=Missing configuration::$name is not configured"
+              missing=1
+            fi
+          done
+          test "$missing" -eq 0
           curl --fail --silent --show-error \
             --request POST "$RAG_REINDEX_URL/api/internal/rag/reindex" \
             --header "Authorization: Bearer $RAG_JOB_SECRET"

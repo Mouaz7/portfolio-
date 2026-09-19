@@ -18,6 +18,7 @@ type SendPayload = {
 };
 
 type Props = {
+  attachmentsEnabled?: boolean;
   className?: string;
   idPrefix?: string;
   onSend?: (payload: SendPayload) => Promise<boolean> | boolean;
@@ -73,6 +74,7 @@ const trimName = (v: string, max = 16) => {
 };
 
 const EmailForm: NextPage<Props> = ({
+  attachmentsEnabled = false,
   className = "",
   idPrefix = "contact",
   onSend,
@@ -106,6 +108,7 @@ const EmailForm: NextPage<Props> = ({
   };
 
   function handleFilesChange(fileList: FileList | null) {
+    if (!attachmentsEnabled) return;
     setError(null);
     const fileError = addFiles(fileList);
     if (fileError) setError(fileError);
@@ -380,12 +383,19 @@ const EmailForm: NextPage<Props> = ({
 
                     <div className="contact-attachment-toolbar">
                       <div>
-                        <button type="button" onClick={() => inputFileRef.current?.click()} className={ATTACH_BUTTON_CLASS} title={copy.attachFiles}>
+                        <button
+                          type="button"
+                          onClick={() => inputFileRef.current?.click()}
+                          className={ATTACH_BUTTON_CLASS}
+                          title={copy.attachFiles}
+                          disabled={!attachmentsEnabled}
+                          aria-disabled={!attachmentsEnabled}
+                        >
                           <svg aria-hidden viewBox="0 0 24 24"><path d="M21.44 11.05l-8.49 8.49a5.5 5.5 0 01-7.78-7.78l9.19-9.19a3.5 3.5 0 114.95 4.95l-9.2 9.2a1.5 1.5 0 01-2.12-2.12l8.5-8.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                           {copy.attachFiles}
                         </button>
                         <span className="contact-attachment-limit">{format(copy.max, { size: maxTotalMb })}</span>
-                        <input ref={inputFileRef} type="file" name="attachments" aria-label={copy.attachments} multiple onChange={(e) => handleFilesChange(e.currentTarget.files)} accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" className="hidden" />
+                        <input ref={inputFileRef} type="file" name="attachments" aria-label={copy.attachments} multiple disabled={!attachmentsEnabled} onChange={(e) => handleFilesChange(e.currentTarget.files)} accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" className="hidden" />
                       </div>
                       {files.length > 0 && <span className={FIELD_META_CLASS}>{format(copy.selectedSize, { size: (totalBytes / (1024 * 1024)).toFixed(2) })}</span>}
                     </div>

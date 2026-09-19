@@ -42,7 +42,17 @@ describe("CodeReviewPage", () => {
     expect(screen.getByText("Review findings")).toBeInTheDocument();
     expect(screen.getByText("Ready to analyze code")).toBeInTheDocument();
     expect(screen.getByText(/Paste code, choose a review focus/i)).toBeInTheDocument();
-    expect(screen.getByText("No code is stored")).toBeInTheDocument();
+    expect(screen.getByText("Not added to portfolio content")).toBeInTheDocument();
+    expect(
+      screen.getByText(/configured external AI provider to generate the response/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Do not paste secrets, personal data or confidential code/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Read the privacy notice" })).toHaveAttribute(
+      "href",
+      "/privacy",
+    );
     expect(screen.getByRole("button", { name: "Response: Auto" })).toBeInTheDocument();
   });
 

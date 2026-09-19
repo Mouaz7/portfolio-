@@ -12,6 +12,7 @@ Short path through project docs. Start here, move to deep guide you need, skip n
 | [Architecture](architecture.md) | Best map of app structure and data flow. |
 | [Database](database.md) | Supabase tables, pgvector RAG, and storage setup. |
 | [Deployment](deployment.md) | Best launch path for Vercel, Netlify, or self-hosted. |
+| [Privacy inventory](privacy-data-inventory.md) | Verified data flows, lifecycle evidence, and open production checks. |
 
 ## Quick Setup
 
@@ -84,7 +85,9 @@ npm run build
 | Hook up Supabase correctly | [Database](database.md) → [CV Setup](cv-setup.md) |
 | Configure AI tools | [Database](database.md) → [Features](features.md) |
 | Ship to production | [Deployment](deployment.md) → [CI/CD Pipeline](cicd-pipeline.md) |
+| Verify privacy claims | [Privacy inventory](privacy-data-inventory.md) → [Deployment](deployment.md) |
 | Work safely in repo | [Testing Guide](testing-guide.md) → [Root README](../README.md) |
+| Rewrite published history | [History rewrite runbook](security/history-rewrite-runbook.md) → [GitHub hardening](github-hardening.md) |
 
 ## Back
 

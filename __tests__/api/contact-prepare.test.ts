@@ -32,6 +32,9 @@ describe("/api/contact/prepare", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.ENABLE_SECURITY_TESTS;
+    process.env.CONTACT_ATTACHMENTS_ENABLED = "true";
+    process.env.CONTACT_MALWARE_SCANNER_ENDPOINT = "https://scanner.example.test/v1/scan";
+    process.env.CONTACT_MALWARE_SCANNER_TOKEN = "test-scanner-token";
     submissionInsert.mockResolvedValue({ error: null });
     uploadInsert.mockResolvedValue({ error: null });
     deleteEq.mockResolvedValue({ error: null });
@@ -47,6 +50,12 @@ describe("/api/contact/prepare", () => {
       throw new Error(`unexpected table ${table}`);
     });
     storageFromMock.mockReturnValue({ createSignedUploadUrl });
+  });
+
+  afterEach(() => {
+    delete process.env.CONTACT_ATTACHMENTS_ENABLED;
+    delete process.env.CONTACT_MALWARE_SCANNER_ENDPOINT;
+    delete process.env.CONTACT_MALWARE_SCANNER_TOKEN;
   });
 
   it("creates a private submission and signed upload destinations", async () => {
@@ -95,6 +104,25 @@ describe("/api/contact/prepare", () => {
     }));
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toMatchObject({ error: "Attachments exceed 10 MB." });
+  });
+
+  it("fails closed for files while scanning is disabled, but keeps message-only contact available", async () => {
+    delete process.env.CONTACT_ATTACHMENTS_ENABLED;
+
+    const blocked = await POST(contactRequest({
+      name: "A", email: "a@example.com", message: "Hello", files: [{ name: "brief.pdf", size: 8, type: "application/pdf" }],
+    }));
+    expect(blocked.status).toBe(503);
+    await expect(blocked.json()).resolves.toMatchObject({
+      attachmentStatus: "scan_failed",
+      code: "attachments_unavailable",
+    });
+    expect(submissionInsert).not.toHaveBeenCalled();
+
+    const messageOnly = await POST(contactRequest({
+      name: "A", email: "a@example.com", message: "Hello", files: [],
+    }));
+    expect(messageOnly.status).toBe(200);
   });
 
   it("removes the submission if signed URL creation fails", async () => {

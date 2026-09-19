@@ -5,6 +5,7 @@ import {
   getProjects,
   ProjectDatabaseError,
 } from "@/lib/projects/data.server";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const revalidate = 1800;
 export const dynamic = "force-dynamic";
@@ -21,10 +22,12 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     if (error instanceof ProjectDatabaseError) {
-      console.error("[/api/project] db error:", error.cause);
+      logServerError("api.projects.database_failed", error.cause, {
+        route: "/api/project",
+      });
       return NextResponse.json({ error: "db" }, { status: 500 });
     }
-    console.error("[/api/project] error:", error);
+    logServerError("api.projects.failed", error, { route: "/api/project" });
     return NextResponse.json({ error: "server error" }, { status: 500 });
   }
 }

@@ -5,6 +5,8 @@ import SkillsGrid from "@/components/skills/SkillsGrid";
 
 jest.mock("@/components/skills/useViewportStage", () => ({
   useViewportStage: () => ({
+    profile: "fit",
+    scale: 1,
     stageStyle: {},
     wrapperStyle: () => ({}),
   }),

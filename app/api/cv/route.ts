@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/backend/supabaseAdminClient";
+import { logServerError, safeLog } from "@/lib/security/safe-logger.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -77,7 +78,10 @@ export async function GET(request: Request) {
 
     const buffer = Buffer.from(await data.arrayBuffer());
     if (!hasPdfSignature(buffer)) {
-      console.error("[/api/cv] invalid PDF signature");
+      safeLog("error", "api.cv.invalid_signature", {
+        code: "invalid_pdf_signature",
+        route: "/api/cv",
+      });
       return NextResponse.json({ error: "File is not a PDF" }, { status: 400 });
     }
 
@@ -110,7 +114,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("[/api/cv] storage error", error);
+    logServerError("api.cv.storage_failed", error, { route: "/api/cv" });
     return NextResponse.json(
       { error: "Failed to fetch CV from storage" },
       { status: 500 },

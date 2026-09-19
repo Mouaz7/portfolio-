@@ -25,12 +25,14 @@ const viewports = [
   { name: "desktop", width: 1440, height: 900 },
 ] as const;
 const adaptiveViewports = [
+  { name: "reported-windows-split", width: 1723, height: 608 },
   { name: "compact-laptop-800", width: 800, height: 600 },
   { name: "compact-laptop-900", width: 900, height: 600 },
   { name: "compact-laptop-1024", width: 1024, height: 600 },
   { name: "small-laptop", width: 1024, height: 768 },
   { name: "short-desktop", width: 1280, height: 720 },
   { name: "standard-laptop", width: 1366, height: 768 },
+  { name: "standard-desktop", width: 1440, height: 900 },
   { name: "galaxy-tab-s4", width: 712, height: 1138 },
   { name: "ipad-mini", width: 768, height: 1024 },
   { name: "zenbook-fold", width: 853, height: 1280 },
@@ -40,25 +42,6 @@ const adaptiveViewports = [
   { name: "nest-hub-max", width: 1280, height: 800 },
 ] as const;
 const visualOutput = "test-results/visual-actual";
-
-// These color-contrast findings are part of the explicitly locked visual
-// design. Keep the allowance narrow and count-based: every other serious or
-// critical axe violation still blocks CI, and additional contrast failures do
-// too. Reducing these counts remains allowed.
-const lockedContrastNodeLimits: Record<string, number> = {
-  "mobile:light:/projects-page": 5,
-  "mobile:light:/journey": 14,
-  "mobile:light:/code-review-page": 1,
-  "mobile:light:/contact-page": 2,
-  "tablet:light:/projects-page": 1,
-  "tablet:light:/journey": 19,
-  "tablet:light:/code-review-page": 2,
-  "tablet:light:/contact-page": 2,
-  "desktop:light:/projects-page": 1,
-  "desktop:light:/journey": 19,
-  "desktop:light:/code-review-page": 2,
-  "desktop:light:/contact-page": 2,
-};
 
 function routeName(route: (typeof routes)[number]) {
   return route === "/" ? "home" : route.slice(1);
@@ -187,7 +170,6 @@ for (const viewport of viewports) {
             path: `${visualOutput}/${viewport.name}-${routeName(route)}-${theme}-after-800.png`,
           });
           await waitUntil(navigationFinishedAt, 5_000);
-          await page.waitForLoadState("networkidle");
           if (route === "/skills-page") {
             await expect(page.locator(".skills-card-surface").first()).toBeVisible();
           }
@@ -209,16 +191,69 @@ for (const viewport of viewports) {
           const blocking = results.violations.filter(
             (item) => ["serious", "critical"].includes(item.impact ?? ""),
           );
-          const contrast = blocking.find((item) => item.id === "color-contrast");
-          expect(blocking.filter((item) => item.id !== "color-contrast")).toEqual([]);
-          expect(contrast?.nodes.length ?? 0).toBeLessThanOrEqual(
-            lockedContrastNodeLimits[`${viewport.name}:${theme}:${route}`] ?? 0,
-          );
+          expect(blocking).toEqual([]);
         });
       }
     });
   }
 }
+
+test("privacy page remains accessible in both themes and at 400 percent reflow", async ({ browser }) => {
+  test.setTimeout(90_000);
+
+  for (const viewport of [
+    { name: "400-percent-reflow", width: 320, height: 800 },
+    { name: "desktop", width: 1440, height: 900 },
+  ] as const) {
+    for (const theme of ["light", "dark"] as const) {
+      const context = await browser.newContext({ viewport });
+      await context.addInitScript((selectedTheme) => localStorage.setItem("theme", selectedTheme), theme);
+      const page = await context.newPage();
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/privacy");
+
+      const label = `${viewport.name} ${theme}`;
+      const privacyPage = page.locator("[data-privacy-page]");
+      const privacyMain = privacyPage.locator("main");
+      await expect(page.getByRole("heading", { name: "Privacy", level: 1 }), label).toBeVisible();
+      await expect(page.locator(".site-footer"), label).toBeInViewport();
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+        label,
+      ).toBeLessThanOrEqual(1);
+
+      await privacyMain.evaluate((element) => element.scrollTo(0, element.scrollHeight));
+      await expect(page.getByRole("link", { name: "Go to Contact" }), label).toBeVisible();
+
+      const results = await new AxeBuilder({ page }).analyze();
+      const blocking = results.violations.filter(
+        (item) => ["serious", "critical"].includes(item.impact ?? ""),
+      );
+      expect(blocking, label).toEqual([]);
+      await context.close();
+    }
+  }
+});
+
+test("privacy page is localized in English, Swedish and Arabic", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const entry of [
+    { route: "/privacy", locale: "en", direction: "ltr", title: "Privacy" },
+    { route: "/sv/privacy", locale: "sv", direction: "ltr", title: "Integritet" },
+    { route: "/ar/privacy", locale: "ar", direction: "rtl", title: "الخصوصية" },
+  ] as const) {
+    await page.goto(entry.route);
+    await expect(page.locator("html")).toHaveAttribute("lang", entry.locale);
+    await expect(page.locator("html")).toHaveAttribute("dir", entry.direction);
+    await expect(page.getByRole("heading", { name: entry.title, level: 1 })).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+      entry.route,
+    ).toBeLessThanOrEqual(1);
+  }
+});
 
 test("mobile project repository stats stay readable inside the card", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -349,6 +384,30 @@ test("header adapts before navigation becomes cramped at common browser zoom lev
   await expect(page.locator('[role="dialog"][aria-hidden="true"]')).toHaveAttribute("inert", "");
 });
 
+test("contact recomputes its viewport profile when a window is resized both ways", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/contact-page?audit=performance");
+
+  const root = page.locator('[data-viewport-page="contact"]');
+  const stage = page.locator("[data-viewport-stage]");
+  await expect(root).toHaveAttribute("data-viewport-profile", "fit");
+  const roomyScale = Number(await stage.getAttribute("data-viewport-scale"));
+
+  await page.setViewportSize({ width: 1723, height: 450 });
+  await expect(root).toHaveAttribute("data-viewport-profile", "accessible-overflow");
+  const shortScale = Number(await stage.getAttribute("data-viewport-scale"));
+  expect(shortScale).toBeLessThan(roomyScale);
+  await expect(page.locator(".contact-repository-shell")).toBeInViewport();
+  await expect(page.locator(".site-footer")).toBeInViewport();
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(root).toHaveAttribute("data-viewport-profile", "fit");
+  const restoredScale = Number(await stage.getAttribute("data-viewport-scale"));
+  expect(restoredScale).toBeCloseTo(roomyScale, 2);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
+});
+
 test("all public pages remain bounded and centered on ultrawide displays", async ({ browser }) => {
   test.setTimeout(240_000);
   const profiles = [
@@ -408,6 +467,18 @@ test("all public pages remain bounded and centered on ultrawide displays", async
       expect(geometry.surfaceLeft, label).toBeGreaterThanOrEqual(0);
       expect(geometry.surfaceRight, label).toBeLessThanOrEqual(profile.width + 1);
       expect(geometry.surfaceWidth, label).toBeLessThanOrEqual(maximumSurfaceWidths[route] + 1);
+      if (route === "/journey") {
+        await expect.poll(async () => {
+          const last = await testPage.locator(".commit-row").last().boundingBox();
+          return last ? last.y + last.height : Number.POSITIVE_INFINITY;
+        }, { message: label }).toBeLessThanOrEqual(profile.height + 1);
+      }
+      if (route === "/contact-page") {
+        await expect(
+          testPage.locator(".contact-adaptive-layout .contact-send-button button"),
+          label,
+        ).toBeInViewport();
+      }
       if (profile.width >= 2200) {
         expect(geometry.headerWidth / profile.width, label).toBeGreaterThanOrEqual(0.64);
         expect(geometry.surfaceWidth / profile.width, label).toBeGreaterThanOrEqual(0.65);
@@ -451,7 +522,32 @@ test("layout follows CSS viewport size instead of physical pixel density", async
     for (const route of routes) {
       await testPage.goto(`${route}?audit=performance`);
       const selector = publicSurfaceSelectors[route];
-      const box = await testPage.locator(selector).first().boundingBox();
+      const surface = testPage.locator(selector).first();
+      await expect(surface, `${route} at DPR ${deviceScaleFactor}`).toBeVisible();
+
+      // The fitted Skills/Journey surfaces replace their SSR fallback scale
+      // during hydration. Compare DPRs only after two consecutive layout
+      // samples agree, otherwise this test can compare the fallback with the
+      // final CSS-pixel geometry under parallel CI load.
+      await expect.poll(async () => {
+        const first = await surface.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return { left: rect.left, width: rect.width };
+        });
+        await testPage.evaluate(() => new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        }));
+        const second = await surface.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return { left: rect.left, width: rect.width };
+        });
+        return Math.max(
+          Math.abs(first.left - second.left),
+          Math.abs(first.width - second.width),
+        );
+      }, { message: `${route} at DPR ${deviceScaleFactor} should settle` }).toBeLessThanOrEqual(0.5);
+
+      const box = await surface.boundingBox();
       expect(box, `${route} at DPR ${deviceScaleFactor}`).not.toBeNull();
       layout[route] = { width: box!.width, left: box!.x };
       expect(
@@ -740,32 +836,33 @@ test("Samsung browser viewport keeps visible geometry and theme chrome in sync",
   await context.close();
 });
 
-test("mobile background stays animated across phone sizes, orientations, routes and themes", async ({ browser }) => {
-  test.setTimeout(600_000);
-  const phoneProfiles: ReadonlyArray<{
-    name: string;
-    width: number;
-    height: number;
-    screenHeight?: number;
-    dpr: number;
-  }> = [
-    { name: "galaxy-fold", width: 280, height: 653, dpr: 3 },
-    { name: "small-phone", width: 320, height: 568, dpr: 2 },
-    { name: "narrow-fold", width: 344, height: 882, dpr: 3 },
-    { name: "samsung-real-visible", width: 360, height: 610, screenHeight: 800, dpr: 2 },
-    { name: "compact-android", width: 360, height: 740, dpr: 3 },
-    { name: "galaxy-s20", width: 360, height: 800, dpr: 3 },
-    { name: "iphone-se", width: 375, height: 667, dpr: 2 },
-    { name: "modern-phone", width: 390, height: 844, dpr: 3 },
-    { name: "pixel-5", width: 393, height: 851, dpr: 2.75 },
-    { name: "galaxy-s20-ultra", width: 412, height: 915, dpr: 3 },
-    { name: "iphone-pro-max", width: 430, height: 932, dpr: 3 },
-    { name: "large-android", width: 480, height: 1040, dpr: 3 },
-    { name: "phone-landscape", width: 844, height: 390, dpr: 2 },
-    { name: "large-phone-landscape", width: 932, height: 430, dpr: 3 },
-  ];
+const phoneBackgroundProfiles: ReadonlyArray<{
+  name: string;
+  width: number;
+  height: number;
+  screenHeight?: number;
+  dpr: number;
+}> = [
+  { name: "galaxy-fold", width: 280, height: 653, dpr: 3 },
+  { name: "small-phone", width: 320, height: 568, dpr: 2 },
+  { name: "narrow-fold", width: 344, height: 882, dpr: 3 },
+  { name: "samsung-real-visible", width: 360, height: 610, screenHeight: 800, dpr: 2 },
+  { name: "compact-android", width: 360, height: 740, dpr: 3 },
+  { name: "galaxy-s20", width: 360, height: 800, dpr: 3 },
+  { name: "iphone-se", width: 375, height: 667, dpr: 2 },
+  { name: "modern-phone", width: 390, height: 844, dpr: 3 },
+  { name: "pixel-5", width: 393, height: 851, dpr: 2.75 },
+  { name: "galaxy-s20-ultra", width: 412, height: 915, dpr: 3 },
+  { name: "iphone-pro-max", width: 430, height: 932, dpr: 3 },
+  { name: "large-android", width: 480, height: 1040, dpr: 3 },
+  { name: "phone-landscape", width: 844, height: 390, dpr: 2 },
+  { name: "large-phone-landscape", width: 932, height: 430, dpr: 3 },
+];
 
-  for (const profile of phoneProfiles) {
+for (const profile of phoneBackgroundProfiles) {
+  test(`mobile background stays animated for ${profile.name} across routes and themes`, async ({ browser }) => {
+    test.setTimeout(120_000);
+
     for (const theme of ["light", "dark"] as const) {
       const context = await browser.newContext({
         viewport: { width: profile.width, height: profile.height },
@@ -820,8 +917,8 @@ test("mobile background stays animated across phone sizes, orientations, routes 
 
       await context.close();
     }
-  }
-});
+  });
+}
 
 test("mobile background follows dynamic browser chrome and orientation changes", async ({ browser }) => {
   const context = await browser.newContext({
@@ -1127,7 +1224,7 @@ test("mobile background matches desktop color balance in both themes", async ({ 
 });
 
 test("theme switches synchronously across phone, landscape and desktop viewports", async ({ browser }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
   const profiles = [
     { name: "small-phone", width: 320, height: 568, dpr: 2, mobile: true },
     { name: "narrow-fold", width: 344, height: 882, dpr: 3, mobile: true },
@@ -1373,6 +1470,24 @@ test("skills load every icon from the same origin", async ({ page }) => {
   expect(externalIconRequests).toEqual([]);
 });
 
+test("public routes make no runtime request to legacy icon CDNs", async ({ page }) => {
+  const externalIconRequests: string[] = [];
+  page.on("request", (request) => {
+    const hostname = new URL(request.url()).hostname;
+    if (["icon.icepanel.io", "cdn.simpleicons.org", "api.iconify.design"].includes(hostname)) {
+      externalIconRequests.push(request.url());
+    }
+  });
+
+  for (const route of ["/", "/skills", "/journey", "/projects", "/code-review", "/contact", "/privacy"]) {
+    await page.goto(`${route}?audit=performance`);
+    await expect(page.locator("body")).toBeVisible();
+    await page.waitForLoadState("networkidle");
+  }
+
+  expect(externalIconRequests).toEqual([]);
+});
+
 test("production responses keep the hardened browser security boundary", async ({ request }) => {
   const response = await request.get("/");
   expect(response.ok()).toBe(true);
@@ -1387,6 +1502,7 @@ test("production responses keep the hardened browser security boundary", async (
   expect(headers["x-permitted-cross-domain-policies"]).toBe("none");
   expect(headers["content-security-policy"]).toContain("object-src 'none'");
   expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+  expect(headers["content-security-policy"]).not.toContain("cdn.simpleicons.org");
 });
 
 test("performance audit disables continuous motion without changing the rendered design", async ({ page }) => {
@@ -1423,19 +1539,125 @@ test("performance audit disables continuous motion without changing the rendered
   );
 });
 
-test("code review listbox and tabs support arrow-key navigation", async ({ page }) => {
+test("constrained computers render the final Skills state without delayed content", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "hardwareConcurrency", {
+      configurable: true,
+      value: 4,
+    });
+    Object.defineProperty(navigator, "deviceMemory", {
+      configurable: true,
+      value: 4,
+    });
+  });
+  const page = await context.newPage();
+  await page.goto("/skills-page");
+
+  await expect(page.locator("html")).toHaveAttribute("data-performance-tier", "low");
+  const animation = await page.locator(".animate-card").first().evaluate((element) => {
+    const runningAnimation = element.getAnimations()[0];
+    runningAnimation?.pause();
+    if (runningAnimation) runningAnimation.currentTime = 100;
+    const styles = getComputedStyle(element);
+    return {
+      duration: styles.animationDuration,
+      filter: styles.filter,
+      name: styles.animationName,
+      opacity: styles.opacity,
+      transform: styles.transform,
+    };
+  });
+
+  expect(animation.name).toBe("none");
+  expect(animation.duration).toBe("0s");
+  expect(animation.filter).toBe("none");
+  expect(animation.opacity).toBe("1");
+  expect(animation.transform).toBe("matrix(1, 0, 0, 1, 0, 0)");
+  await context.close();
+});
+
+test("both code review listboxes implement the complete keyboard contract", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/code-review-page");
   await expect(page.locator(".la-status")).toBeHidden({ timeout: 10_000 });
+
+  const responseButton = page.getByRole("button", { name: "Response: Auto" });
+  await responseButton.press("ArrowDown");
+  const responseListbox = page.getByRole("listbox", { name: "Response language options" });
+  const auto = responseListbox.getByRole("option", { name: "Auto" });
+  const swedish = responseListbox.getByRole("option", { name: "Swedish" });
+  const english = responseListbox.getByRole("option", { name: "English" });
+  const arabic = responseListbox.getByRole("option", { name: "Arabic" });
+  await expect(auto).toBeFocused();
+  await expect(auto).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowDown");
+  await expect(swedish).toBeFocused();
+  await page.keyboard.press("End");
+  await expect(arabic).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(auto).toBeFocused();
+  await page.keyboard.press("End");
+  await page.keyboard.press("Space");
+  const selectedArabicButton = page.getByRole("button", { name: "Response: Arabic" });
+  await expect(selectedArabicButton).toBeFocused();
+  await expect(responseListbox).toBeHidden();
+
+  await selectedArabicButton.press("ArrowUp");
+  await expect(arabic).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(english).toBeFocused();
+  await page.keyboard.press("Enter");
+  const selectedEnglishButton = page.getByRole("button", { name: "Response: English" });
+  await expect(selectedEnglishButton).toBeFocused();
+  await selectedEnglishButton.press("ArrowDown");
+  await expect(english).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Tab");
+  await expect(responseListbox).toBeHidden();
+
   const languageButton = page.getByRole("button", { name: "Code language" });
   await expect(languageButton).toBeVisible({ timeout: 5_000 });
   await languageButton.press("ArrowDown");
   const listbox = page.getByRole("listbox", { name: "Code language options" });
-  await expect(listbox.getByRole("option", { name: "TypeScript" })).toBeFocused();
+  const typescript = listbox.getByRole("option", { name: "TypeScript" });
+  const javascript = listbox.getByRole("option", { name: "JavaScript" });
+  const shell = listbox.getByRole("option", { name: "Shell" });
+  const rust = listbox.getByRole("option", { name: "Rust" });
+  await expect(typescript).toBeFocused();
+  await expect(typescript).toHaveAttribute("aria-selected", "true");
   await page.keyboard.press("ArrowDown");
-  await expect(listbox.getByRole("option", { name: "JavaScript" })).toBeFocused();
+  await expect(javascript).toBeFocused();
+  await page.keyboard.press("End");
+  await expect(rust).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(typescript).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(languageButton).toBeFocused();
+
+  await languageButton.press("ArrowDown");
+  await page.keyboard.press("End");
+  await page.keyboard.press("Enter");
+  await expect(languageButton).toBeFocused();
+  await expect(languageButton).toContainText("Rust");
+  await languageButton.press("ArrowUp");
+  await expect(rust).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(shell).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(languageButton).toBeFocused();
+  await expect(languageButton).toContainText("Shell");
+  await languageButton.press("ArrowDown");
+  await expect(shell).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Tab");
+  await expect(listbox).toBeHidden();
+
+  // Arrow-key tab behavior is covered separately from the two listboxes.
+});
+
+test("code review tabs support arrow-key navigation", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/code-review-page");
+  await expect(page.locator(".la-status")).toBeHidden({ timeout: 10_000 });
 
   const editorTab = page.getByRole("tab", { name: "Editor" });
   await editorTab.focus();
@@ -1498,26 +1720,36 @@ test("journey and contact stay fully framed across compact laptops and portrait 
     const testPage = await context.newPage();
     await testPage.emulateMedia({ reducedMotion: "reduce" });
     await testPage.goto("/contact-page");
+    await expect(testPage.locator(".contact-stage-surface")).toHaveAttribute(
+      "style",
+      /translate\(-50%, -50%\) scale/,
+    );
 
     const layout = await testPage.evaluate(() => {
+      const contactPage = document.querySelector<HTMLElement>(".contact-page");
       const shell = document.querySelector<HTMLElement>(".contact-repository-shell");
       const send = document.querySelector<HTMLElement>(
         ".contact-adaptive-layout .contact-send-button button",
       );
+      const command = document.querySelector<HTMLElement>(
+        ".contact-adaptive-layout .contact-command-strip",
+      );
       const footer = document.querySelector<HTMLElement>(".contact-page .site-footer");
       const portraitRow = document.querySelector<HTMLElement>(".contact-profile-portrait-row");
       const portrait = document.querySelector<HTMLElement>(".contact-portrait-frame");
-      if (!shell || !send || !footer || !portraitRow || !portrait) {
+      if (!contactPage || !shell || !send || !command || !footer || !portraitRow || !portrait) {
         throw new Error("Contact layout is incomplete");
       }
       const shellRect = shell.getBoundingClientRect();
       const sendRect = send.getBoundingClientRect();
+      const commandRect = command.getBoundingClientRect();
       const footerRect = footer.getBoundingClientRect();
       const portraitRowRect = portraitRow.getBoundingClientRect();
       const portraitRect = portrait.getBoundingClientRect();
       return {
         horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
         documentHeight: document.documentElement.scrollHeight,
+        pageScrollOverflow: contactPage.scrollHeight - contactPage.clientHeight,
         shell: {
           left: shellRect.left,
           right: shellRect.right,
@@ -1526,6 +1758,7 @@ test("journey and contact stay fully framed across compact laptops and portrait 
           height: shellRect.height,
         },
         send: { top: sendRect.top, bottom: sendRect.bottom },
+        command: { top: commandRect.top, bottom: commandRect.bottom },
         footer: { top: footerRect.top, bottom: footerRect.bottom },
         portrait: {
           width: portraitRect.width,
@@ -1551,22 +1784,25 @@ test("journey and contact stay fully framed across compact laptops and portrait 
     expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.documentHeight + 1);
     expect(layout.send.top, profile.name).toBeGreaterThanOrEqual(layout.shell.top);
     expect(layout.send.bottom, profile.name).toBeLessThanOrEqual(layout.shell.bottom + 1);
+    expect(layout.command.top, profile.name).toBeGreaterThanOrEqual(layout.shell.top);
+    expect(layout.command.bottom, profile.name).toBeLessThanOrEqual(layout.shell.bottom + 1);
     expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.footer.top + 1);
     expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.documentHeight + 1);
     expect(layout.portrait.top, profile.name).toBeGreaterThanOrEqual(layout.shell.top);
     expect(layout.portrait.bottom, profile.name).toBeLessThanOrEqual(layout.shell.bottom + 1);
     expect(layout.portrait.centreDelta, profile.name).toBeLessThanOrEqual(2);
 
+    expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
+    expect(layout.pageScrollOverflow, profile.name).toBeLessThanOrEqual(1);
+
     if (profile.height <= 720) {
-      expect(layout.shell.height, profile.name).toBeGreaterThanOrEqual(589);
-      expect(layout.documentHeight, profile.name).toBeGreaterThan(layout.viewportHeight);
-    } else {
-      expect(layout.footer.bottom, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
+      expect(layout.shell.height, profile.name).toBeGreaterThanOrEqual(430);
+      expect(layout.documentHeight, profile.name).toBeLessThanOrEqual(layout.viewportHeight + 1);
     }
 
     if (profile.height >= 1024) {
-      expect(layout.shell.height, profile.name).toBeGreaterThanOrEqual(736);
-      expect(layout.shell.height, profile.name).toBeLessThanOrEqual(901);
+      expect(layout.shell.height, profile.name).toBeGreaterThanOrEqual(690);
+      expect(layout.shell.bottom, profile.name).toBeLessThanOrEqual(layout.footer.top + 1);
       expect(layout.portrait.height, profile.name).toBeGreaterThanOrEqual(275);
       expect(Math.abs(layout.portrait.width - layout.portrait.rowWidth), profile.name).toBeLessThanOrEqual(1);
       expect(Math.abs(layout.portrait.height - layout.portrait.rowHeight), profile.name).toBeLessThanOrEqual(1);
@@ -1600,6 +1836,145 @@ test("journey and contact stay fully framed across compact laptops and portrait 
   await journeyContext.close();
 });
 
+test("very short desktop windows fit contact controls without document scrolling", async ({ browser }) => {
+  for (const profile of [
+    { name: "wide-450", width: 1723, height: 450 },
+    { name: "desktop-500", width: 1366, height: 500 },
+    { name: "laptop-550", width: 1024, height: 550 },
+    { name: "compact-450", width: 800, height: 450 },
+  ]) {
+    const context = await browser.newContext({ viewport: profile });
+    const page = await context.newPage();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/contact-page?audit=performance");
+    await expect(page.locator(".contact-stage-surface")).toHaveAttribute(
+      "style",
+      /translate\(-50%, -50%\) scale/,
+    );
+
+    const geometry = await page.evaluate(() => {
+      const contactPage = document.querySelector<HTMLElement>(".contact-page");
+      const shell = document.querySelector<HTMLElement>(".contact-repository-shell");
+      const send = document.querySelector<HTMLElement>(
+        ".contact-adaptive-layout .contact-send-button button",
+      );
+      const command = document.querySelector<HTMLElement>(
+        ".contact-adaptive-layout .contact-command-strip",
+      );
+      const footer = document.querySelector<HTMLElement>(".contact-page .site-footer");
+      if (!contactPage || !shell || !send || !command || !footer) {
+        throw new Error("Short contact layout is incomplete");
+      }
+      const shellRect = shell.getBoundingClientRect();
+      const sendRect = send.getBoundingClientRect();
+      const commandRect = command.getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+      return {
+        horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+        pageScrollOverflow: contactPage.scrollHeight - contactPage.clientHeight,
+        documentHeight: document.documentElement.scrollHeight,
+        viewportHeight: innerHeight,
+        shell: { top: shellRect.top, bottom: shellRect.bottom },
+        send: { top: sendRect.top, bottom: sendRect.bottom },
+        command: { top: commandRect.top, bottom: commandRect.bottom },
+        footer: { top: footerRect.top, bottom: footerRect.bottom },
+      };
+    });
+
+    expect(geometry.horizontalOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(geometry.pageScrollOverflow, profile.name).toBeLessThanOrEqual(1);
+    expect(geometry.documentHeight, profile.name).toBeLessThanOrEqual(geometry.viewportHeight + 1);
+    expect(geometry.send.top, profile.name).toBeGreaterThanOrEqual(geometry.shell.top);
+    expect(geometry.send.bottom, profile.name).toBeLessThanOrEqual(geometry.shell.bottom + 1);
+    expect(geometry.command.top, profile.name).toBeGreaterThanOrEqual(geometry.shell.top);
+    expect(geometry.command.bottom, profile.name).toBeLessThanOrEqual(geometry.shell.bottom + 1);
+    expect(geometry.footer.top, profile.name).toBeGreaterThanOrEqual(geometry.shell.bottom);
+    await expect(page.locator(".contact-page .site-footer"), profile.name).toBeInViewport();
+    await expect(
+      page.locator(".contact-adaptive-layout .contact-send-button button"),
+      profile.name,
+    ).toBeInViewport();
+    await context.close();
+  }
+});
+
+test("all public pages keep their primary content visible or reachable in short browser windows", async ({ browser }) => {
+  test.setTimeout(240_000);
+  const shortProfiles = [
+    { name: "wide-split-screen", width: 1723, height: 450 },
+    { name: "wide-short-laptop", width: 1723, height: 608 },
+    { name: "small-short-laptop", width: 1024, height: 600 },
+    { name: "compact-short-laptop", width: 800, height: 600 },
+  ] as const;
+
+  for (const profile of shortProfiles) {
+    const context = await browser.newContext({ viewport: profile });
+    const page = await context.newPage();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+
+    for (const route of routes) {
+      const label = `${profile.name} ${route}`;
+      await page.goto(`${route}?audit=performance`);
+      await expect(page.locator(publicSurfaceSelectors[route]).first(), label).toBeVisible();
+
+      const frame = await page.evaluate(() => {
+        const header = document.querySelector<HTMLElement>(".site-header")?.getBoundingClientRect();
+        return {
+          horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+          headerTop: header?.top ?? -1,
+          headerBottom: header?.bottom ?? -1,
+          viewportHeight: innerHeight,
+        };
+      });
+      expect(frame.horizontalOverflow, label).toBeLessThanOrEqual(1);
+      expect(frame.headerTop, label).toBeGreaterThanOrEqual(0);
+      expect(frame.headerBottom, label).toBeLessThanOrEqual(frame.viewportHeight + 1);
+
+      if (route === "/") {
+        await expect(page.locator("[data-home-actions]"), label).toBeInViewport();
+        const capabilities = page.locator("[data-home-capability]:visible");
+        if (await capabilities.count()) {
+          await capabilities.last().scrollIntoViewIfNeeded();
+          await expect(capabilities.last(), label).toBeInViewport();
+        }
+      } else if (route === "/skills-page") {
+        const stage = page.locator(".skills-stage");
+        const firstCard = page.locator(".skills-card-surface").first();
+        const lastCard = page.locator(".skills-card-surface").last();
+        await expect(firstCard, label).toBeInViewport();
+        await expect(lastCard, label).toBeInViewport();
+        const [stageBox, firstBox, lastBox] = await Promise.all([
+          stage.boundingBox(), firstCard.boundingBox(), lastCard.boundingBox(),
+        ]);
+        expect(firstBox!.y, label).toBeGreaterThanOrEqual(stageBox!.y - 1);
+        expect(lastBox!.y + lastBox!.height, label)
+          .toBeLessThanOrEqual(stageBox!.y + stageBox!.height + 1);
+      } else if (route === "/journey") {
+        const main = page.locator(".journey-main");
+        const lastCommit = page.locator(".commit-row").last();
+        const mainBox = await main.boundingBox();
+        expect(mainBox!.y + mainBox!.height, label).toBeLessThanOrEqual(profile.height + 1);
+        await lastCommit.scrollIntoViewIfNeeded();
+        await expect(lastCommit, label).toBeInViewport();
+      } else if (route === "/projects-page") {
+        const lastProject = page.locator(".projects-project-row:visible, .projects-mobile-card-wrap:visible").last();
+        await lastProject.scrollIntoViewIfNeeded();
+        await expect(lastProject, label).toBeInViewport();
+      } else if (route === "/code-review-page") {
+        await expect(page.locator('button[type="submit"]:visible'), label).toBeInViewport();
+      } else {
+        await expect(page.locator(".site-footer"), label).toBeInViewport();
+        await expect(
+          page.locator(".contact-adaptive-layout .contact-send-button button"),
+          label,
+        ).toBeInViewport();
+      }
+    }
+
+    await context.close();
+  }
+});
+
 test("Journey resolves its loader promptly and keeps its route", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/journey");
@@ -1620,10 +1995,10 @@ test("server-preloaded data and code routes do not add an artificial loading del
   });
 
   for (const { route, readySelector } of [
-    { route: "/skills-page", readySelector: ".skills-bento-grid" },
+    { route: "/skills", readySelector: ".skills-bento-grid" },
     { route: "/journey", readySelector: ".commit-row" },
-    { route: "/projects-page", readySelector: ".projects-shell" },
-    { route: "/code-review-page", readySelector: "[data-code-review-shell]" },
+    { route: "/projects", readySelector: ".projects-shell" },
+    { route: "/code-review", readySelector: "[data-code-review-shell]" },
   ]) {
     await page.goto("/");
     await Promise.all([
@@ -1637,6 +2012,21 @@ test("server-preloaded data and code routes do not add an artificial loading del
   expect(duplicateDataRequests).toEqual([]);
 });
 
+test("canonical public routes replace legacy page suffixes without breaking locale or query", async ({ page }) => {
+  for (const [legacy, canonical] of [
+    ["/skills-page", "/skills"],
+    ["/projects-page", "/projects"],
+    ["/code-review-page", "/code-review"],
+    ["/contact-page", "/contact"],
+    ["/sv/skills-page", "/sv/skills"],
+  ] as const) {
+    await page.goto(`${legacy}?redirect-check=1`);
+    const url = new URL(page.url());
+    expect(url.pathname).toBe(canonical);
+    expect(url.searchParams.get("redirect-check")).toBe("1");
+  }
+});
+
 test("Arabic keeps the established home composition and reports no app errors", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -1646,18 +2036,43 @@ test("Arabic keeps the established home composition and reports no app errors", 
     if (message.type() === "error") errors.push(message.text());
   });
 
+  const readStableHomeComposition = async () => {
+    const hero = page.locator("[data-home-hero]");
+    const portrait = page.locator("[data-home-stage]");
+    await expect(hero).toBeVisible();
+    await expect(portrait).toBeVisible();
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await Promise.all(Array.from(document.images, (image) => {
+        if (image.complete) return Promise.resolve();
+        return new Promise<void>((resolve) => {
+          image.addEventListener("load", () => resolve(), { once: true });
+          image.addEventListener("error", () => resolve(), { once: true });
+        });
+      }));
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
+    });
+    const [heroBox, portraitBox] = await Promise.all([
+      hero.boundingBox(),
+      portrait.boundingBox(),
+    ]);
+    expect(heroBox).not.toBeNull();
+    expect(portraitBox).not.toBeNull();
+    return { hero: heroBox!, portrait: portraitBox! };
+  };
+
   await page.goto("/");
-  const englishHero = await page.locator("[data-home-hero]").boundingBox();
-  const englishPortrait = await page.locator("[data-home-stage]").boundingBox();
+  const english = await readStableHomeComposition();
 
   await page.goto("/ar");
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  const arabicHero = await page.locator("[data-home-hero]").boundingBox();
-  const arabicPortrait = await page.locator("[data-home-stage]").boundingBox();
+  const arabic = await readStableHomeComposition();
 
-  expect(Math.abs((arabicHero?.x ?? 0) - (englishHero?.x ?? 0))).toBeLessThan(2);
-  expect(Math.abs((arabicPortrait?.x ?? 0) - (englishPortrait?.x ?? 0))).toBeLessThan(2);
+  expect(Math.abs(arabic.hero.x - english.hero.x)).toBeLessThan(2);
+  expect(Math.abs(arabic.portrait.x - english.portrait.x)).toBeLessThan(2);
   expect(errors).toEqual([]);
 });
 

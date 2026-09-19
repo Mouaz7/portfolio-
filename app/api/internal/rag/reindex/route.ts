@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { refreshRagIndex } from "@/lib/ai/rag";
 import { hasValidBearerSecret } from "@/lib/security/request-protection";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,7 +16,9 @@ async function run(req: Request) {
     const result = await refreshRagIndex();
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
-    console.error("RAG reindex failed:", error);
+    logServerError("api.internal.rag_reindex.failed", error, {
+      route: "/api/internal/rag/reindex",
+    });
     return NextResponse.json({ ok: false, error: "Reindex failed" }, { status: 500 });
   }
 }

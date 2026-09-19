@@ -9,6 +9,13 @@ import {
   type Locale,
 } from "@/lib/i18n/config";
 
+const LEGACY_PUBLIC_ROUTES = new Map([
+  ["/skills-page", "/skills"],
+  ["/projects-page", "/projects"],
+  ["/code-review-page", "/code-review"],
+  ["/contact-page", "/contact"],
+]);
+
 function publicSupabaseOrigins() {
   const value = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
   if (!value) return { https: "", wss: "" };
@@ -28,7 +35,7 @@ export function middleware(request: NextRequest) {
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://challenges.cloudflare.com${isDevelopment ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: https://cdn.simpleicons.org${supabase.https ? ` ${supabase.https}` : ""}`,
+    `img-src 'self' data: blob:${supabase.https ? ` ${supabase.https}` : ""}`,
     "font-src 'self' data:",
     `connect-src 'self' https://challenges.cloudflare.com https://vitals.vercel-insights.com${supabase.https ? ` ${supabase.https} ${supabase.wss}` : ""}`,
     "frame-src https://challenges.cloudflare.com",
@@ -48,6 +55,19 @@ export function middleware(request: NextRequest) {
   const firstSegment = pathname.split("/").filter(Boolean)[0];
   const pathLocale = isLocale(firstSegment) ? firstSegment : null;
   const inheritedLocale = request.headers.get("x-locale");
+
+  const unprefixedPathname = stripLocaleFromPathname(pathname);
+  const canonicalPathname = LEGACY_PUBLIC_ROUTES.get(unprefixedPathname);
+  if (canonicalPathname) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = localizedPath(
+      canonicalPathname,
+      pathLocale ?? defaultLocale,
+    );
+    const redirect = NextResponse.redirect(redirectUrl, 308);
+    redirect.headers.set("Content-Security-Policy", contentSecurityPolicy);
+    return redirect;
+  }
 
   // English remains canonical without a prefix, so /en/... never creates
   // duplicate indexable URLs.

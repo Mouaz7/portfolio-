@@ -126,10 +126,14 @@ describe("/api/journey", () => {
 
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({ error: "db" });
-    expect(consoleError).toHaveBeenCalledWith(
-      "[/api/journey] db error:",
-      { message: "database unavailable" },
-    );
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    const output = String(consoleError.mock.calls[0]?.[0]);
+    expect(JSON.parse(output)).toMatchObject({
+      code: "unknown_error",
+      event: "api.journey.database_failed",
+      route: "/api/journey",
+    });
+    expect(output).not.toContain("database unavailable");
     consoleError.mockRestore();
   });
 

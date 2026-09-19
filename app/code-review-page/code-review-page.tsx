@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { ChatCircleTextIcon } from "@phosphor-icons/react/dist/csr/ChatCircleText";
 import { CaretDownIcon } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { CodeIcon } from "@phosphor-icons/react/dist/csr/Code";
@@ -24,6 +25,8 @@ import { parseReviewResponse, type ReviewResponse } from "@/lib/ai/review-parser
 import { fetchWithTurnstile } from "@/lib/security/turnstile-client";
 import styles from "../code-review-page.module.css";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { localizedPath } from "@/lib/i18n/config";
+import { useRouteEntrance } from "@/components/navigation/NavigationExperienceProvider";
 
 type ReviewFocus = "review" | "optimize" | "security";
 type MobilePane = "editor" | "result" | "chat";
@@ -92,7 +95,8 @@ async function readApiError(response: Response, fallback: string): Promise<strin
 }
 
 export default function CodeReviewPage() {
-  const { dictionary, format } = useI18n();
+  const { dictionary, format, locale } = useI18n();
+  const routeEntrance = useRouteEntrance();
   const copy = dictionary.codeReview;
   const [listboxFocusTarget, setListboxFocusTarget] = useState<string | null>(null);
   const languageLabels: Record<LanguagePreference, string> = {
@@ -241,9 +245,15 @@ export default function CodeReviewPage() {
   }
 
   return (
-    <div className={styles.root} data-page="code-review">
+    <div
+      className={styles.root}
+      data-page="code-review"
+      data-viewport-page="code-review"
+      data-route-entrance={routeEntrance}
+      data-viewport-profile="fit"
+    >
       <Header />
-      <main className={styles.main}>
+      <main className={styles.main} data-viewport-content>
         <div className={styles.shell} data-code-review-shell>
           <div className={styles.toolbar}>
             <div className={styles.pageTitle}>
@@ -296,6 +306,7 @@ export default function CodeReviewPage() {
                       type="button"
                       role="option"
                       aria-selected={language === value}
+                      tabIndex={language === value ? 0 : -1}
                       className={styles.selectOption}
                       data-active={language === value}
                       onKeyDown={(event) => handleOptionKey(event, () => setLanguageOpen(false), "response-language-button")}
@@ -405,9 +416,20 @@ export default function CodeReviewPage() {
                 id="code-review-editor"
                 value={code}
                 aria-label={copy.snippet}
+                aria-describedby="code-review-data-notice"
                 placeholder={copy.placeholder}
                 onChange={(event) => setCode(event.target.value)}
               />
+
+              <p id="code-review-data-notice" className={styles.dataNotice}>
+                <WarningCircleIcon aria-hidden="true" />
+                <span>
+                  {copy.externalProcessing} {copy.secretWarning}{" "}
+                  <Link href={localizedPath("/privacy", locale)}>
+                    {copy.privacyLink}
+                  </Link>
+                </span>
+              </p>
 
               <div className={styles.controls}>
                 <div
@@ -455,6 +477,7 @@ export default function CodeReviewPage() {
                           type="button"
                           role="option"
                           aria-selected={codeLanguage === value}
+                          tabIndex={codeLanguage === value ? 0 : -1}
                           className={styles.selectOption}
                           data-active={codeLanguage === value}
                           onKeyDown={(event) => handleOptionKey(event, () => setCodeLanguageOpen(false), "code-language-button")}

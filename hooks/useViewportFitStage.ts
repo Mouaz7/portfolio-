@@ -1,6 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState, type RefObject } from "react";
+
+const useBrowserLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+export type ViewportLayoutProfile = "fit" | "compact" | "accessible-overflow";
+
+export function selectViewportLayoutProfile(
+  fitScale: number,
+  availableWidth: number,
+  availableHeight: number,
+): ViewportLayoutProfile {
+  if (availableWidth <= 540 || availableHeight <= 360 || fitScale < 0.58) {
+    return "accessible-overflow";
+  }
+  if (fitScale < 0.9 || availableWidth < 1200 || availableHeight < 700) {
+    return "compact";
+  }
+  return "fit";
+}
 
 export function computeViewportFitScale(
   availableWidth: number,
@@ -37,6 +55,7 @@ export function computeFluidStageWidth(
 type Options = {
   baseWidth: number;
   baseHeight: number;
+  containerRef?: RefObject<HTMLElement | null>;
   enabled?: boolean;
   headerSelector?: string;
   minScale?: number;
@@ -49,6 +68,7 @@ type Options = {
 export function useViewportFitStage({
   baseWidth,
   baseHeight,
+  containerRef,
   enabled = true,
   headerSelector = "header",
   minScale = 0,
@@ -58,36 +78,68 @@ export function useViewportFitStage({
   transformOrigin = "50% 50%",
 }: Options) {
   const [scale, setScale] = useState(1);
+  const [fitScale, setFitScale] = useState(1);
   const [availableWidth, setAvailableWidth] = useState(0);
   const [availableHeight, setAvailableHeight] = useState(0);
+  const [profile, setProfile] = useState<ViewportLayoutProfile>("fit");
 
-  useEffect(() => {
+  useBrowserLayoutEffect(() => {
     if (!enabled) {
       setScale(1);
+      setFitScale(1);
       setAvailableWidth(0);
       setAvailableHeight(0);
+      setProfile("fit");
       return;
     }
 
     let frameId: number | null = null;
+    let resizeObserver: ResizeObserver | null = null;
     const update = () => {
       frameId = null;
-      const header = typeof document !== "undefined" ? document.querySelector(headerSelector) : null;
-      const headerHeight = header ? (header as HTMLElement).offsetHeight : 0;
-      const nextAvailableWidth = Math.max(0, window.innerWidth - padX * 2);
-      const nextAvailableHeight = Math.max(0, window.innerHeight - headerHeight - padY * 2);
+      const container = containerRef?.current;
+      let nextAvailableWidth: number;
+      let nextAvailableHeight: number;
+
+      if (container) {
+        const styles = window.getComputedStyle(container);
+        const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+        const verticalPadding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+        nextAvailableWidth = Math.max(0, container.clientWidth - horizontalPadding - padX * 2);
+        nextAvailableHeight = Math.max(0, container.clientHeight - verticalPadding - padY * 2);
+      } else {
+        const header = typeof document !== "undefined" ? document.querySelector(headerSelector) : null;
+        // `offsetHeight` excludes the header's top margin. Using its visual
+        // bottom edge keeps fitted stages inside the viewport on short browser
+        // windows as well as at browser/OS zoom levels.
+        const headerHeight = header
+          ? Math.max(
+            (header as HTMLElement).offsetHeight,
+            (header as HTMLElement).getBoundingClientRect().bottom,
+          )
+          : 0;
+        const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+        const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+        nextAvailableWidth = Math.max(0, viewportWidth - padX * 2);
+        nextAvailableHeight = Math.max(0, viewportHeight - headerHeight - padY * 2);
+      }
+
+      const nextFitScale = computeViewportFitScale(
+        nextAvailableWidth,
+        nextAvailableHeight,
+        baseWidth,
+        baseHeight,
+        0,
+        maxScale,
+      );
+      const nextScale = Math.max(minScale, nextFitScale);
 
       setAvailableWidth(nextAvailableWidth);
       setAvailableHeight(nextAvailableHeight);
-      setScale(
-        computeViewportFitScale(
-          nextAvailableWidth,
-          nextAvailableHeight,
-          baseWidth,
-          baseHeight,
-          minScale,
-          maxScale
-        )
+      setFitScale(nextFitScale);
+      setScale(nextScale);
+      setProfile(
+        selectViewportLayoutProfile(nextFitScale, nextAvailableWidth, nextAvailableHeight),
       );
     };
 
@@ -96,21 +148,33 @@ export function useViewportFitStage({
       frameId = window.requestAnimationFrame(update);
     };
 
-    scheduleUpdate();
+    // The first measurement is layout-critical. Run it synchronously in the
+    // browser layout effect so a slow device never paints the unscaled fallback
+    // stage for one frame. Later resize bursts remain animation-frame batched.
+    update();
     window.addEventListener("resize", scheduleUpdate);
     window.addEventListener("orientationchange", scheduleUpdate);
     window.visualViewport?.addEventListener("resize", scheduleUpdate);
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(scheduleUpdate);
+      if (containerRef?.current) resizeObserver.observe(containerRef.current);
+      const header = document.querySelector(headerSelector);
+      if (header) resizeObserver.observe(header);
+    }
 
     return () => {
       window.removeEventListener("resize", scheduleUpdate);
       window.removeEventListener("orientationchange", scheduleUpdate);
       window.visualViewport?.removeEventListener("resize", scheduleUpdate);
+      resizeObserver?.disconnect();
       if (frameId !== null) window.cancelAnimationFrame(frameId);
     };
-  }, [baseWidth, baseHeight, enabled, headerSelector, minScale, maxScale, padX, padY]);
+  }, [baseWidth, baseHeight, containerRef, enabled, headerSelector, minScale, maxScale, padX, padY]);
 
   return {
     scale,
+    fitScale,
+    profile,
     availableWidth,
     availableHeight,
     stageStyle: {

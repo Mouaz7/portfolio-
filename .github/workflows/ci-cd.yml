@@ -17,6 +17,41 @@ env:
   NODE_VERSION: "22.x"
 
 jobs:
+  database:
+    name: Isolated migrations and pgTAP
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
+        with:
+          version: 2.111.0
+
+      - name: Apply all migrations and test database policies
+        run: |
+          supabase start
+          supabase db reset
+          # Hosted Docker cleanup can occasionally fail after tests pass.
+          # A genuine test failure still fails after the second attempt.
+          for attempt in 1 2; do
+            if supabase test db --local; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 2 ]; then
+              exit 1
+            fi
+
+            echo "Supabase test runner cleanup failed; retrying once..."
+            sleep 5
+          done
+
   quality:
     name: Security, tests, build and design lock
     runs-on: ubuntu-latest
@@ -26,6 +61,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node.js
@@ -42,6 +78,15 @@ jobs:
 
       - name: Audit complete dependency tree
         run: npm audit --audit-level=high
+
+      - name: Scan the complete Git history with Gitleaks
+        run: npm run test:secrets:gitleaks
+
+      - name: Scan project-specific history patterns
+        run: npm run test:secrets
+
+      - name: Inventory dependency licenses
+        run: npm run test:licenses
 
       - name: Lint, types, dead code and design lock
         run: |
@@ -65,25 +110,10 @@ jobs:
         with:
           version: 2.111.0
 
-      - name: Start isolated test database and run SQL policy tests
+      - name: Start isolated test database for application tests
         run: |
           supabase start
           supabase db reset
-          # Docker cleanup on hosted runners can occasionally return exit 125
-          # after pgTAP has already passed. Retry once; a real test failure
-          # still exits non-zero after the second attempt.
-          for attempt in 1 2; do
-            if supabase test db --local; then
-              exit 0
-            fi
-
-            if [ "$attempt" -eq 2 ]; then
-              exit 1
-            fi
-
-            echo "Supabase test runner cleanup failed; retrying once..."
-            sleep 5
-          done
 
       - name: Export isolated CI runtime configuration
         shell: bash

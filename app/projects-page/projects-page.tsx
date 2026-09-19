@@ -14,6 +14,7 @@ import { useMediaQuery, usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { localeTag } from "@/lib/i18n/config";
 import type { RepositoryStats } from "@/lib/projects/repository-stats.server";
+import { useRouteEntrance } from "@/components/navigation/NavigationExperienceProvider";
 
 const PROJECT_CATEGORY_TONES: Record<
   ProjectCategory,
@@ -80,6 +81,7 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
   initialRepositoryStats,
 }) => {
   const { locale, dictionary, format } = useI18n();
+  const routeEntrance = useRouteEntrance();
   const copy = dictionary.projects;
   const prefersReducedMotion = usePrefersReducedMotion();
   const hasInitialProjects = initialProjects !== undefined;
@@ -297,11 +299,19 @@ const ProjectsPageClient: React.FC<ProjectsPageProps> = ({
   };
 
   return (
-    <div className="flex flex-col overflow-hidden h-screen">
+    <div
+      className="flex h-dvh min-h-0 flex-col overflow-hidden"
+      data-viewport-page="projects"
+      data-route-entrance={routeEntrance}
+      data-viewport-profile={isMobileLayout ? "accessible-overflow" : "fit"}
+    >
       <Header />
 
       {/* Background is the shared global WebGL nebula (see app/layout.tsx) */}
-      <main className="projects-main relative flex-1 min-h-0 overflow-hidden px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 flex flex-col">
+      <main
+        className="projects-main relative flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-6 sm:px-6 md:px-8 md:py-8 lg:px-12"
+        data-viewport-content
+      >
         <h1 className="sr-only">{copy.title}</h1>
         {/* Content - NO SCROLLING */}
         <div className="projects-stage relative z-10 flex flex-col h-full max-w-[1800px] mx-auto w-full overflow-hidden">

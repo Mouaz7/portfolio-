@@ -35,7 +35,7 @@ function safeIconUrl(value: string): string | null {
     const url = new URL(value);
     if (url.protocol !== "https:") return null;
     const configuredUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const allowedOrigins = new Set(["https://cdn.simpleicons.org"]);
+    const allowedOrigins = new Set<string>();
     if (configuredUrl) allowedOrigins.add(new URL(configuredUrl).origin);
     return allowedOrigins.has(url.origin) ? url.toString() : null;
   } catch {

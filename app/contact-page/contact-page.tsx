@@ -1,8 +1,9 @@
 "use client";
 import "./contact-repository.css";
+import "./contact-repository-adaptive.css";
 
 import type { NextPage } from "next";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 import Header from "@/components/navigation/Header";
 import Footer from "@/components/navigation/Footer";
@@ -12,13 +13,58 @@ import ContactRepositoryHeader from "@/components/contact/ContactRepositoryHeade
 import { fetchWithTurnstile } from "@/lib/security/turnstile-client";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import type { ContactSocialLink } from "@/lib/contact/social-links";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  computeFluidStageWidth,
+  useViewportFitStage,
+} from "@/hooks/useViewportFitStage";
+import { useRouteEntrance } from "@/components/navigation/NavigationExperienceProvider";
 
 const MOBILE_FORM_CLASS = "w-full p-0";
+const CONTACT_STAGE_MIN_WIDTH = 560;
+const CONTACT_STAGE_FALLBACK_WIDTH = 1328;
+const CONTACT_STAGE_MAX_WIDTH = 1875;
+const CONTACT_STAGE_HEIGHT = 720;
 
-type ContactPageProps = { initialLinks?: ContactSocialLink[] };
+type ContactPageProps = {
+  attachmentsEnabled?: boolean;
+  initialLinks?: ContactSocialLink[];
+};
 
-const ContactPage: NextPage<ContactPageProps> = ({ initialLinks }) => {
+const ContactPage: NextPage<ContactPageProps> = ({
+  attachmentsEnabled = false,
+  initialLinks,
+}) => {
   const { dictionary } = useI18n();
+  const routeEntrance = useRouteEntrance();
+  const mainRef = useRef<HTMLElement>(null);
+  const adaptiveLayout = useMediaQuery("(min-width: 676px)");
+  const {
+    scale,
+    fitScale,
+    profile,
+    availableWidth,
+    stageStyle,
+  } = useViewportFitStage({
+    baseWidth: CONTACT_STAGE_MIN_WIDTH,
+    baseHeight: CONTACT_STAGE_HEIGHT,
+    containerRef: mainRef,
+    maxScale: 1.6,
+    padX: 0,
+    padY: 0,
+    transformOrigin: "50% 50%",
+  });
+  const fluidStageWidth = Math.min(
+    CONTACT_STAGE_MAX_WIDTH,
+    Math.max(
+      CONTACT_STAGE_MIN_WIDTH,
+      computeFluidStageWidth(
+        availableWidth,
+        scale,
+        CONTACT_STAGE_FALLBACK_WIDTH,
+      ),
+    ),
+  );
   const handleSend = useCallback(
     async ({ name, email, message, files }: {
       name: string;
@@ -27,6 +73,7 @@ const ContactPage: NextPage<ContactPageProps> = ({ initialLinks }) => {
       files: File[];
     }) => {
       try {
+        if (files.length > 0 && !attachmentsEnabled) return false;
         const prepareResponse = await fetchWithTurnstile("/api/contact/prepare", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -73,57 +120,95 @@ const ContactPage: NextPage<ContactPageProps> = ({ initialLinks }) => {
         return false;
       }
     },
-    [],
+    [attachmentsEnabled],
   );
 
   return (
-    <div className="contact-page w-full min-h-[100dvh] relative overflow-x-hidden flex flex-col">
+    <div
+      className="contact-page relative flex h-dvh min-h-0 w-full flex-col overflow-hidden"
+      data-viewport-page="contact"
+      data-route-entrance={routeEntrance}
+      data-viewport-profile={adaptiveLayout ? profile : "accessible-overflow"}
+    >
       <Header />
 
-      <main className="contact-main flex-1 min-h-0 px-2 min-[676px]:px-6 relative z-10">
+      <main
+        ref={mainRef}
+        className="contact-main relative z-10 min-h-0 flex-1 px-2 min-[676px]:px-6"
+        data-viewport-content
+      >
         <h1 className="sr-only">{dictionary.contact.title}</h1>
-        <section className="contact-repository-shell" aria-label={dictionary.contact.repository}>
-          <ContactRepositoryHeader />
+        <div
+          className="contact-stage-viewport"
+          data-viewport-stage
+          data-viewport-scale={adaptiveLayout ? fitScale.toFixed(3) : "1.000"}
+        >
+          <div
+            className="contact-stage-surface"
+            style={
+              adaptiveLayout
+                ? {
+                  ...stageStyle,
+                  width: fluidStageWidth,
+                  transform: `translate(-50%, -50%) scale(${scale})`,
+                }
+                : undefined
+            }
+          >
+            <section
+              className="contact-repository-shell"
+              aria-label={dictionary.contact.repository}
+              style={
+                adaptiveLayout
+                  ? { width: "100%", height: "100%", minHeight: 0, transform: "none" }
+                  : undefined
+              }
+            >
+              <ContactRepositoryHeader />
 
-          <div className="contact-repository-workspace">
-            <div className="contact-phone-layout min-[676px]:hidden">
-              <EmailForm
-                idPrefix="contact-mobile"
-                onSend={handleSend}
-                showMobileIcons
-                initialLinks={initialLinks}
-                className={MOBILE_FORM_CLASS}
-              />
-            </div>
-
-            <div className="contact-adaptive-layout hidden min-[676px]:flex h-full w-full items-center justify-center">
-              <div className="contact-premium-shell grid w-full min-w-0 overflow-visible">
-                <div
-                  className="contact-profile-column contact-enter-left min-w-0 overflow-visible"
-                >
-                  <PhotoSocialContainer
-                    className="contact-profile-card h-full w-full max-w-none"
+              <div className="contact-repository-workspace">
+                <div className="contact-phone-layout min-[676px]:hidden">
+                  <EmailForm
+                    attachmentsEnabled={attachmentsEnabled}
+                    idPrefix="contact-mobile"
+                    onSend={handleSend}
+                    showMobileIcons
                     initialLinks={initialLinks}
+                    className={MOBILE_FORM_CLASS}
                   />
                 </div>
 
-                <div
-                  className="contact-form-column contact-enter-right grid min-w-0 place-items-center overflow-visible"
-                >
-                  <EmailForm
-                    idPrefix="contact-desktop"
-                    onSend={handleSend}
-                    className="contact-email-form w-full max-w-[820px]"
-                    initialLinks={initialLinks}
-                  />
+                <div className="contact-adaptive-layout hidden min-[676px]:flex h-full w-full items-center justify-center">
+                  <div className="contact-premium-shell grid w-full min-w-0 overflow-visible">
+                    <div
+                      className="contact-profile-column contact-enter-left min-w-0 overflow-visible"
+                    >
+                      <PhotoSocialContainer
+                        className="contact-profile-card h-full w-full max-w-none"
+                        initialLinks={initialLinks}
+                      />
+                    </div>
+
+                    <div
+                      className="contact-form-column contact-enter-right grid min-w-0 place-items-center overflow-visible"
+                    >
+                      <EmailForm
+                        attachmentsEnabled={attachmentsEnabled}
+                        idPrefix="contact-desktop"
+                        onSend={handleSend}
+                        className="contact-email-form w-full max-w-[820px]"
+                        initialLinks={initialLinks}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
-        </section>
+        </div>
       </main>
 
-      <Footer year={2026} owner="Mouaz Naji" />
+      <Footer year={2026} owner="Mouaz Naji" className="shrink-0" />
     </div>
   );
 };

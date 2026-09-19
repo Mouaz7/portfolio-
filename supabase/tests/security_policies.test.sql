@@ -1,5 +1,5 @@
 begin;
-select plan(32);
+select plan(34);
 
 select ok((select relrowsecurity from pg_class where oid = 'public.project'::regclass), 'project has RLS');
 select ok((select relrowsecurity from pg_class where oid = 'public.site_cv'::regclass), 'site_cv has RLS');
@@ -17,6 +17,29 @@ select ok(not has_table_privilege('anon', 'public.content_translation', 'insert'
 select ok(not has_table_privilege('anon', 'public.site_cv', 'select'), 'anon cannot read CV source text');
 select ok(not has_table_privilege('anon', 'public.rag_chunk', 'select'), 'anon cannot read RAG chunks');
 select ok(not has_table_privilege('anon', 'public.contact_submission', 'select'), 'anon cannot read contact submissions');
+
+insert into public.home_capability (id, title, description, icon_key, sort_order, is_active)
+values
+  ('pgtap-active-parent', 'Active test', 'Visible parent', 'quality', 9001, true),
+  ('pgtap-inactive-parent', 'Inactive test', 'Hidden parent', 'quality', 9002, false);
+
+insert into public.content_translation (entity_type, entity_id, locale, fields)
+values
+  ('home_capability', 'pgtap-active-parent', 'sv', '{"title":"Synlig"}'::jsonb),
+  ('home_capability', 'pgtap-inactive-parent', 'sv', '{"title":"Dold"}'::jsonb);
+
+set local role anon;
+select is(
+  (select count(*) from public.content_translation where entity_id = 'pgtap-active-parent'),
+  1::bigint,
+  'anon can read a translation whose parent is active'
+);
+select is(
+  (select count(*) from public.content_translation where entity_id = 'pgtap-inactive-parent'),
+  0::bigint,
+  'translations for inactive parents do not leak to anon'
+);
+reset role;
 
 select ok(not has_table_privilege('authenticated', 'public.project', 'select'), 'authenticated receives no extra project access');
 select ok(not has_table_privilege('authenticated', 'public.contact_submission', 'insert'), 'authenticated cannot insert contact submissions');

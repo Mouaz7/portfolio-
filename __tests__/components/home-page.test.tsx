@@ -145,7 +145,7 @@ describe("Premium home redesign", () => {
     expect(actions).toBeInTheDocument();
     expect(actions?.firstElementChild).toBe(projectLink);
     expect(actions?.lastElementChild).toBe(downloadButton);
-    expect(projectLink).toHaveAttribute("href", "/projects-page");
+    expect(projectLink).toHaveAttribute("href", "/projects");
     expect(downloadButton).toHaveAttribute("data-download-href", "/api/cv");
     expect(container.querySelector("header")).toHaveAttribute(
       "data-route-navigation",

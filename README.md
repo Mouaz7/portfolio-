@@ -22,6 +22,8 @@
   <a href="docs/architecture.md">Architecture</a>
   &nbsp;·&nbsp;
   <a href=".github/SECURITY.md">Security</a>
+  &nbsp;·&nbsp;
+  <a href="https://mouazdev.vercel.app/privacy">Privacy</a>
 </p>
 
 <p align="center">
@@ -45,11 +47,11 @@
 The site presents Mouaz's work as a coherent developer environment instead of a collection of unrelated landing-page sections.
 
 - **[Home](https://mouazdev.vercel.app/)** introduces the profile, roles, capabilities, selected work, and the protected CV download.
-- **[Skills](https://mouazdev.vercel.app/skills-page)** organizes the technology stack into nine connected repository cards with branches, hashes, checks, contribution strips, `HEAD`, and self-hosted icons.
+- **[Skills](https://mouazdev.vercel.app/skills)** organizes the technology stack into nine connected repository cards with branches, hashes, checks, contribution strips, `HEAD`, and self-hosted icons.
 - **[Journey](https://mouazdev.vercel.app/journey)** renders education and professional experience as a chronological Git graph with lanes, commits, tags, verified states, and a current head.
-- **[Projects](https://mouazdev.vercel.app/projects-page)** provides a searchable repository index with category tabs, language filters, sorting, visibility labels, and GitHub repository statistics.
-- **[Code Review](https://mouazdev.vercel.app/code-review-page)** combines a pull-request-inspired editor, multilingual AI review, structured findings, and a contextual code/portfolio assistant.
-- **[Contact](https://mouazdev.vercel.app/contact-page)** turns the contact flow into a repository and commit composer with Write/Preview, changed files, private attachments, status feedback, and SMTP delivery.
+- **[Projects](https://mouazdev.vercel.app/projects)** provides a searchable repository index with category tabs, language filters, sorting, visibility labels, and GitHub repository statistics.
+- **[Code Review](https://mouazdev.vercel.app/code-review)** combines a pull-request-inspired editor, multilingual AI review, structured findings, and a contextual code/portfolio assistant.
+- **[Contact](https://mouazdev.vercel.app/contact)** turns the contact flow into a repository and commit composer with Write/Preview, changed files, quarantined private attachments, status feedback, and SMTP delivery.
 
 English is the canonical language. Swedish and Arabic use localized routes, translated content and metadata, language-aware formatting, and right-to-left layout where required.
 
@@ -74,15 +76,15 @@ Approved presentation is protected by source-level design locks and **36 visual 
 
 Skills, Journey, and Projects receive localized data directly from server-only loaders. Available SSR data, including empty results, is shown immediately without a duplicate primary-data request or minimum loading duration. The terminal loader appears only during a real client fallback request; Skills waits for both categories and skills. Code Review has no initial data dependency and opens immediately. Navigation prefetches on user intent rather than fetching every route at startup.
 
-Fixed visual stages are measured at most once per animation frame and scaled for the available viewport. Supported mobile views avoid unintended horizontal page overflow, preserve touch targets, and keep approved card and icon geometry intact. Every public page now has height-gated QHD and 4K density profiles, preventing laptop-sized 1328–1800 px caps from making the interface miniature on genuinely large CSS viewports while leaving zoomed Full HD layouts unchanged. Skills adds dedicated wide, extra-wide, and 4K profiles: cards grow from the compact layout to 620, 760, and 900 CSS-pixel design widths, while square icon canvases grow up to 96 px and remain bounded when the stage scales down.
+Fixed visual stages are measured at most once per animation frame from their real content container and the Visual Viewport, rather than from a monitor's physical resolution. Every public page owns exactly one `100dvh` frame with a zero-minimum flex chain, so browser chrome, Windows scaling, split-screen windows, and DevTools cannot silently extend content below the visible area. The shared `fit`, `compact`, and `accessible-overflow` profiles update during live resize. Contact scales the complete repository composition after reserving header and footer space; Journey and Skills use the same two-axis fit calculation. Normal laptop and tablet layouts avoid document scrolling, while deliberate content panels remain internally reachable at high zoom. QHD and 4K density profiles still prevent laptop-sized caps from making the interface miniature on genuinely large CSS viewports. Skills retains dedicated wide, extra-wide, and 4K card/icon profiles.
 
 ### Animated background without blocking the interface
 
-The shared background uses a theme-aware WebGL ocean shader. Desktop rendering moves to an `OffscreenCanvas` worker where supported; mobile uses a lighter analytic shader and reduced frame rate. Rendering pauses when hidden, coalesces resize and pointer updates, respects reduced motion, and falls back to CSS when WebGL or workers are unavailable.
+The shared background uses a theme-aware WebGL ocean shader. Desktop rendering moves to an `OffscreenCanvas` worker where supported; mobile uses a lighter analytic shader and reduced frame rate. A constrained desktop that cannot use the worker also receives the analytic shader, avoiding a complex fragment program on the main thread. Rendering pauses when hidden, coalesces resize and pointer updates, respects reduced motion, and falls back to CSS when WebGL or workers are unavailable.
 
 Motion preferences and mobile/desktop profile changes are handled live. Worker startup has a five-second deadline, WebGL context loss activates the fallback, and recovery is bounded. Generations isolate stale worker messages; failed renderers release their resources. The CSS fallback also pauses in hidden tabs and follows reduced-motion changes. Touchscreen laptops retain the desktop profile at desktop widths.
 
-Skills cards are memoized while preserving their 900 ms entrance and 120 ms stagger. Temporary opacity/filter hints are released after animation; the transform layer remains to preserve text rendering in the scaled layout. Entrance animation never forces data to wait.
+Skills cards are memoized while preserving their 900 ms entrance and 120 ms stagger. Temporary opacity/filter hints are released after animation; the transform layer remains to preserve text rendering in the scaled layout. Low-memory, four-core and data-saver clients retain the same bounce and timing without the expensive animated blur. Entrance animation never forces data to wait.
 
 ### AI review and portfolio-grounded assistance
 
@@ -92,13 +94,13 @@ Its About mode uses Supabase pgvector retrieval over approved portfolio sources 
 
 ### Protected Contact and CV delivery
 
-Contact supports up to five attachments through short-lived signed upload targets in private Supabase Storage. The server verifies the session, submission state, exact object manifest, actual byte totals, MIME types, and file signatures before taking a concurrency lease and atomically claiming a message for delivery. PDF, PNG, JPG/JPEG, WebP, and TXT are accepted up to a combined 10 MB.
+Contact message delivery remains available, while file upload is disabled by default. After a scanner is procured and explicitly enabled, Contact supports up to five attachments through short-lived signed upload targets in private Supabase Storage. The server verifies the session, submission state, exact object manifest, actual byte totals, MIME types, file signatures, and a provider-neutral malware verdict before delivery. Anything except `clean` fails closed. PDF, PNG, JPG/JPEG, WebP, and TXT are accepted up to a combined 10 MB.
 
 The public `/api/cv` URL streams one configured private, versioned PDF. It validates the PDF signature and supports a strong ETag, `Last-Modified`, conditional `304` responses, and controlled browser/CDN caching.
 
 ### Safe project synchronization
 
-The scheduled GitHub synchronization accepts repositories only from the configured owner, normalizes repository names and URLs case-insensitively, prevents casing or trailing-slash duplicates, updates Supabase through protected server access, and then revalidates Projects and refreshes the RAG index.
+The GitHub synchronization accepts repositories only from the configured owner, normalizes repository names and URLs case-insensitively, prevents casing or trailing-slash duplicates, and updates Supabase through protected server access. Its schedule is currently paused. Manual dispatch runs separately reported Projects sync, cache revalidation, and RAG refresh jobs; each step receives only the configuration it actually reads.
 
 ## Architecture
 
@@ -118,7 +120,7 @@ flowchart TD
   Protection --> Models[NVIDIA-compatible models]
   Protection --> Mail[SMTP]
 
-  GitHub[Allowlisted GitHub repositories] --> Sync[Scheduled project sync]
+  GitHub[Allowlisted GitHub repositories] --> Sync[Manually dispatched project sync]
   Cron[Vercel Cron] --> Internal[Bearer-protected internal routes]
   Sync --> PrivateData
   Sync --> Internal
@@ -145,11 +147,26 @@ Read [the architecture guide](docs/architecture.md) for routing, localization, r
 - Internal automation accepts only strict `Bearer <token>` authorization and uses timing-safe digest comparison.
 - Public shallow health and authenticated backend health are separate endpoints with different cache policies.
 - Supabase service credentials, AI keys, SMTP credentials, automation tokens, and security peppers never belong in client bundles.
-- Request protection combines signed sessions, optional Turnstile verification, distributed budgets, concurrency limits, bounded request bodies, and controlled errors.
+- Request protection combines signed sessions, optional Turnstile verification, distributed budgets, concurrency limits, bounded request bodies, and controlled errors. Lazy Turnstile loading and challenge execution have hard time limits, and model failover does not spend the complete request budget on a stalled primary.
 - Contact uses private uploads, exact manifest validation, sequential file verification, an atomic claim, replay protection, and cleanup.
 - Security headers include a per-request nonce CSP, HSTS, frame denial, MIME sniffing protection, restrictive permissions, and cross-origin isolation controls.
+- Server logs use an explicit field allowlist and never serialize raw provider bodies, submitted code, prompts, credentials, email addresses, IP addresses, headers, file metadata, or complete database errors.
 
-Responsible disclosure instructions live in [`.github/SECURITY.md`](.github/SECURITY.md). Deeper implementation details are documented in [Architecture](docs/architecture.md) and [Database](docs/database.md).
+Responsible disclosure instructions live in [`.github/SECURITY.md`](.github/SECURITY.md). The public [privacy notice](https://mouazdev.vercel.app/privacy) is backed by a repository [data inventory](docs/privacy-data-inventory.md). Deeper implementation details are documented in [Architecture](docs/architecture.md) and [Database](docs/database.md).
+
+## Accessibility verification
+
+Automated coverage includes axe serious/critical findings, color contrast,
+keyboard behavior, forced-colors mode, reduced motion, 400% zoom/reflow, and a
+mobile/desktop viewport matrix. The two Code Review listboxes are exercised for
+Arrow Up/Down, Home, End, Enter, Space, Escape, Tab, selection state and focus
+return. Existing manually approved pixel references remain immutable during
+automated runs, including after intentional WCAG color corrections.
+
+A release still requires manual keyboard and screen-reader verification. This
+README therefore makes no claim of complete WCAG conformance; such a claim is
+blocked until automated serious/critical exceptions are zero and the manual
+verification record is approved.
 
 ## Getting started
 
@@ -172,6 +189,11 @@ npm run dev
 ```
 
 Fill in the environment values needed for the features you want to run, then open `http://localhost:3000`.
+
+Local development uses Turbopack and warms all six public routes after Next is
+ready. Wait for `Public pages ready` in the terminal before the first browser
+navigation; this moves route compilation to startup instead of making the
+first click on each page appear frozen.
 
 Use [`.env.example`](.env.example) as the maintained configuration reference. Real `.env*` files, credentials, private keys, and certificates must never be committed.
 
@@ -201,6 +223,9 @@ npm run test:design-lock  Verify protected presentation source and assets
 npm run test:pixel-lock   Compare all 36 approved screenshots
 npm run test:lighthouse   Run three audits per public route and assert quality gates
 npm run test:motion-performance  Measure active animations on a constrained CPU/network
+npm run test:navigation-performance  Measure five clicks for each canonical public route
+npm run test:secrets       Scan all Git refs with project-specific redacted rules
+npm run test:secrets:gitleaks  Scan full reachable history with pinned Gitleaks
 npm run sync:projects     Synchronize allowlisted GitHub repositories
 ```
 
@@ -210,7 +235,7 @@ npm run sync:projects     Synchronize allowlisted GitHub repositories
 
 Every push to `main` or a `fix/**` verification branch, plus every pull request targeting `main`, runs the Quality workflow:
 
-1. production and complete dependency audits;
+1. full-history Gitleaks plus project-specific secret scanning, then production and complete dependency audits;
 2. ESLint, TypeScript, Knip, and the design lock;
 3. Jest with coverage;
 4. an isolated Supabase database and pgTAP security-policy tests;
@@ -225,7 +250,7 @@ The Lighthouse gate requires performance ≥ 0.80, accessibility ≥ 0.90, best 
 
 Motion reports include LCP, layout shifts, long tasks and frame intervals across three runs. Supply `PERF_BASELINE` to compare against a same-machine report: a median LCP/blocking regression must exceed both 15% and 100 ms, with non-overlapping three-run ranges, to fail. CI builds the PR base commit (or previous commit on `main`) and measures it on the same runner before measuring the candidate; it saves both reports and enforces median CLS ≤ 0.05. The browser matrix also requires large-display surfaces to occupy at least 65% of the viewport and verifies that DPR 1 and DPR 2 produce the same layout for the same CSS viewport. These checks complement Lighthouse; viewport and CPU emulation do not certify physical Windows scaling or every GPU. See the [testing guide](docs/testing-guide.md) for commands and device-verification limits.
 
-A separate scheduled workflow synchronizes allowlisted GitHub repositories, revalidates project data, and refreshes the RAG index. Dependency updates are reviewed and applied manually. The SHA-pinned CodeQL workflow analyzes JavaScript and TypeScript when repository visibility supports code scanning.
+A separate, currently manual workflow synchronizes allowlisted GitHub repositories, revalidates project data, and refreshes the RAG index as separately scoped jobs. Its schedule remains paused until a coherent deployed manual run passes. Dependabot proposes reviewed npm and GitHub Actions updates. The SHA-pinned CodeQL workflow analyzes JavaScript and TypeScript when repository visibility supports code scanning.
 
 See [CI/CD](docs/cicd-pipeline.md), [Testing](docs/testing-guide.md), and [Deployment](docs/deployment.md) for operational details.
 

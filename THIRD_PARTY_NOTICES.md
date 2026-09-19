@@ -35,8 +35,8 @@ React, Android, and all other product marks belong to their respective owners.
 
 - BTH and Softhouse logos are used to identify education and professional
   experience. Rights remain with their respective organizations.
-- Mouaz branding, portraits, CV content, and personal identity material are
-  excluded from MIT as described in
+- Mouaz branding, portraits, CV content, and personal identity material remain
+  under the repository's proprietary terms as described in
   [`ASSETS_LICENSE.md`](ASSETS_LICENSE.md).
 
 ## Software dependencies

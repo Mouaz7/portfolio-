@@ -4,6 +4,10 @@ import { createEmbeddings, embeddingModelId, vectorToSqlLiteral } from "./nvidia
 import { chunkText, createSnapshot, createSourceHash, formatDbError, sourceKey, textLines } from "./rag/text";
 import { searchRagChunks } from "./rag/search";
 import type { ExistingSource, RagRefreshResult, RagSnapshot } from "./rag/types";
+import {
+  logServerError,
+  safeErrorContext,
+} from "@/lib/security/safe-logger.server";
 
 export { chunkText, createSourceHash, searchRagChunks };
 export type { RagRefreshResult, RagSearchMatch } from "./rag/types";
@@ -265,7 +269,11 @@ async function updateRun(
 ): Promise<void> {
   if (!runId) return;
   const { error } = await supabase.from("rag_index_run").update(patch).eq("id", runId);
-  if (error) console.error("[rag] failed to update run log", error);
+  if (error) {
+    logServerError("rag.run_log.update_failed", error, {
+      operation: "update_rag_index_run",
+    });
+  }
 }
 
 async function indexSnapshot(
@@ -389,7 +397,7 @@ async function refreshRagIndexInner(): Promise<RagRefreshResult> {
       sources_seen: sourcesSeen,
       sources_indexed: sourcesIndexed,
       chunks_indexed: chunksIndexed,
-      error_summary: error instanceof Error ? error.message.slice(0, 900) : "Unknown RAG error",
+      error_summary: String(safeErrorContext(error).code),
     });
     throw error;
   } finally {
@@ -398,7 +406,11 @@ async function refreshRagIndexInner(): Promise<RagRefreshResult> {
         p_job_name: "rag_reindex",
         p_lease_token: leaseToken,
       });
-      if (error) console.error("[rag] failed to release job lease", error);
+      if (error) {
+        logServerError("rag.job_lease.release_failed", error, {
+          operation: "release_job_lease",
+        });
+      }
     }
   }
 }

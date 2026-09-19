@@ -14,11 +14,13 @@ class NvidiaConfigError extends Error {
 }
 
 class NvidiaApiError extends Error {
+  readonly code: string;
   readonly status?: number;
 
-  constructor(message: string, status?: number) {
+  constructor(message: string, status?: number, code = "nvidia_api_error") {
     super(message);
     this.name = "NvidiaApiError";
+    this.code = code;
     this.status = status;
   }
 }
@@ -37,6 +39,9 @@ const DEFAULT_DEEPSEEK_PRO_MODEL = "deepseek-ai/deepseek-v4-pro-0813";
 const DEFAULT_EMBEDDING_MODEL = "nvidia/nemotron-3-embed-1b";
 const EMBEDDING_DIMENSIONS = 2048;
 const CHAT_TIMEOUT_MS = 25000;
+// A slow primary must not make a healthy fallback look like a dead button.
+// Preserve the full timeout when it is the only configured target.
+const PRIMARY_CHAT_FAILOVER_MS = 8000;
 
 const RETIRED_CHAT_MODEL_REPLACEMENTS: Readonly<Record<string, string>> = {
   "deepseek-ai/deepseek-v4-flash": DEFAULT_CV_MODEL,
@@ -154,7 +159,9 @@ async function postJson<T>(
 ): Promise<T> {
   const controller = new AbortController();
   const remaining = deadlineMs == null ? timeoutMs : Math.min(timeoutMs, deadlineMs - Date.now());
-  if (remaining <= 0) throw new NvidiaApiError("AI request deadline exceeded");
+  if (remaining <= 0) {
+    throw new NvidiaApiError("AI request deadline exceeded", undefined, "deadline_exceeded");
+  }
   const timeout = setTimeout(() => controller.abort(), remaining);
 
   try {
@@ -170,17 +177,22 @@ async function postJson<T>(
     });
 
     if (!response.ok) {
-      const detail = (await response.text()).slice(0, 500);
-      throw new NvidiaApiError(`NVIDIA API ${response.status}: ${detail}`, response.status);
+      // Provider bodies can echo submitted code or include operational details.
+      // Preserve only the status and a stable internal code.
+      throw new NvidiaApiError(
+        "NVIDIA API request failed",
+        response.status,
+        "upstream_http_error",
+      );
     }
 
     return (await response.json()) as T;
   } catch (error) {
     if (error instanceof NvidiaApiError) throw error;
     if (error instanceof Error && error.name === "AbortError") {
-      throw new NvidiaApiError("NVIDIA API timeout");
+      throw new NvidiaApiError("NVIDIA API timeout", undefined, "upstream_timeout");
     }
-    throw new NvidiaApiError(error instanceof Error ? error.message : "NVIDIA API request failed");
+    throw new NvidiaApiError("NVIDIA API request failed", undefined, "upstream_network_error");
   } finally {
     clearTimeout(timeout);
   }
@@ -243,7 +255,7 @@ export async function createChatCompletion(params: {
   }
 
   let lastError: unknown;
-  for (const target of targets) {
+  for (const [index, target] of targets.entries()) {
     try {
       const json = await postJson<{
         choices?: Array<{ message?: { content?: string } }>;
@@ -256,7 +268,9 @@ export async function createChatCompletion(params: {
           params.maxTokens ?? 1400,
           params.temperature ?? (params.kind === "code" ? 0.2 : 0.35),
         ),
-        CHAT_TIMEOUT_MS,
+        targets.length > 1 && index === 0
+          ? PRIMARY_CHAT_FAILOVER_MS
+          : CHAT_TIMEOUT_MS,
         params.deadlineMs,
       );
 

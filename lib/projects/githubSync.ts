@@ -1,3 +1,5 @@
+import { canonicalProjectIconHref } from "./icon-assets";
+
 export const GITHUB_OWNER = "Mouaz7";
 export const MANUAL_PORTFOLIO_URL = `https://github.com/${GITHUB_OWNER}/portfolio-`;
 const EXCLUDED_REPO_NAMES = new Set(["portfolio-test", GITHUB_OWNER.toLowerCase()]);
@@ -465,7 +467,7 @@ function inferProjectCategory(
 }
 
 function buildIconPath(iconKey: string) {
-  return `${PROJECT_ICON_DIR}/${iconKey}.svg`;
+  return canonicalProjectIconHref(`${PROJECT_ICON_DIR}/${iconKey}.svg`);
 }
 
 export function getProjectCategoryRank(category: ProjectCategory) {

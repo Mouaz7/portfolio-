@@ -200,7 +200,14 @@ describe("/api/skills", () => {
 
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({ error: "db" });
-    expect(consoleError).toHaveBeenCalledWith("[/api/skills] db error:", legacyError);
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    const output = String(consoleError.mock.calls[0]?.[0]);
+    expect(JSON.parse(output)).toMatchObject({
+      code: "unknown_error",
+      event: "api.skills.database_failed",
+      route: "/api/skills",
+    });
+    expect(output).not.toContain(legacyError.message);
     consoleError.mockRestore();
   });
 });

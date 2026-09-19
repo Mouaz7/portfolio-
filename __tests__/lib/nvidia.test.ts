@@ -23,6 +23,7 @@ describe("NVIDIA client", () => {
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     process.env = originalEnv;
     jest.restoreAllMocks();
   });
@@ -43,6 +44,46 @@ describe("NVIDIA client", () => {
     });
 
     expect(result).toEqual({ content: "fallback ok", model: "fallback-model" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("never includes an upstream response body in the thrown error", async () => {
+    process.env.NVIDIA_FALLBACK_API_KEY = "";
+    process.env.NVIDIA_API_KEY = "";
+    process.env.NVIDIA_EMBEDDING_API_KEY = "";
+    const marker = "provider-secret-response-marker";
+    jest.spyOn(global, "fetch").mockResolvedValue(
+      new Response(marker, { status: 502 }),
+    );
+
+    await expect(createChatCompletion({
+      kind: "cv",
+      messages: [{ role: "user", content: "hello" }],
+    })).rejects.not.toThrow(marker);
+  });
+
+  it("fails over before a slow primary can leave the interface waiting for 25 seconds", async () => {
+    jest.useFakeTimers();
+    const fetchMock = jest
+      .spyOn(global, "fetch")
+      .mockImplementationOnce((_input, init) => new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => {
+          reject(new DOMException("aborted", "AbortError"));
+        }, { once: true });
+      }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ choices: [{ message: { content: "fallback ok" } }] }), {
+          status: 200,
+        }),
+      );
+
+    const request = createChatCompletion({
+      kind: "cv",
+      messages: [{ role: "user", content: "hello" }],
+    });
+    await jest.advanceTimersByTimeAsync(8_000);
+
+    await expect(request).resolves.toEqual({ content: "fallback ok", model: "fallback-model" });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 

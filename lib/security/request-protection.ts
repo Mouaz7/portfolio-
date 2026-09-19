@@ -4,6 +4,7 @@ import { isIP } from "node:net";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/backend/supabaseAdminClient";
 import { securitySecret } from "@/lib/security/production-config";
+import { logServerError } from "@/lib/security/safe-logger.server";
 
 export type ProtectedAction = "cv_chat" | "code_review" | "code_review_chat" | "contact";
 
@@ -315,12 +316,16 @@ export async function protectApiRequest(
       p_session_window_seconds: policy.sessionWindowSeconds,
     }));
   } catch (error) {
-    console.error("[request-protection] limiter timed out", error);
+    logServerError("security.request_limiter.timeout", error, {
+      operation: "consume_request_budget",
+    });
     return { ok: false, response: securityError(503, "security_unavailable", identity.sessionCookie) };
   }
   const { data, error } = budgetResponse;
   if (error) {
-    console.error("[request-protection] limiter unavailable", error);
+    logServerError("security.request_limiter.unavailable", error, {
+      operation: "consume_request_budget",
+    });
     return { ok: false, response: securityError(503, "security_unavailable", identity.sessionCookie) };
   }
 
@@ -387,9 +392,15 @@ export async function releaseProtection(context: ProtectionContext | null): Prom
       }),
       SECURITY_RELEASE_TIMEOUT_MS,
     );
-    if (error) console.error("[request-protection] failed to release lease", error);
+    if (error) {
+      logServerError("security.request_lease.release_failed", error, {
+        operation: "release_request_lease",
+      });
+    }
   } catch (error) {
-    console.error("[request-protection] lease release timed out", error);
+    logServerError("security.request_lease.release_timeout", error, {
+      operation: "release_request_lease",
+    });
   }
 }
 

@@ -20,6 +20,9 @@
   --contact-gh-orange-rgb: 247, 129, 102;
   --contact-gh-danger: #f85149;
   --contact-gh-shadow: 0 18px 55px -36px rgba(0, 0, 0, 0.78), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 html.light .contact-page {
@@ -31,7 +34,7 @@ html.light .contact-page {
   --contact-gh-border-strong: #afb8c1;
   --contact-gh-text: #1f2328;
   --contact-gh-muted: #57606a;
-  --contact-gh-subtle: #6e7781;
+  --contact-gh-subtle: #656d76;
   --contact-gh-blue: #0969da;
   --contact-gh-blue-rgb: 9, 105, 218;
   --contact-gh-green: #1a7f37;
@@ -43,8 +46,56 @@ html.light .contact-page {
 }
 
 .contact-page .contact-main {
+  display: block;
   width: 100%;
+  min-height: 0;
   padding: 10px 12px 16px;
+}
+
+.contact-stage-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.contact-stage-surface {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.contact-stage-surface .contact-repository-shell {
+  max-width: none;
+}
+
+/* SSR fallback: keep the repository bounded before hydration supplies the
+   measured transform. The client replaces this with the proportional stage
+   in its first layout pass. */
+@media (min-width: 676px) {
+  .contact-stage-surface:not([style]) {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .contact-stage-surface:not([style]) .contact-repository-shell {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    transform: none;
+  }
+}
+
+.contact-page .site-footer {
+  position: relative;
+  inset: auto;
+  flex: 0 0 auto;
+  margin-top: 0;
 }
 
 .contact-repository-shell {
@@ -1088,11 +1139,6 @@ html.light .contact-page {
     place-items: center;
   }
 
-  .contact-repository-shell {
-    height: min(720px, calc(100dvh - 144px));
-    min-height: 540px;
-  }
-
   .contact-repository-workspace {
     height: calc(100% - 82px);
   }
@@ -1160,11 +1206,6 @@ html.light .contact-page {
 }
 
 @media (min-width: 676px) and (max-width: 899px) {
-  .contact-repository-shell {
-    height: calc(100dvh - 132px);
-    min-height: 520px;
-  }
-
   .contact-page .contact-main {
     padding-inline: 9px;
   }
@@ -1613,627 +1654,5 @@ html.light .contact-page {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-  }
-}
-
-/*
- * Lighter repository composition.
- * GitHub language now lives in the commit UI instead of decorative rails and frames.
- */
-.contact-repository-workspace {
-  background-image: none;
-}
-
-.contact-page .contact-form-worktree {
-  display: block;
-}
-
-.contact-page .contact-commit-panel {
-  width: 100%;
-  box-shadow: 0 14px 38px -34px rgba(31, 35, 40, 0.5);
-}
-
-@media (max-width: 675px) {
-  .contact-page .contact-main {
-    padding: 4px 8px 10px;
-  }
-
-  .contact-page .contact-repository-header {
-    display: none;
-  }
-
-  .contact-page .contact-repository-shell {
-    overflow: visible;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .contact-page .contact-repository-shell::after {
-    display: none;
-  }
-
-  .contact-page .contact-phone-layout {
-    padding: 2px 0 8px;
-  }
-
-  .contact-page .contact-commit-panel {
-    border-color: color-mix(in srgb, var(--contact-gh-border-strong) 84%, transparent);
-    border-radius: 7px;
-  }
-}
-
-@media (min-width: 676px) {
-  .contact-page .contact-repository-shell {
-    height: min(690px, calc(100dvh - 176px));
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--contact-gh-border) 88%, transparent);
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--contact-gh-canvas) 92%, transparent);
-    box-shadow: 0 22px 60px -48px rgba(31, 35, 40, 0.42);
-  }
-
-  .contact-page .contact-repository-shell::after {
-    display: none;
-  }
-
-  .contact-page .contact-repository-header {
-    margin-bottom: 0;
-    border: 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--contact-gh-border) 88%, transparent);
-    border-radius: 0;
-    background: color-mix(in srgb, var(--contact-gh-surface-muted) 92%, transparent);
-    box-shadow: none;
-  }
-
-  .contact-page .contact-repository-workspace {
-    height: calc(100% - 82px);
-  }
-
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(310px, 0.34fr) minmax(540px, 0.66fr);
-    gap: 0;
-    padding: 0;
-  }
-
-  .contact-page .contact-profile-column {
-    border-right: 1px solid var(--contact-gh-border);
-    background: var(--contact-gh-surface-muted);
-    padding: 14px 18px 12px;
-  }
-
-  .contact-page .contact-form-column {
-    overflow: visible;
-    padding: 0;
-    place-items: stretch;
-  }
-
-  .contact-page .contact-email-form,
-  .contact-page .contact-form-worktree,
-  .contact-page .contact-commit-panel {
-    height: 100%;
-  }
-
-  .contact-page .contact-commit-panel {
-    display: flex;
-    flex-direction: column;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .contact-page .contact-commit-body {
-    display: flex;
-    min-height: 0;
-    flex: 1 1 auto;
-    flex-direction: column;
-  }
-
-  .contact-page .contact-form-fields {
-    display: flex;
-    min-height: 0;
-    flex: 1 1 auto;
-    flex-direction: column;
-  }
-
-  .contact-page .contact-message-control,
-  .contact-page .contact-message-field,
-  .contact-page .contact-message-field > [role="tabpanel"] {
-    min-height: 0;
-    flex: 1 1 auto;
-  }
-
-  .contact-page .contact-message-field > [role="tabpanel"] {
-    display: flex;
-  }
-
-  .contact-page .contact-message-field textarea,
-  .contact-page .contact-message-preview {
-    height: auto !important;
-    min-height: 150px;
-    flex: 1 1 auto;
-  }
-
-  .contact-page .contact-portrait-panel {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    gap: 0;
-    justify-content: stretch;
-  }
-
-  .contact-page .contact-profile-heading {
-    width: auto;
-    min-height: 35px;
-    margin: -14px -18px 0;
-    align-items: center;
-    padding: 4px 18px;
-  }
-
-  .contact-page .contact-profile-heading > div {
-    display: grid;
-    min-width: 0;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: end;
-    column-gap: 7px;
-  }
-
-  .contact-page .contact-profile-heading .contact-profile-role {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    grid-column: 1 / -1;
-    color: var(--contact-gh-muted);
-    font-size: 0.58rem;
-    font-weight: 650;
-    letter-spacing: 0.035em;
-    line-height: 1;
-  }
-
-  .contact-page .contact-profile-heading .contact-profile-role svg {
-    width: 9px;
-    height: 9px;
-  }
-
-  .contact-page .contact-profile-heading h2 {
-    margin: 1px 0 0;
-    font-size: 0.94rem;
-    line-height: 1;
-  }
-
-  .contact-page .contact-profile-heading .contact-profile-handle {
-    overflow: hidden;
-    font-size: 0.63rem;
-    line-height: 1;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .contact-page .contact-profile-portrait-row {
-    width: 100%;
-    overflow: hidden;
-    padding: 0 10px;
-    background: transparent;
-  }
-
-  .contact-page .contact-profile-details {
-    width: auto;
-    margin: 0 -18px -12px;
-    border-width: 1px 0 0;
-    border-radius: 0;
-  }
-
-  .contact-page .contact-portrait-frame {
-    aspect-ratio: 1600 / 2405;
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    overflow: visible;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .contact-page .contact-portrait-aura {
-    display: none;
-  }
-
-  .contact-page .contact-portrait-frame img {
-    padding: 0;
-    filter: none;
-    transform: translateY(-26px) scale(1.16);
-    transform-origin: center top;
-  }
-
-  .contact-page .contact-portrait-links {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .contact-page .contact-portrait-links a {
-    justify-content: center;
-  }
-}
-
-@media (min-width: 676px) and (max-width: 899px) {
-  .contact-page .contact-repository-shell {
-    height: calc(100dvh - 170px);
-    min-height: 500px;
-  }
-
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(220px, 0.34fr) minmax(420px, 0.66fr);
-    gap: 0;
-    padding: 0;
-  }
-
-  .contact-page .contact-profile-column {
-    padding: 10px;
-  }
-
-  .contact-page .contact-form-column {
-    padding: 0;
-  }
-
-  .contact-page .contact-profile-heading {
-    margin: -10px -10px 0;
-    padding: 4px 10px;
-  }
-
-  .contact-page .contact-profile-details {
-    margin: 0 -10px -10px;
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: 100%;
-    height: auto;
-    max-height: none;
-  }
-
-  .contact-page .contact-portrait-frame img {
-    transform: translateY(-10px) scale(1.08);
-    transform-origin: center top;
-  }
-}
-
-@media (min-width: 900px) and (min-height: 1050px) {
-  .contact-page .contact-repository-shell {
-    height: min(800px, calc(100dvh - 220px));
-  }
-}
-
-@media (min-width: 900px) {
-  .contact-page .contact-repository-shell {
-    transform: translateY(-2dvh);
-  }
-}
-
-@media (min-width: 1200px) {
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(340px, 0.33fr) minmax(690px, 0.67fr);
-    gap: 0;
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: auto;
-    height: 100%;
-    max-height: 100%;
-  }
-}
-
-/* Mobile repository editor: roomy, GitHub-like commit flow. */
-@media (max-width: 675px) {
-  .contact-page .contact-main {
-    padding: 4px 4px 9px;
-  }
-
-  .contact-page .contact-phone-layout {
-    padding: 0 0 8px;
-  }
-
-  .contact-page .contact-commit-panel {
-    border-radius: 6px;
-  }
-
-  .contact-page .contact-commit-toolbar {
-    display: grid;
-    min-height: 34px;
-    grid-template-columns: minmax(0, 1fr) auto;
-    padding: 5px 8px;
-  }
-
-  .contact-page .contact-mobile-repository-context {
-    display: flex;
-    min-width: 0;
-    grid-column: 1 / -1;
-    align-items: center;
-    gap: 4px;
-    margin: -5px -8px 3px;
-    border-bottom: 1px solid var(--contact-gh-border);
-    padding: 5px 8px;
-    color: var(--contact-gh-blue);
-    font-size: 0.68rem;
-  }
-
-  .contact-page .contact-mobile-repository-context svg {
-    width: 13px;
-    height: 13px;
-    flex: 0 0 auto;
-    color: var(--contact-gh-muted);
-  }
-
-  .contact-page .contact-mobile-repository-context i {
-    color: var(--contact-gh-subtle);
-    font-style: normal;
-  }
-
-  .contact-page .contact-mobile-repository-context strong {
-    overflow: hidden;
-    font-weight: 700;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .contact-page .contact-commit-body {
-    padding: 11px;
-  }
-
-  .contact-page .contact-commit-heading {
-    margin-bottom: 9px;
-  }
-
-  .contact-page .contact-commit-heading h2 {
-    font-size: 0.98rem;
-  }
-
-  .contact-page .contact-identity-grid {
-    gap: 8px;
-  }
-
-  .contact-page .contact-input {
-    height: 36px !important;
-  }
-
-  .contact-page .contact-message-control {
-    margin-top: 9px;
-  }
-
-  .contact-page .contact-message-field textarea,
-  .contact-page .contact-message-preview {
-    height: 72px !important;
-    min-height: 72px;
-  }
-
-  .contact-page .contact-changed-files-heading,
-  .contact-page .contact-tracked-file,
-  .contact-page .contact-no-files {
-    min-height: 31px;
-  }
-
-  .contact-page .contact-attachment-toolbar {
-    min-height: 35px;
-  }
-
-  .contact-page .contact-mobile-actions {
-    margin-top: 7px;
-  }
-
-  .contact-page .contact-mobile-send button {
-    min-height: 37px;
-  }
-
-  .contact-page .contact-mobile-social-link {
-    width: 32px;
-    height: 32px;
-  }
-
-  .contact-page .contact-command-strip {
-    margin: 7px -11px -11px;
-    padding: 6px 9px;
-  }
-}
-
-/*
- * Viewport sizing guardrails.
- *
- * Keep the split repository fluid from compact laptops through portrait
- * tablets. Short screens may scroll vertically, but the repository itself
- * always remains tall enough to expose every form action. Tall portrait
- * screens use more of their available space instead of leaving the editor
- * stranded in a narrow band through the middle of the page.
- */
-@media (min-width: 676px) {
-  .contact-page .contact-repository-shell {
-    height: clamp(590px, 72dvh, 900px);
-    min-height: 590px;
-  }
-
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(0, 0.34fr) minmax(0, 0.66fr);
-  }
-
-  .contact-page .contact-profile-column,
-  .contact-page .contact-form-column,
-  .contact-page .contact-portrait-panel,
-  .contact-page .contact-profile-portrait-row {
-    min-width: 0;
-  }
-
-  .contact-page .contact-profile-portrait-row {
-    display: grid;
-    min-height: 0;
-    place-items: center;
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: min(100%, 360px);
-    height: auto;
-    max-height: 100%;
-  }
-}
-
-@media (min-width: 676px) and (max-width: 899px) {
-  .contact-page .contact-repository-shell {
-    height: clamp(590px, 72dvh, 880px);
-  }
-
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(0, 0.35fr) minmax(0, 0.65fr);
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: min(100%, 300px);
-  }
-}
-
-/* Portrait tablets: the cutout fills its complete repository pane. */
-@media (min-width: 676px) and (max-aspect-ratio: 4 / 5) {
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(0, 0.46fr) minmax(0, 0.54fr);
-  }
-
-  .contact-page .contact-profile-portrait-row {
-    padding-inline: 0;
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    aspect-ratio: auto;
-    overflow: hidden;
-  }
-
-  .contact-page .contact-portrait-frame img {
-    object-fit: contain;
-    object-position: center bottom;
-    transform: scale(1.15);
-    transform-origin: center bottom;
-  }
-}
-
-@media (min-width: 900px) and (max-aspect-ratio: 4 / 5) {
-  .contact-page .contact-portrait-frame img {
-    transform: scale(1.05);
-  }
-}
-
-@media (min-width: 676px) and (max-height: 850px) {
-  .contact-page .site-footer {
-    position: static;
-    flex: 0 0 auto;
-    margin-top: 0;
-  }
-
-  .contact-page .contact-repository-shell {
-    height: max(590px, calc(100dvh - 176px));
-    min-height: 590px;
-    transform: none;
-  }
-
-  .contact-page .contact-commit-body {
-    padding: 12px 14px;
-  }
-
-  .contact-page .contact-commit-heading {
-    margin-bottom: 8px;
-  }
-
-  .contact-page .contact-message-control {
-    margin-top: 7px;
-  }
-
-  .contact-page .contact-message-field textarea,
-  .contact-page .contact-message-preview {
-    min-height: 92px;
-  }
-
-  .contact-page .contact-changed-files-heading,
-  .contact-page .contact-tracked-file,
-  .contact-page .contact-no-files {
-    min-height: 27px;
-  }
-
-  .contact-page .contact-attachment-toolbar {
-    min-height: 31px;
-    padding-block: 4px;
-  }
-
-  .contact-page .contact-commit-actions {
-    margin-top: 6px;
-  }
-
-  .contact-page .contact-command-strip {
-    margin-top: 8px;
-  }
-}
-
-/* Validation remains obvious and readable at browser zoom levels. */
-.contact-page .contact-input[aria-invalid="true"],
-.contact-page .contact-message-field:has(textarea[aria-invalid="true"]) {
-  border-color: var(--contact-gh-danger);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--contact-gh-danger) 18%, transparent);
-}
-
-.contact-page .contact-form-error {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-/* Match the repository editor to genuinely large desktop viewports. The
-   portrait remains contained, but is no longer limited to a laptop-sized
-   360px frame inside a much larger profile pane. */
-@media (min-width: 2200px) and (min-height: 1000px) {
-  .contact-page .contact-main {
-    padding-inline: clamp(48px, 6vw, 150px);
-  }
-
-  .contact-page .contact-repository-shell {
-    width: min(82vw, 2200px);
-    height: min(78dvh, 1120px);
-    min-height: 760px;
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-  }
-}
-
-@media (min-width: 3200px) and (min-height: 1400px) {
-  .contact-page .contact-main {
-    padding-inline: clamp(100px, 8vw, 320px);
-  }
-
-  .contact-page .contact-repository-shell {
-    width: min(78vw, 3000px);
-    height: min(78dvh, 1600px);
-    min-height: 1120px;
-  }
-
-  .contact-page .contact-premium-shell {
-    grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
-  }
-
-  .contact-page .contact-profile-column {
-    padding: 20px 26px 18px;
-  }
-
-  .contact-page .contact-profile-heading {
-    margin-inline: -26px;
-    padding-inline: 26px;
-  }
-
-  .contact-page .contact-profile-details {
-    margin-inline: -26px;
-  }
-
-  .contact-page .contact-portrait-frame {
-    width: auto;
-    height: 100%;
-    max-width: 100%;
   }
 }

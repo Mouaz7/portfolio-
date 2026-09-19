@@ -6,6 +6,7 @@ import { POST } from "@/app/api/contact/send/route";
 import { supabaseAdmin } from "@/lib/backend/supabaseAdminClient";
 import { CONTACT_MAX_TOTAL_BYTES } from "@/lib/contact/file-policy";
 import { sendContactMail } from "@/lib/contact/mailer";
+import { scanAttachment } from "@/lib/contact/malware-scanner.server";
 
 jest.mock("@/lib/backend/supabaseAdminClient", () => ({
   supabaseAdmin: {
@@ -15,18 +16,23 @@ jest.mock("@/lib/backend/supabaseAdminClient", () => ({
   },
 }));
 jest.mock("@/lib/contact/mailer", () => ({ sendContactMail: jest.fn() }));
+jest.mock("@/lib/contact/malware-scanner.server", () => ({
+  scanAttachment: jest.fn(),
+}));
 
 const ID = "11111111-1111-1111-1111-111111111111";
 const fromMock = supabaseAdmin.from as jest.Mock;
 const rpcMock = supabaseAdmin.rpc as jest.Mock;
 const storageFromMock = supabaseAdmin.storage.from as jest.Mock;
 const mailMock = sendContactMail as jest.Mock;
+const scanMock = scanAttachment as jest.Mock;
 const pendingMaybeSingle = jest.fn();
 const uploadEq = jest.fn();
 const statusUpdateResult = jest.fn();
 const download = jest.fn();
 const list = jest.fn();
 const remove = jest.fn();
+const scanStatusEq = jest.fn();
 
 const pendingQuery: {
   eq: jest.Mock;
@@ -60,6 +66,7 @@ function uploadRow(size: number, path = `${ID}/brief.pdf`) {
   return {
     declared_mime: "application/pdf",
     declared_size: size,
+    id: "22222222-2222-2222-2222-222222222222",
     object_path: path,
     original_name: "brief.pdf",
   };
@@ -107,9 +114,14 @@ describe("/api/contact/send", () => {
     download.mockResolvedValue({ data: new Blob([pdf]), error: null });
     remove.mockResolvedValue({ error: null });
     mailMock.mockResolvedValue(undefined);
+    scanMock.mockResolvedValue({ status: "clean" });
+    scanStatusEq.mockResolvedValue({ error: null });
     fromMock.mockImplementation((table: string) => {
       if (table === "contact_upload") {
-        return { select: jest.fn(() => ({ eq: uploadEq })) };
+        return {
+          select: jest.fn(() => ({ eq: uploadEq })),
+          update: jest.fn(() => ({ eq: scanStatusEq })),
+        };
       }
       if (table === "contact_submission") {
         return {
@@ -146,6 +158,33 @@ describe("/api/contact/send", () => {
       ],
       email: "hello@example.com",
     }));
+    expect(scanMock).toHaveBeenCalledWith(expect.objectContaining({
+      mediaType: "application/pdf",
+      name: "brief.pdf",
+    }));
+    expect(scanMock.mock.invocationCallOrder[0])
+      .toBeLessThan(mailMock.mock.invocationCallOrder[0]);
+    expect(scanStatusEq).toHaveBeenCalledWith(
+      "id",
+      "22222222-2222-2222-2222-222222222222",
+    );
+    expect(remove).toHaveBeenCalledWith([`${ID}/brief.pdf`]);
+  });
+
+  it.each([
+    ["infected", 422, "attachment_infected"],
+    ["scan_failed", 503, "attachment_scan_failed"],
+  ])("fails closed when the scanner returns %s", async (status, expectedStatus, code) => {
+    scanMock.mockResolvedValue({ status });
+
+    const response = await POST(sendRequest({ submissionId: ID }));
+
+    expect(response.status).toBe(expectedStatus);
+    await expect(response.json()).resolves.toMatchObject({
+      attachmentStatus: status,
+      code,
+    });
+    expect(mailMock).not.toHaveBeenCalled();
     expect(remove).toHaveBeenCalledWith([`${ID}/brief.pdf`]);
   });
 

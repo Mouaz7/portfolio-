@@ -1,7 +1,7 @@
 .root {
   display: flex;
   height: 100dvh;
-  min-height: 100dvh;
+  min-height: 0;
   flex-direction: column;
   overflow: hidden;
 }
@@ -125,6 +125,10 @@
   font-size: 0.73rem;
   font-weight: 800;
   white-space: nowrap;
+}
+
+:global(html.light) .introStatus {
+  color: #176329;
 }
 
 @media (max-width: 639px) {
@@ -293,6 +297,41 @@
   border-bottom: 1px solid var(--page-border);
   background: var(--page-panel);
   padding: 0 16px;
+}
+
+.dataNotice {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0;
+  border-top: 1px solid var(--page-border);
+  background: color-mix(in srgb, #d29922 10%, var(--page-field));
+  padding: 7px 12px;
+  color: var(--page-text);
+  font-size: 0.72rem;
+  font-weight: 620;
+  line-height: 1.4;
+}
+
+.dataNotice svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: color-mix(in srgb, #d29922 75%, var(--page-text));
+}
+
+.dataNotice a {
+  color: var(--accent);
+  font-weight: 780;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dataNotice a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 .panelTitle {

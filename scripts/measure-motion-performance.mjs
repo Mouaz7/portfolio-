@@ -9,9 +9,20 @@ const recordBaseline = process.env.PERF_RECORD_BASELINE === "1";
 if (recordBaseline && baselinePath) {
   throw new Error("PERF_RECORD_BASELINE and PERF_BASELINE cannot be used together");
 }
-const routes = ["/", "/skills-page", "/code-review-page"];
+const routes = process.env.PERF_ROUTES?.split(",").map((route) => route.trim()).filter(Boolean)
+  ?? ["/", "/skills", "/code-review"];
 const median = (values) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
-const report = { profile: { cpu: 4, latency: 150, download: 200000, viewport: [1366, 768] }, routes: {} };
+const report = {
+  profile: {
+    cpu: 4,
+    hardwareConcurrency: 4,
+    deviceMemory: 4,
+    latency: 150,
+    download: 200000,
+    viewport: [1366, 768],
+  },
+  routes: {},
+};
 const browser = await chromium.launch();
 try {
   for (const route of routes) {
@@ -19,6 +30,19 @@ try {
     for (let index = 0; index < 3; index += 1) {
       const context = await browser.newContext({ viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
       const page = await context.newPage();
+      // CPU throttling alone does not alter the browser's hardware hints. Keep
+      // the synthetic profile internally consistent so the application uses
+      // the same low-power path that a real four-core/4 GB device receives.
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, "hardwareConcurrency", {
+          configurable: true,
+          value: 4,
+        });
+        Object.defineProperty(navigator, "deviceMemory", {
+          configurable: true,
+          value: 4,
+        });
+      });
       const cdp = await context.newCDPSession(page);
       await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
       await cdp.send("Network.enable");
@@ -27,7 +51,14 @@ try {
       });
       await page.addInitScript(() => {
         localStorage.setItem("theme", "light");
-        const metrics = window.motionMetrics = { lcp: 0, cls: 0, blocking: 0, longTasks: [], frames: [] };
+        const metrics = window.motionMetrics = {
+          lcp: 0,
+          cls: 0,
+          blocking: 0,
+          longTasks: [],
+          longAnimationFrames: [],
+          frames: [],
+        };
         new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) metrics.lcp = entry.startTime;
         }).observe({ type: "largest-contentful-paint", buffered: true });
@@ -52,6 +83,22 @@ try {
             metrics.blocking += Math.max(0, entry.duration - 50);
           }
         }).observe({ type: "longtask", buffered: true });
+        if (PerformanceObserver.supportedEntryTypes.includes("long-animation-frame")) {
+          new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              metrics.longAnimationFrames.push({
+                duration: entry.duration,
+                startTime: entry.startTime,
+                scripts: (entry.scripts ?? []).map((script) => ({
+                  duration: script.duration,
+                  forcedStyleAndLayoutDuration: script.forcedStyleAndLayoutDuration,
+                  invoker: script.invoker,
+                  sourceURL: script.sourceURL,
+                })),
+              });
+            }
+          }).observe({ type: "long-animation-frame", buffered: true });
+        }
         let previous;
         const frame = (now) => {
           if (previous !== undefined) metrics.frames.push(now - previous);
@@ -61,8 +108,16 @@ try {
         requestAnimationFrame(frame);
       });
       await page.goto(`${baseURL}${route}`, { waitUntil: "load" });
+      const performanceTier = await page.locator("html").getAttribute("data-performance-tier");
+      if (performanceTier !== "low") {
+        throw new Error(`${route} measured ${performanceTier ?? "unknown"} performance tier; expected low`);
+      }
       await page.waitForTimeout(4000);
-      runs.push(await page.evaluate(() => window.motionMetrics));
+      const metrics = await page.evaluate(() => window.motionMetrics);
+      if (!Number.isFinite(metrics.lcp) || metrics.lcp <= 0) {
+        throw new Error(`${route} produced no LCP candidate in run ${index + 1}`);
+      }
+      runs.push(metrics);
       await context.close();
     }
     report.routes[route] = {
