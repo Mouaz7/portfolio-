@@ -1,100 +1,117 @@
 <div align="center">
 
-<img src="public/brand/mouaz%2Dlogo.svg" width="72" alt="Mouaz Naji logo" />
-
-# Mouaz Naji
+# 👨‍💻 Mouaz Naji
 
 ### Developer Portfolio
 
-Projects, skills and experience in an interactive developer workspace.
+A developer portfolio built around code, projects and experience.
 
-**[View portfolio](https://mouazdev.vercel.app) · [Documentation](docs/README.md) · [Contact](https://mouazdev.vercel.app/contact)**
+**[🌐 Explore the portfolio ↗](https://mouazdev.vercel.app)**
 
-English · Swedish · Arabic
+[📖 Documentation](docs/README.md) &nbsp; · &nbsp; [✉️ Contact](https://mouazdev.vercel.app/contact)
+
+<sub>English · Swedish · Arabic &nbsp; / &nbsp; Light & dark</sub>
 
 </div>
 
-## Inside the portfolio
+<br />
 
-A responsive personal portfolio built with Next.js, React, TypeScript and
-Supabase. Explore the site in light or dark mode, on desktop, tablet or phone.
+## ✨ The portfolio
 
-<table>
-<tr><th>Page</th><th>What you can explore</th></tr>
-<tr>
-<td><strong>Home</strong></td>
-<td>Profile, selected work and CV access.</td>
-</tr>
-<tr>
-<td><strong>Skills</strong></td>
-<td>Technologies arranged as connected repository cards.</td>
-</tr>
-<tr>
-<td><strong>Journey</strong></td>
-<td>Education and experience along a chronological Git graph.</td>
-</tr>
-<tr>
-<td><strong>Projects</strong></td>
-<td>Search, category filters and GitHub repository details.</td>
-</tr>
-<tr>
-<td><strong>Code Review</strong></td>
-<td>AI code review and an assistant that answers portfolio questions.</td>
-</tr>
-<tr>
-<td><strong>Contact</strong></td>
-<td>A contact form presented as a repository workflow.</td>
-</tr>
-</table>
+A personal developer workspace with a Git inspired interface, built with
+**Next.js**, **React**, **TypeScript** and **Supabase**.
+Designed for desktop, tablet and mobile.
 
-## Start locally
+**🏠 Home & 🧩 Skills**<br />
+Get to know the developer, explore technologies and access the CV.
 
-Use **Node.js 22.x** and npm. Open the project directory, then run:
+**🌱 Journey & 🚀 Projects**<br />
+Follow education and experience, then browse projects with search,
+category filters and GitHub details.
+
+**🔎 Code Review & ✉️ Contact**<br />
+Review code with AI, ask the portfolio assistant a question or send a message.
+
+<br />
+
+## 🧰 Built with
+
+**⚛️ Interface · Next.js, React & TypeScript**<br />
+Pages, reusable components and application logic.
+
+**🎨 Styling · Tailwind CSS & CSS Modules**<br />
+Responsive layouts, theme styling and component animations.
+
+**🗄️ Data · Supabase**<br />
+PostgreSQL data and storage integrations for portfolio features.
+
+**🤖 Features · NVIDIA AI, Shiki & Nodemailer**<br />
+AI responses, code highlighting and contact email delivery.
+
+**🧪 Quality · Jest, Playwright & axe**<br />
+Unit tests, browser checks and accessibility checks.
+
+**☁️ Delivery · GitHub Actions & Vercel**<br />
+Automated project checks and website deployment.
+
+<br />
+
+## ⚡ Run it locally
+
+**1️⃣ Prepare**
+
+Install **Node.js 22.x** and npm, then open the project directory.
 
 ```bash
 npm ci
 cp .env.example .env.local
 ```
 
-Configure the values in [`.env.example`](.env.example). A Supabase project is
-required for database features. AI, email and other integrations need their
-own credentials. Keep real credentials in your local environment file.
+**2️⃣ Configure**
+
+Use [`.env.example`](.env.example) as the setup reference.
+Supabase powers database features. AI and email features need their own
+credentials. Keep real credentials in `.env.local`.
+
+**3️⃣ Start**
 
 ```bash
 npm run dev
 ```
 
-Open **[localhost:3000](http://localhost:3000)** when the terminal reports
-`Public pages ready`.
+When the terminal reports `Public pages ready`, open
+**[localhost:3000](http://localhost:3000)**.
 
-## Everyday commands
+<details>
+<summary><strong>🛠️ Build, checks and tests</strong></summary>
 
-<table>
-<tr><th>Command</th><th>Purpose</th></tr>
-<tr><td><code>npm run dev</code></td><td>Start development</td></tr>
-<tr><td><code>npm run build</code></td><td>Create a production build</td></tr>
-<tr><td><code>npm start</code></td><td>Serve the production build</td></tr>
-<tr><td><code>npm run lint</code></td><td>Check code style</td></tr>
-<tr><td><code>npm run typecheck</code></td><td>Check TypeScript</td></tr>
-<tr><td><code>npm run test:ci</code></td><td>Run unit tests with coverage</td></tr>
-<tr><td><code>npm run test:e2e</code></td><td>Run browser tests</td></tr>
-</table>
+```bash
+# Production build and server
+npm run build
+npm start
 
-Browser installation and additional checks are explained in the
-[testing guide](docs/testing%2Dguide.md).
+# Code checks
+npm run lint
+npm run typecheck
 
-## Documentation and policies
+# Unit and browser tests
+npm run test:ci
+npm run test:e2e
+```
 
-**[Documentation hub](docs/README.md)** covers setup, features, architecture
-and deployment.
+See the [testing guide](docs/testing%2Dguide.md) for browser installation
+and additional checks.
 
-**[Security policy](.github/SECURITY.md)** explains how to report a vulnerability.
+</details>
 
-**[Privacy notice](https://mouazdev.vercel.app/privacy)** describes site data use.
+<br />
 
-## Rights
+## 📚 Further reading
 
-Copyright © 2026 Mouaz Naji. All rights reserved.
+[📖 Documentation](docs/README.md) &nbsp; · &nbsp; [🛡️ Security](.github/SECURITY.md) &nbsp; · &nbsp; [🔒 Privacy](https://mouazdev.vercel.app/privacy)
 
-Read the [license](LICENSE) and [asset rights](ASSETS_LICENSE.md) before
-reusing code or assets.
+Setup, architecture, integrations and deployment guides live in the documentation hub.
+
+<br />
+
+<sub>© 2026 Mouaz Naji. All rights reserved. Read the <a href="LICENSE">license</a> and <a href="ASSETS_LICENSE.md">asset rights</a> before reusing code or assets.</sub>
