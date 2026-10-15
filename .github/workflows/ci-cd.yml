@@ -1,0 +1,240 @@
+name: Quality
+
+on:
+  push:
+    branches: [main, "fix/**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22.x"
+
+jobs:
+  database:
+    name: Isolated migrations and pgTAP
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@46f7f98c7f948ad727d22c1e67fab04c223a0520 # v3.0.0
+        with:
+          version: 2.111.0
+
+      - name: Apply all migrations and test database policies
+        run: |
+          supabase start
+          supabase db reset
+          # Hosted Docker cleanup can occasionally fail after tests pass.
+          # A genuine test failure still fails after the second attempt.
+          for attempt in 1 2; do
+            if supabase test db --local; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 2 ]; then
+              exit 1
+            fi
+
+            echo "Supabase test runner cleanup failed; retrying once..."
+            sleep 5
+          done
+
+  quality:
+    name: Security, tests, build and design lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies once
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit complete dependency tree
+        run: npm audit --audit-level=high
+
+      - name: Scan the complete Git history with Gitleaks
+        run: npm run test:secrets:gitleaks
+
+      - name: Scan project-specific history patterns
+        run: npm run test:secrets
+
+      - name: Inventory dependency licenses
+        run: npm run test:licenses
+
+      - name: Lint, types, dead code and design lock
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run check:dead
+          npm run test:design-lock
+
+      - name: Unit tests with coverage
+        run: npm run test:ci
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@46f7f98c7f948ad727d22c1e67fab04c223a0520 # v3.0.0
+        with:
+          version: 2.111.0
+
+      - name: Start isolated test database for application tests
+        run: |
+          supabase start
+          supabase db reset
+
+      - name: Export isolated CI runtime configuration
+        shell: bash
+        run: |
+          set -a
+          source <(supabase status -o env)
+          set +a
+
+          publishable_key="${PUBLISHABLE_KEY:-${ANON_KEY:-}}"
+          secret_key="${SECRET_KEY:-${SERVICE_ROLE_KEY:-}}"
+
+          test -n "$API_URL"
+          test -n "$publishable_key"
+          test -n "$secret_key"
+
+          echo "::add-mask::$secret_key"
+
+          rate_limit_pepper="$(openssl rand -hex 32)"
+          session_cookie_secret="$(openssl rand -hex 32)"
+          cron_secret="$(openssl rand -hex 32)"
+          rag_job_secret="$(openssl rand -hex 32)"
+          revalidate_secret="$(openssl rand -hex 32)"
+
+          echo "::add-mask::$rate_limit_pepper"
+          echo "::add-mask::$session_cookie_secret"
+          echo "::add-mask::$cron_secret"
+          echo "::add-mask::$rag_job_secret"
+          echo "::add-mask::$revalidate_secret"
+
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$publishable_key"
+            echo "SUPABASE_URL=$API_URL"
+            echo "SUPABASE_PUBLISHABLE_KEY=$publishable_key"
+            echo "SUPABASE_SECRET_KEY=$secret_key"
+            echo "RATE_LIMIT_PEPPER=$rate_limit_pepper"
+            echo "SESSION_COOKIE_SECRET=$session_cookie_secret"
+            echo "CRON_SECRET=$cron_secret"
+            echo "RAG_JOB_SECRET=$rag_job_secret"
+            echo "REVALIDATE_SECRET=$revalidate_secret"
+          } >> "$GITHUB_ENV"
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Browser and accessibility tests
+        run: npm run test:e2e
+
+      - name: Pixel comparison against the pre-change baseline
+        run: npm run test:pixel-lock
+
+      - name: Upload visual verification images
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: visual-verification
+          path: test-results/visual-actual/
+          retention-days: 7
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Lighthouse CI
+        run: npm run test:lighthouse
+
+      - name: Resolve motion comparison baseline
+        id: motion_baseline
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          baseline_ref="${PR_BASE_SHA:-}"
+          if [ -z "$baseline_ref" ]; then
+            baseline_ref="$(git rev-parse --verify HEAD^ 2>/dev/null || true)"
+          fi
+          echo "ref=$baseline_ref" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout motion comparison baseline
+        if: steps.motion_baseline.outputs.ref != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.motion_baseline.outputs.ref }}
+          path: .motion-baseline
+          persist-credentials: false
+
+      - name: Build and measure unchanged baseline on the same runner
+        if: steps.motion_baseline.outputs.ref != ''
+        run: |
+          npm ci --prefix .motion-baseline
+          npm run build --prefix .motion-baseline
+          PERF_RECORD_BASELINE=1 PERF_SERVER_ROOT=.motion-baseline PERF_OUTPUT=.performance-results/baseline.json node scripts/run-motion-ci.mjs
+
+      - name: Motion-enabled constrained-device regression gate
+        env:
+          PERF_BASELINE: ${{ steps.motion_baseline.outputs.ref != '' && '.performance-results/baseline.json' || '' }}
+        run: node scripts/run-motion-ci.mjs
+
+      - name: Upload motion performance measurements
+        if: always() && hashFiles('.performance-results/**') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: motion-performance
+          path: .performance-results/
+          include-hidden-files: true
+          retention-days: 7
+
+      - name: Reject whitespace errors
+        run: git diff --check
+
+      - name: Upload Lighthouse reports
+        if: always() && hashFiles('.lighthouseci/**') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          include-hidden-files: true
+          retention-days: 7

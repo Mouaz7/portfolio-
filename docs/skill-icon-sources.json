@@ -1,0 +1,901 @@
+[
+  {
+    "category": "frontend",
+    "name": "TypeScript",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/typescript/typescript-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/frontend-typescript.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 943,
+      "sha256": "c9191199f4049920c2fc19035b8a6664f37f4689fcd9e8434e786097e78863f0"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/typescript/typescript-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "frontend",
+    "name": "JavaScript",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/javascript/javascript-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/frontend-javascript.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1144,
+      "sha256": "0656ff65fc8eeacda5c78d7f9ffe91ec1eb919db64f56e0b7dcd460af4bbd36c"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/javascript/javascript-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "frontend",
+    "name": "React",
+    "source": "https://cdn.simpleicons.org/react/61DAFB",
+    "sourceLight": "https://cdn.simpleicons.org/react/0E7490",
+    "localPath": "/skill-icons/frontend-react.svg",
+    "localPathLight": "/skill-icons/frontend-react-light.svg",
+    "primary": {
+      "bytes": 2941,
+      "sha256": "37c8c23bc6ea999ad58b7f3883fc08b7e22128ec25adcca60ae1046ff878bcc3"
+    },
+    "light": {
+      "bytes": 2941,
+      "sha256": "479b112ca391ee2ebe72523213d9b782ac8751fa5c1d74dcf68b526145820f98"
+    },
+    "downloadSource": "https://cdn.simpleicons.org/react/61DAFB",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md",
+    "downloadSourceLight": "https://cdn.simpleicons.org/react/0E7490",
+    "lightLicense": "CC0-1.0",
+    "lightLicenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "frontend",
+    "name": "Next.js",
+    "source": "https://cdn.simpleicons.org/nextdotjs/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/frontend-next-js.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 337,
+      "sha256": "1fac8f85df14b1fcc6c851e2810dbf70eff5a6f3432e1f7ed50c1fd4aa48ff60"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/nextdotjs/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "frontend",
+    "name": "Vue 3",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/vuejs/vuejs-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/frontend-vue-3.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 561,
+      "sha256": "4cc1153600c0845c645ac6c718c11d516d6899079a0dc406e3d62f68b1d02c49"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/vuejs/vuejs-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "frontend",
+    "name": "Tailwind CSS",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/tailwindcss/tailwindcss-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/frontend-tailwind-css.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 689,
+      "sha256": "f8cec54589553807eb603bcaf4e056aa090196211698b056542e3cc62a2f3448"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/tailwindcss/tailwindcss-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "mobile",
+    "name": "Kotlin",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/kotlin/kotlin-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/mobile-kotlin.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 502,
+      "sha256": "5053c2e1288582d1ac2cfc1e807eabb7f6059b1aa2f7d04e5cf00063682a2cbe"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/kotlin/kotlin-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "mobile",
+    "name": "Swift",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/swift/swift-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/mobile-swift.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1294,
+      "sha256": "46b6e4abd3ab12c589b8e276295f9439e2869bc4788d918efbc6e76147e8a06e"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/swift/swift-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "mobile",
+    "name": "Flutter",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/flutter/flutter-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/mobile-flutter.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 646,
+      "sha256": "c188249043aecad16b31eaa230474643270a8d8200b897af54a97949cb88e4ae"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/flutter/flutter-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "mobile",
+    "name": "Dart",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/dart/dart-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/mobile-dart.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 710,
+      "sha256": "8dec3d6f6d92d5c8db294baf7ea89cbad5c3dd0f7fde5ca972ffc6cebf9b2d40"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/dart/dart-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "mobile",
+    "name": "Android",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/android/android-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/mobile-android.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 3827,
+      "sha256": "d6c8aa6c2b94c90ff02c1b7e89f9cf863d54db59b459b8b287c19bfb8e664c41"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/android/android-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "mobile",
+    "name": "Firebase",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/firebase/firebase-plain.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/mobile-firebase.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 353,
+      "sha256": "88633887e7ce34dc6b46a0b0f7aa17e48f8951c229df406bce63cbaa7f457e52"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/firebase/firebase-plain.svg",
+    "collection": "Devicon",
+    "version": "1119b9f84c0290e0f0b38982099a2bd027a48bf1",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/1119b9f84c0290e0f0b38982099a2bd027a48bf1/LICENSE"
+  },
+  {
+    "category": "backend",
+    "name": "Python",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/python/python-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/backend-python.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 2300,
+      "sha256": "71493b4a732f0532b3a03a7a95da3ee11a65766367c8303b901ffbe7bf91a3a2"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/python/python-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "backend",
+    "name": "Java",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/java/java-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/backend-java.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1540,
+      "sha256": "7582e518a9c02425f97155e5a3bd39d1a3a7d421b78caf9c8df7443dad3edc5d"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/java/java-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "backend",
+    "name": "C++",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/cplusplus/cplusplus-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/backend-c-plus-plus.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1143,
+      "sha256": "7ff8253551235e3a6b002a7c2bd6e3190d85113a64fcb40f2254473caeb025d4"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/cplusplus/cplusplus-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "backend",
+    "name": "C",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/c/c-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/backend-c.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 657,
+      "sha256": "7f383aff199491bfc4d45ba3d4f0486cd1ece307216ace19bf205a8783ae68fd"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/c/c-original.svg",
+    "collection": "Devicon",
+    "version": "1119b9f84c0290e0f0b38982099a2bd027a48bf1",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/1119b9f84c0290e0f0b38982099a2bd027a48bf1/LICENSE"
+  },
+  {
+    "category": "backend",
+    "name": "Bun",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/bun/bun-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/backend-bun.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 5552,
+      "sha256": "54664655dec93da013d1fe8f8e1bf3311054708a17b445fdde319e0d7011f93c"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/bun/bun-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "backend",
+    "name": "x86 Asm",
+    "source": "https://cdn.simpleicons.org/assemblyscript/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/backend-x86-asm.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1362,
+      "sha256": "0b8924a8f1433fb8a9850d59067fabc1e9c46b1ed4723f0ff023ec5df81b0cde"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/assemblyscript/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "storage",
+    "name": "Node.js",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/nodejs/nodejs-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/storage-node-js.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1530,
+      "sha256": "597b870ecbd5278fda4a2c86e1e1504bab2ada3dfda39479dee72fa42c3ae9b0"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/nodejs/nodejs-original.svg",
+    "collection": "Devicon",
+    "version": "1119b9f84c0290e0f0b38982099a2bd027a48bf1",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/1119b9f84c0290e0f0b38982099a2bd027a48bf1/LICENSE"
+  },
+  {
+    "category": "storage",
+    "name": "GraphQL",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/graphql/graphql-plain.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/storage-graphql.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1550,
+      "sha256": "1fafe03a1f77be5a1c25c20db6e52f292ed8ae5a9b2536f807ee2a3d2e78d3d3"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/graphql/graphql-plain.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "storage",
+    "name": "PostgreSQL",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/postgresql/postgresql-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/storage-postgresql.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 9178,
+      "sha256": "f220a436258ed014c512ba4f9c0de6b9e5c2c4b55331a0a29f8c7a1a12c36443"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/postgresql/postgresql-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "storage",
+    "name": "MySQL",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/storage-mysql.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 2813,
+      "sha256": "cdb91ed6eee37f512b9ad45a37f5cb007974fe96d411424eb5b327238a543376"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/mysql/mysql-original.svg",
+    "collection": "Devicon",
+    "version": "1119b9f84c0290e0f0b38982099a2bd027a48bf1",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/1119b9f84c0290e0f0b38982099a2bd027a48bf1/LICENSE"
+  },
+  {
+    "category": "storage",
+    "name": "MariaDB",
+    "source": "https://cdn.simpleicons.org/mariadb/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/storage-mariadb.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1388,
+      "sha256": "8aa80abe928d18b98173a6356208d4fff3abbf05d40f0e4b52862b049ac876ca"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/mariadb/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "storage",
+    "name": "SQL",
+    "source": "https://learn.microsoft.com/en-us/azure/architecture/icons/",
+    "sourceLight": null,
+    "localPath": "/skill-icons/storage-sql.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 3435,
+      "sha256": "934ea232bcbb6f948610bed844cbc13190d7123819107469fe54c6f8507af1d1"
+    },
+    "light": null,
+    "downloadSource": null,
+    "collection": "Microsoft Azure Architecture Icons",
+    "version": "verified SQL Database artwork",
+    "license": "Microsoft icon terms",
+    "licenseUrl": "https://learn.microsoft.com/en-us/azure/architecture/icons/#icon-terms"
+  },
+  {
+    "category": "devops",
+    "name": "Docker",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/docker/docker-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/devops-docker.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 4452,
+      "sha256": "3fd830ea69431ed7a0b8d068cd5b34ad3f00a1a78195d50f13ff56713f2462e1"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/docker/docker-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "devops",
+    "name": "Git",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/git/git-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/devops-git.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 778,
+      "sha256": "717a57ea97bf7e86de721dab3e68afac66332a10676d5c9abce4ae6a5a9c9983"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/git/git-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "devops",
+    "name": "GitHub",
+    "source": "https://cdn.simpleicons.org/github/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/devops-github.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 837,
+      "sha256": "57979bb764f0dbd057cc21ddbc92dd10bfaca086a44cb517ae26d63a03e4687b"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/github/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "devops",
+    "name": "CI/CD",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/githubactions/githubactions-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/devops-ci-cd.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 2854,
+      "sha256": "3a2524052ccf301d1a239f20cfef98d655e060c51cc29c5e94c867913899a47e"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/githubactions/githubactions-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "devops",
+    "name": "Linux",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/linux/linux-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/devops-linux.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 193922,
+      "sha256": "cf50ae4a263c6142963fad3561f7cb0311d0d41cc6189eadfb34f81a8a36acb0"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/linux/linux-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "devops",
+    "name": "Pytest",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/pytest/pytest-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/devops-pytest.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 689,
+      "sha256": "e3073e7f520866f93a40e76b633efc29715539150423178cdb2e33f7077e4be1"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/pytest/pytest-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "ai",
+    "name": "LLM Integration",
+    "source": "https://api.iconify.design/hugeicons:neural-network.svg?color=white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ai-llm-integration.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 497,
+      "sha256": "5010503d5d6ba74a7d9516713a57c98f7f9821878bef0355a3339147cb643bf8"
+    },
+    "light": null,
+    "downloadSource": "https://api.iconify.design/hugeicons:neural-network.svg?color=white",
+    "collection": "Hugeicons Free via Iconify",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/hugeicons/hugeicons-react/blob/main/LICENSE"
+  },
+  {
+    "category": "ai",
+    "name": "Function Calling",
+    "source": "https://api.iconify.design/hugeicons:ai-chip.svg?color=white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ai-function-calling.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 720,
+      "sha256": "210f57695362b70fa2546331742f9b1a7b1035133b56db49457560a1331659f3"
+    },
+    "light": null,
+    "downloadSource": "https://api.iconify.design/hugeicons:ai-chip.svg?color=white",
+    "collection": "Hugeicons Free via Iconify",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/hugeicons/hugeicons-react/blob/main/LICENSE"
+  },
+  {
+    "category": "ai",
+    "name": "Prompt Design",
+    "source": "https://api.iconify.design/lucide:sparkles.svg?color=white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ai-prompt-design.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 507,
+      "sha256": "c5a32c75bcf344910a979d54f4b021f1039c40f268715184ab133536cf74b21a"
+    },
+    "light": null,
+    "downloadSource": "https://api.iconify.design/lucide:sparkles.svg?color=white",
+    "collection": "Lucide via Iconify",
+    "license": "ISC",
+    "licenseUrl": "https://github.com/lucide-icons/lucide/blob/main/LICENSE"
+  },
+  {
+    "category": "ides",
+    "name": "VS Code",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/vscode/vscode-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ides-vs-code.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 3404,
+      "sha256": "503d580c442a7071aae180d9b4766e312e4600bf0e9d842b30f56d0e614eceb8"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/vscode/vscode-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "ides",
+    "name": "Visual Studio",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/visualstudio/visualstudio-plain.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ides-visual-studio.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 224,
+      "sha256": "abad94ec23395c38f2a83677f88e56215f976673aa112e800475477a876a2d29"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/visualstudio/visualstudio-plain.svg",
+    "collection": "Devicon",
+    "version": "1119b9f84c0290e0f0b38982099a2bd027a48bf1",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/1119b9f84c0290e0f0b38982099a2bd027a48bf1/LICENSE"
+  },
+  {
+    "category": "ides",
+    "name": "Figma",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/figma/figma-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ides-figma.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 585,
+      "sha256": "d37c2bf1a1d4f10aeffb224e44da672cb8b9510f6e5a2e24b61758262995805e"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/figma/figma-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "ides",
+    "name": "Bitbucket",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/bitbucket/bitbucket-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ides-bitbucket.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 737,
+      "sha256": "6d3b83235eea8714cad68a187ff7b0960edb3a70f161dc5b0f273376fe45c04c"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/bitbucket/bitbucket-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "ides",
+    "name": "Premiere Pro",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/premierepro/premierepro-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/ides-premiere-pro.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 418,
+      "sha256": "53ebac2c132ae702cab230295ecf80f30fa87990cb52a557cbdbdc9c78a9f8ac"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/premierepro/premierepro-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "workflow",
+    "name": "Jira",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/jira/jira-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/workflow-jira.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 1092,
+      "sha256": "e5010dd0056d130e32fa3d0dc589aa1288370b525b4123658ea6eb90f53ca1db"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/jira/jira-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "workflow",
+    "name": "Trello",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/trello/trello-plain.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/workflow-trello.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 577,
+      "sha256": "16e78bee6b30811d9b35f385e812487c7c9972858ab3d80a56070e11fc55edc7"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/trello/trello-plain.svg",
+    "collection": "Devicon",
+    "version": "1119b9f84c0290e0f0b38982099a2bd027a48bf1",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/1119b9f84c0290e0f0b38982099a2bd027a48bf1/LICENSE"
+  },
+  {
+    "category": "workflow",
+    "name": "Cypress",
+    "source": "https://cdn.simpleicons.org/cypress",
+    "sourceLight": "https://cdn.simpleicons.org/cypress/16775C",
+    "localPath": "/skill-icons/workflow-cypress.svg",
+    "localPathLight": "/skill-icons/workflow-cypress-light.svg",
+    "primary": {
+      "bytes": 1505,
+      "sha256": "e8c43ff09fe553e7282e7ddb7d5268020c58286e42c34573b06526c39b02c883"
+    },
+    "light": {
+      "bytes": 1505,
+      "sha256": "c5d1c08ea113e81088617a3ce3f92a1da1b08c95f2c342ec4a116074eee0970c"
+    },
+    "downloadSource": "https://cdn.simpleicons.org/cypress",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md",
+    "downloadSourceLight": "https://cdn.simpleicons.org/cypress/16775C",
+    "lightLicense": "CC0-1.0",
+    "lightLicenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "workflow",
+    "name": "Jenkins",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/jenkins/jenkins-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/workflow-jenkins.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 15407,
+      "sha256": "917c7525a9d6c544f4b5d1d4318778e2dee5ef2d47be075ee494613cb10d2a4e"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/jenkins/jenkins-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "workflow",
+    "name": "Vercel",
+    "source": "https://cdn.simpleicons.org/vercel/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/workflow-vercel.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 147,
+      "sha256": "cededc2e08f4425f38b2cae42c3c6806ab5168dfe37f8ecd303f2e13901648d1"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/vercel/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "workflow",
+    "name": "Bash",
+    "source": "https://cdn.simpleicons.org/gnubash/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/workflow-bash.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 2047,
+      "sha256": "23e1c9de5a5ca5cb1acb6985f4f0b69242fe442b1e5d91be48bc5c0dae021229"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/gnubash/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "webdata",
+    "name": "HTML5",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/html5/html5-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/webdata-html5.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 607,
+      "sha256": "34826e5b3315daadf4fa15f723a3c1d5ba4a89277bfd94e22ac4d7d3d54338c5"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/html5/html5-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "webdata",
+    "name": "CSS3",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/css3/css3-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/webdata-css3.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 778,
+      "sha256": "36b7d94b657d571d3f94042acbf6a4c86a5301a222f83f4b4583ad2acf6e297d"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/css3/css3-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "webdata",
+    "name": "PHP",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/php/php-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/webdata-php.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 4623,
+      "sha256": "e111a2310eea247e8091065ed748e21886582a3e44d8dc2c2bbf3b413b1d88be"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/php/php-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  },
+  {
+    "category": "webdata",
+    "name": "Flask",
+    "source": "https://cdn.simpleicons.org/flask/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/webdata-flask.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 866,
+      "sha256": "84b98162456ca15985d4d35d99ceffc1c475520d5fb5b9d0e0a6b8b2fd53a484"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/flask/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "webdata",
+    "name": "Express",
+    "source": "https://cdn.simpleicons.org/express/white",
+    "sourceLight": null,
+    "localPath": "/skill-icons/webdata-express.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 974,
+      "sha256": "1668a1aba6280bd5e1828d613a4c9cbfa7321d229ff637e5c51ec1cd559385d8"
+    },
+    "light": null,
+    "downloadSource": "https://cdn.simpleicons.org/express/white",
+    "collection": "Simple Icons",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+  },
+  {
+    "category": "webdata",
+    "name": "MongoDB",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/mongodb/mongodb-original.svg",
+    "sourceLight": null,
+    "localPath": "/skill-icons/webdata-mongodb.svg",
+    "localPathLight": null,
+    "primary": {
+      "bytes": 5611,
+      "sha256": "d9f2bf7041264f4747e9969fb82ede0199c0ac97dfa8632aa0687d702ec05f7b"
+    },
+    "light": null,
+    "downloadSource": "https://raw.githubusercontent.com/devicons/devicon/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/icons/mongodb/mongodb-original.svg",
+    "collection": "Devicon",
+    "version": "54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/devicons/devicon/blob/54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08/LICENSE"
+  }
+]

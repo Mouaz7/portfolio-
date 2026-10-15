@@ -1,0 +1,11 @@
+.next
+.next-dev
+node_modules
+coverage
+.lighthouseci
+.performance-results
+.motion-baseline
+playwright-report
+test-results
+.git
+.env*

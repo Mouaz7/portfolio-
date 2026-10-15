@@ -1,0 +1,105 @@
+.root {
+  display: grid;
+  gap: 12px;
+  color: var(--fg);
+  line-height: 1.5;
+}
+
+.root h1,
+.root h2,
+.root h3 {
+  margin: 0;
+  color: var(--fg);
+  font-weight: 820;
+}
+
+.root h1 { font-size: 1.05rem; }
+.root h2 { font-size: 0.98rem; }
+.root h3 { font-size: 0.92rem; }
+
+.root p,
+.root ul,
+.root ol {
+  margin: 0;
+}
+
+.root ul,
+.root ol {
+  display: grid;
+  gap: 6px;
+  padding-inline-start: 20px;
+}
+
+.inlineCode {
+  border: 1px solid var(--surface-border);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--surface-2) 78%, transparent);
+  padding: 1px 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em;
+}
+
+.codeShell {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.codeToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-2);
+  padding: 7px 10px;
+  color: var(--fg-50);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.74rem;
+}
+
+.copyButton {
+  border: 1px solid var(--surface-border);
+  border-radius: 5px;
+  background: transparent;
+  padding: 2px 7px;
+  color: var(--fg-70);
+  font-size: 0.72rem;
+}
+
+.copyButton:hover,
+.copyButton:focus-visible {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.codeBlock {
+  max-width: 100%;
+  margin: 0;
+  overflow: auto;
+  padding: 10px 0;
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.codeLine {
+  display: grid;
+  grid-template-columns: 34px minmax(max-content, 1fr);
+  min-width: max-content;
+}
+
+.lineNumber {
+  padding-inline: 10px 8px;
+  color: color-mix(in srgb, var(--fg) 38%, transparent);
+  user-select: none;
+  text-align: end;
+}
+
+.lineContent {
+  padding-inline-end: 14px;
+}

@@ -1,0 +1,275 @@
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@layer theme, base, components, utilities;
+@config "../tailwind.config.js";
+
+@layer theme {
+  :root {
+    --font-sans: var(--font-urbanist);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Theme tokens. These feed the Tailwind color tokens in
+ * tailwind.config.js (black→--bg, white→--fg, accent→--accent),
+ * so every existing bg-black / text-white / text-accent utility
+ * flips automatically between dark and light.
+ * Accent values are fixed here so every page and canvas uses one palette.
+ * ------------------------------------------------------------------ */
+:root {
+  color-scheme: dark;
+
+  /* Shared with Mouaz7/portfolio-test dark theme. */
+  --bg: #0a0b10;
+  --bg-rgb: 10, 11, 16;
+  --fg: #f4f6fb;
+  --fg-rgb: 244, 246, 251;
+  --fg-70: rgba(244, 246, 251, 0.84);
+  --fg-50: rgba(244, 246, 251, 0.66);
+  --fg-10: rgba(244, 246, 251, 0.1);
+
+  --accent: #19e3c2;
+  --accent-strong: #0fc9ac;
+  --accent-rgb: 25, 227, 194;
+  --navigation-accent: #2fd0ba;
+  --accent-2: #6d8bff;
+  --accent-2-rgb: 109, 139, 255;
+  --wave-cyan-rgb: 25, 227, 194;
+  --wave-teal-rgb: 15, 201, 172;
+  --wave-mint-rgb: 109, 139, 255;
+  --wave-foam-rgb: 244, 246, 251;
+
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  --surface: #181a22;
+  --surface-2: #111219;
+  --surface-border: rgba(244, 246, 251, 0.12);
+  --field: #14161f;
+  --page-panel: var(--surface);
+  --page-panel-muted: var(--surface-2);
+  --page-field: var(--field);
+  --page-border: var(--surface-border);
+  --page-border-hover: color-mix(in srgb, var(--accent) 38%, var(--surface-border));
+  --page-text: var(--fg);
+  --page-text-muted: var(--fg-70);
+  --page-text-subtle: var(--fg-50);
+  --contact-meta: rgba(244, 246, 251, 0.55);
+  --contact-meta-strong: rgba(244, 246, 251, 0.72);
+  --contact-field-action: rgba(244, 246, 251, 0.82);
+
+  /* GitHub-authentic tokens (dark) */
+  --gh-topic-bg: rgba(56, 139, 253, 0.15);
+  --gh-topic-fg: #58a6ff;
+
+  /* Skills cards: keep aurora identity, raise readability */
+  --skills-card-bg: color-mix(in srgb, var(--page-panel) 86%, transparent);
+  --skills-card-border: var(--page-border);
+  --skills-card-title: var(--page-text);
+  --skills-card-body: var(--page-text-muted);
+  --skills-card-label: var(--page-text-muted);
+  --skills-card-glow: rgba(var(--accent-rgb), 0.12);
+  --skills-card-glow-edge: rgba(var(--accent-2-rgb), 0.1);
+  --skills-card-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --skills-icon-plain-filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.18));
+  --skills-icon-themed-filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.16));
+  --skills-icon-mono-filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.16));
+}
+
+html.light {
+  color-scheme: light;
+
+  /* Milky-cyan light mode, matching the ocean-wave reference. */
+  --bg: #defaf5;
+  --bg-rgb: 222, 250, 245;
+  --fg: #0b2c31;
+  --fg-rgb: 11, 44, 49;
+  --fg-70: rgba(11, 44, 49, 0.86);
+  --fg-50: rgba(11, 44, 49, 0.68);
+  --fg-10: rgba(11, 44, 49, 0.09);
+
+  /* Contrast-safe teal for text, buttons, hover, and active states. */
+  --accent: #08b9be;
+  --accent-strong: #00848a;
+  --accent-rgb: 8, 185, 190;
+  --navigation-accent: #006d73;
+
+  --accent-2: #92f4d4;
+  --accent-2-rgb: 146, 244, 212;
+  --wave-cyan-rgb: 29, 207, 212;
+  --wave-teal-rgb: 0, 166, 171;
+  --wave-mint-rgb: 128, 246, 203;
+  --wave-foam-rgb: 250, 255, 253;
+
+  /* Home depth / glass tokens (light) */
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.72);
+
+  /* Light-mode surfaces — pale cyan/mint ramp. */
+  --surface: #f8fffd;
+  --surface-2: #d5f5ef;
+  --surface-border: rgba(11, 44, 49, 0.11);
+  --field: #ffffff;
+  --contact-meta: rgba(11, 44, 49, 0.52);
+  --contact-meta-strong: rgba(11, 44, 49, 0.68);
+  --contact-field-action: rgba(11, 44, 49, 0.8);
+
+  /* GitHub-authentic tokens (light) */
+  --gh-topic-bg: #ddf4ff;
+  --gh-topic-fg: #0969da;
+
+  /* Skills cards: clearer light-mode surface and icon contrast */
+  --skills-card-bg: color-mix(in srgb, var(--page-panel) 86%, transparent);
+  --skills-card-border: var(--page-border);
+  --skills-card-title: var(--page-text);
+  --skills-card-body: var(--page-text-muted);
+  --skills-card-label: var(--page-text-muted);
+  --skills-card-glow: rgba(var(--accent-rgb), 0.06);
+  --skills-card-glow-edge: rgba(var(--accent-2-rgb), 0.07);
+  --skills-card-shadow: 0 18px 32px -28px rgba(0, 116, 124, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --skills-icon-plain-filter: contrast(1.08) saturate(1.05)
+    drop-shadow(0 6px 12px rgba(12, 13, 20, 0.12));
+  --skills-icon-themed-filter: contrast(1.02) saturate(1.02)
+    drop-shadow(0 6px 12px rgba(12, 13, 20, 0.1));
+  --skills-icon-mono-filter: invert(1) contrast(1.08)
+    drop-shadow(0 6px 12px rgba(12, 13, 20, 0.12));
+}
+
+/* Text-sized Journey and Code Review accents need the darker member of the
+ * same teal/blue palette on pale surfaces. Geometry and component structure
+ * remain unchanged. */
+html.light [data-viewport-page="journey"],
+html.light [data-viewport-page="code-review"] {
+  --accent: #006d73;
+  --accent-strong: #005c62;
+  --accent-rgb: 0, 109, 115;
+}
+
+html.light [data-viewport-page="journey"] {
+  --accent-2: #3155b7;
+  --accent-2-rgb: 49, 85, 183;
+  --journey-branch-text: var(--fg);
+}
+
+/* Theme colors switch atomically; no delayed repaint cascade. */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html[data-theme-switching="true"],
+html[data-theme-switching="true"] *,
+html[data-theme-switching="true"] *::before,
+html[data-theme-switching="true"] *::after {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+body {
+  @apply leading-[normal] m-0;
+  font-family: var(--font-sans);
+}
+
+/* Animated soft fallback for devices where WebGL is unavailable. */
+.site-background[data-background-renderer="css"][data-background-mode="animated"] {
+  background-size: 145% 145%, 150% 150%, 155% 155%, 145% 145%, 100% 100% !important;
+  animation: site-background-fallback-flow 16s ease-in-out infinite alternate;
+  will-change: background-position;
+}
+
+@keyframes site-background-fallback-flow {
+  from {
+    background-position: 0% 8%, 100% 18%, 22% 100%, 100% 82%, 50% 50%;
+  }
+  to {
+    background-position: 22% 0%, 78% 34%, 48% 76%, 74% 100%, 50% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-background {
+    animation: none !important;
+  }
+}
+
+/* Cohesive site-wide accents */
+::selection {
+  background: rgba(var(--accent-rgb), 0.28);
+  color: var(--fg);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-rgb), 0.35) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-rgb), 0.35);
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb), 0.55); }
+*::-webkit-scrollbar-track { background: transparent; }
+
+.site-header-nav-item:not([aria-current="page"]):hover .site-header-nav-label,
+.site-header-nav-item:not([aria-current="page"]):focus-visible .site-header-nav-label {
+  color: var(--navigation-accent) !important;
+}
+
+.site-header-nav-item:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--navigation-accent) 70%, transparent);
+}
+
+.site-header-nav-item[aria-current="page"] .site-header-nav-label {
+  color: var(--navigation-accent) !important;
+  font-weight: 800;
+}
+
+.site-header-nav > .site-header-nav-item[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+@layer base {
+  *, *::before, *::after { border-width: 0; }
+  html, body { margin: 0; line-height: normal; }
+}
+
+/* Skills readability layer: keep same geometry, improve paint/contrast only. */
+.skills-card-surface {
+  background:
+    linear-gradient(
+      180deg,
+      var(--skills-card-local-tint, transparent) 0%,
+      rgba(255, 255, 255, 0) 66%
+    ),
+    var(--skills-card-bg);
+  border-color: var(--skills-card-local-border, var(--skills-card-border));
+  box-shadow: var(--skills-card-shadow);
+}
+
+.skills-card-glow {
+  background:
+    radial-gradient(
+      78% 74% at 72% 18%,
+      var(--skills-card-local-glow, var(--skills-card-glow)) 0%,
+      rgba(var(--accent-rgb), 0.025) 38%,
+      transparent 70%
+    ),
+    radial-gradient(
+      54% 48% at 16% 86%,
+      var(--skills-card-local-glow-edge, var(--skills-card-glow-edge)) 0%,
+      transparent 74%
+    );
+}
+
+.skills-card-title { color: var(--skills-card-title); }
+.skills-card-body { color: var(--skills-card-body); }
+.skills-card-label { color: var(--skills-card-label); }

@@ -1,0 +1,19 @@
+{
+  "entry": [
+    "app/**/page.tsx!",
+    "app/**/layout.tsx!",
+    "app/**/route.ts!",
+    "scripts/**/*.{ts,mts}",
+    "scripts/run-motion-ci.mjs",
+    "__tests__/**/*.{ts,tsx}"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx}!",
+    "components/**/*.{ts,tsx}!",
+    "hooks/**/*.{ts,tsx}!",
+    "lib/**/*.{ts,tsx}!",
+    "scripts/**/*.{ts,mts,mjs}"
+  ],
+  "jest": false,
+  "ignoreDependencies": ["@shikijs/*"]
+}
