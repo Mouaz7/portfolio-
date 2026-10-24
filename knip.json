@@ -12,7 +12,7 @@
     "components/**/*.{ts,tsx}!",
     "hooks/**/*.{ts,tsx}!",
     "lib/**/*.{ts,tsx}!",
-    "scripts/**/*.{ts,mts,mjs}"
+    "scripts/**/*.{ts,mts,mjs,cjs}"
   ],
   "jest": false
 }

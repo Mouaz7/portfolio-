@@ -1,4 +1,5 @@
 import { chromium } from "@playwright/test";
+import { compareMotionReports } from "./motion-comparison.cjs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
@@ -188,66 +189,8 @@ try {
 await mkdir(dirname(output), { recursive: true });
 await writeFile(output, `${JSON.stringify(report, null, 2)}\n`);
 if (!recordBaseline) {
-  for (const route of routes) {
-    if (report.routes[route].cls > 0.05) throw new Error(`${route} CLS ${report.routes[route].cls}`);
-  }
-}
-if (baselinePath) {
-  const baseline = JSON.parse(await readFile(baselinePath, "utf8"));
-  if (JSON.stringify(baseline.profile) !== JSON.stringify(report.profile)) throw new Error("Performance profiles differ");
-  const failures = [];
-  for (const route of routes) {
-    const current = report.routes[route];
-    const previous = baseline.routes[route];
-    if (!previous) throw new Error(`Missing baseline: ${route}`);
-    const metrics = ["lcp", "blocking"];
-    if (Number.isFinite(previous.gridVisible) && Number.isFinite(current.gridVisible)) metrics.push("gridVisible");
-    for (const metric of metrics) {
-      const exceedsThreshold = current[metric] > previous[metric] * 1.15
-        && current[metric] - previous[metric] > 100;
-      if (metric === "lcp" && exceedsThreshold) {
-        const identity = (element) => {
-          if (!element?.tag) return null;
-          const url = element.url ? new URL(element.url, baseURL) : null;
-          return JSON.stringify([element.tag, element.text, url ? url.pathname + url.search : ""]);
-        };
-        const previousElements = new Set((previous.runs ?? []).map((run) => identity(run.lcpElement)));
-        const currentElements = new Set(current.runs.map((run) => identity(run.lcpElement)));
-        const changedCandidate = previousElements.size === 1 && currentElements.size === 1
-          && !previousElements.has(null) && !currentElements.has(null)
-          && [...previousElements][0] !== [...currentElements][0]
-          && previous.runs.every((run) => run.lcpElement.region === "header")
-          && current.runs.every((run) => run.lcpElement.region === "main");
-        const measuredGridRuns = [previous, current].every((report) => report.runs?.length
-          && report.runs.every((run) => Number.isFinite(run.gridVisible)));
-        const gridImproved = measuredGridRuns
-          && previous.gridVisible - current.gridVisible > 100
-          && current.gridVisible < previous.gridVisible * 0.85
-          && Math.max(...current.runs.map((run) => run.gridVisible))
-            < Math.min(...previous.runs.map((run) => run.gridVisible));
-        // Removing a large header label can make an earlier-painted content
-        // element win LCP. Accept that different candidate only with a proven
-        // grid improvement AND an LCP within the absolute loading objective.
-        if (changedCandidate && gridImproved && current.lcp <= 2500) {
-          console.warn(`${route} relative LCP is not comparable: the stable winning element changed; `
-            + `grid visibility improved ${previous.gridVisible} -> ${current.gridVisible} ms `
-            + `and absolute LCP ${current.lcp} ms meets the 2500 ms objective`);
-          continue;
-        }
-      }
-      const currentMinimum = Math.min(...current.runs.map((run) => run[metric]));
-      const previousMaximum = previous.runs?.length
-        ? Math.max(...previous.runs.map((run) => run[metric]))
-        : previous[metric];
-      if (exceedsThreshold && currentMinimum > previousMaximum) {
-        failures.push(`${route} ${metric}: ${previous[metric]} -> ${current[metric]}`);
-      } else if (exceedsThreshold) {
-        console.warn(
-          `${route} ${metric} median crossed the threshold, but three-run ranges overlap `
-          + `(${previousMaximum} baseline max, ${currentMinimum} candidate min); treating as noise`,
-        );
-      }
-    }
-  }
+  const baseline = baselinePath ? JSON.parse(await readFile(baselinePath, "utf8")) : undefined;
+  const { failures, warnings } = compareMotionReports(report, baseline);
+  for (const warning of warnings) console.warn(warning);
   if (failures.length) throw new Error(failures.join("\n"));
 }

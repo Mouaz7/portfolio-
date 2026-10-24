@@ -28,19 +28,27 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@46f7f98c7f948ad727d22c1e67fab04c223a0520 # v3.0.0
         with:
           version: 2.111.0
 
+      - name: Prepare isolated Supabase configuration
+        run: node scripts/prepare-supabase-ci.mjs
+
       - name: Apply all migrations and test database policies
         run: |
-          supabase start
-          supabase db reset
+          supabase start --workdir "$SUPABASE_CI_WORKDIR"
+          supabase db reset --local --workdir "$SUPABASE_CI_WORKDIR"
           # Hosted Docker cleanup can occasionally fail after tests pass.
           # A genuine test failure still fails after the second attempt.
           for attempt in 1 2; do
-            if supabase test db --local; then
+            if supabase test db --local --workdir "$SUPABASE_CI_WORKDIR"; then
               exit 0
             fi
 
@@ -51,6 +59,11 @@ jobs:
             echo "Supabase test runner cleanup failed; retrying once..."
             sleep 5
           done
+
+      - name: Stop isolated Supabase stack
+        if: always() && env.SUPABASE_CI_WORKDIR != ''
+        continue-on-error: true
+        run: supabase stop --no-backup --workdir "$SUPABASE_CI_WORKDIR"
 
   quality:
     name: Security, tests, build and design lock
@@ -110,16 +123,19 @@ jobs:
         with:
           version: 2.111.0
 
+      - name: Prepare isolated Supabase configuration
+        run: node scripts/prepare-supabase-ci.mjs
+
       - name: Start isolated test database for application tests
         run: |
-          supabase start
-          supabase db reset
+          supabase start --workdir "$SUPABASE_CI_WORKDIR"
+          supabase db reset --local --workdir "$SUPABASE_CI_WORKDIR"
 
       - name: Export isolated CI runtime configuration
         shell: bash
         run: |
           set -a
-          source <(supabase status -o env)
+          source <(supabase status --workdir "$SUPABASE_CI_WORKDIR" -o env)
           set +a
 
           publishable_key="${PUBLISHABLE_KEY:-${ANON_KEY:-}}"
@@ -235,3 +251,8 @@ jobs:
           path: .lighthouseci/
           include-hidden-files: true
           retention-days: 7
+
+      - name: Stop isolated Supabase stack
+        if: always() && env.SUPABASE_CI_WORKDIR != ''
+        continue-on-error: true
+        run: supabase stop --no-backup --workdir "$SUPABASE_CI_WORKDIR"
