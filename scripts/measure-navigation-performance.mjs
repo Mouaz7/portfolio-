@@ -7,7 +7,6 @@ const targets = [
   { label: "Skills", path: "/skills", ready: ".skills-bento-grid" },
   { label: "Journey", path: "/journey", ready: '[data-journey-fit="desktop"]' },
   { label: "Projects", path: "/projects", ready: ".projects-shell" },
-  { label: "Code Review", path: "/code-review", ready: "[data-code-review-shell]" },
   { label: "Contact", path: "/contact", ready: ".contact-repository-shell" },
 ];
 

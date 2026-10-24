@@ -25,11 +25,6 @@ export function localeTag(locale: Locale): string {
   return "en-US";
 }
 
-export function localeFromPathname(pathname: string): Locale {
-  const segment = pathname.split("/").filter(Boolean)[0];
-  return isLocale(segment) ? segment : defaultLocale;
-}
-
 export function stripLocaleFromPathname(pathname: string): string {
   const segments = pathname.split("/").filter(Boolean);
   if (isLocale(segments[0])) segments.shift();

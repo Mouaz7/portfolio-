@@ -4,6 +4,7 @@ import SkillsGrid from "@/components/skills/SkillsGrid";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import type { SkillCategoryData, SkillData } from "@/lib/skills/data.server";
 import { useRouteEntrance } from "@/components/navigation/NavigationExperienceProvider";
+import styles from "@/components/skills/SkillsGrid.module.css";
 
 type SkillsPageProps = {
   initialCategories?: SkillCategoryData[];
@@ -32,7 +33,7 @@ export default function Page({
       <Header />
 
       {/* Background is the shared global WebGL nebula (see app/layout.tsx) */}
-      <div className="relative z-10 flex-1 min-h-0">
+      <div className={`${styles.viewport} relative z-10 flex-1 min-h-0`}>
         <h1 className="sr-only">{dictionary.skills.title}</h1>
         <SkillsGrid
           initialCategories={initialCategories}

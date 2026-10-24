@@ -3,7 +3,7 @@ import { chromium, firefox, webkit } from "@playwright/test";
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
 const outputPath = process.env.CSP_REPORT_OUTPUT;
-const routes = ["/", "/skills", "/journey", "/projects", "/code-review", "/contact", "/privacy"];
+const routes = ["/", "/skills", "/journey", "/projects", "/contact", "/privacy"];
 const engines = { chromium, firefox, webkit };
 const results = [];
 

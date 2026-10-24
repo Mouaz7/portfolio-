@@ -22,7 +22,6 @@ const BASE_ROUTES = [
   "/skills",
   "/journey",
   "/projects",
-  "/code-review",
   "/contact",
 ];
 
@@ -171,7 +170,6 @@ const Header: NextPage<HeaderType> = ({
         <NavItem href={localizedPath("/skills", locale)} label={labels.skills} active={basePathname === "/skills"} />
         <NavItem href={localizedPath("/journey", locale)} label={labels.journey} active={basePathname === "/journey"} />
         <NavItem href={localizedPath("/projects", locale)} label={labels.projects} active={basePathname === "/projects"} />
-        <NavItem href={localizedPath("/code-review", locale)} label={labels.codeReview} active={basePathname === "/code-review"} />
         <NavItem href={localizedPath("/contact", locale)} label={labels.contact} active={basePathname === "/contact"} />
         <LanguageSwitcher />
         <ThemeToggle className="ml-1" />
@@ -258,7 +256,6 @@ const Header: NextPage<HeaderType> = ({
             <li><NavItem href={localizedPath("/skills", locale)} label={labels.skills} size="sm" active={basePathname === "/skills"} /></li>
             <li><NavItem href={localizedPath("/journey", locale)} label={labels.journey} size="sm" active={basePathname === "/journey"} /></li>
             <li><NavItem href={localizedPath("/projects", locale)} label={labels.projects} size="sm" active={basePathname === "/projects"} /></li>
-            <li><NavItem href={localizedPath("/code-review", locale)} label={labels.codeReview} size="sm" active={basePathname === "/code-review"} /></li>
             <li><NavItem href={localizedPath("/contact", locale)} label={labels.contact} size="sm" active={basePathname === "/contact"} /></li>
           </ul>
         </nav>

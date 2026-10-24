@@ -6,7 +6,6 @@ import {
   detectLocale,
   isLocale,
   localeDirection,
-  localeFromPathname,
   localeTag,
   localizedPath,
   stripLocaleFromPathname,
@@ -23,8 +22,6 @@ describe("portfolio internationalization", () => {
   it("recognizes and extracts supported locales", () => {
     expect(isLocale("sv")).toBe(true);
     expect(isLocale("de")).toBe(false);
-    expect(localeFromPathname("/ar/projects-page")).toBe("ar");
-    expect(localeFromPathname("/projects-page")).toBe("en");
     expect(stripLocaleFromPathname("/sv/projects-page")).toBe("/projects-page");
     expect(stripLocaleFromPathname("/ar")).toBe("/");
   });
@@ -100,9 +97,9 @@ describe("portfolio internationalization", () => {
     expect(sv.contact.preview).toBe("Förhandsgranska");
     expect(sv.journey.commits).toBe("commits");
     expect(sv.journey.branches).toBe("branches");
-    expect(sv.chatbot.label).toBe("Chattbot");
+    expect(sv.nav.contact).toBe("Kontakt");
     expect(ar.journey.commits).toBe("التزامات");
-    expect(ar.contact.sendStep).toBe("الرفع");
+    expect(ar.contact.commitAndSend).toBe("إنشاء التزام وإرسال");
     expect(ar.home.hello).toBe("مرحبًا!");
 
     const activeCopy = JSON.stringify({ sv, ar });

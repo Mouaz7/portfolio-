@@ -20,9 +20,11 @@ The independent `database` job resets an isolated Supabase database and runs the
 10. a same-run motion comparison against the base commit;
 11. `git diff --check`.
 
+Lighthouse stores normal-motion results for Home, Skills, Projects and Contact separately from the existing reduced-motion Journey diagnostic. Journey produces no qualified mobile LCP under normal animation; its normal desktop LCP is checked by the motion script. The assertion thresholds remain unchanged. Historical motion baselines receive disposable missing security values only inside their own build/server subprocesses.
+
 The Lighthouse CLI version and GitHub Actions are pinned to reviewed versions. Browser, pixel, Playwright, coverage, and Lighthouse reports are retained as private workflow artifacts for seven days.
 
-The production build receives five independent random CI-only values for the central secret validator. Performance 0.85 and later 0.90 are future ratchets, not blockers for this delivery.
+The production build receives four independent random CI-only values for the central secret validator. Performance 0.85 and later 0.90 are future ratchets, not blockers for this delivery.
 
 Vercel's Git integration owns deployments: pushes to `main` create production deployments and pull requests create previews. The workflow does not duplicate deployments or store a Vercel access token in GitHub Actions. Protect `main` with the quality job as a required status check so pull requests cannot merge before validation succeeds.
 
@@ -32,13 +34,13 @@ Vercel's Git integration owns deployments: pushes to `main` create production de
 
 ## Project synchronization
 
-`sync-projects.yml` is intentionally paused as a scheduled job and can be dispatched manually. It reports three jobs separately: Projects sync, project-cache revalidation, and RAG refresh. The latter two depend on a successful sync but do not share each other's secrets. Its concurrency group prevents two synchronization runs from overlapping.
+`sync-projects.yml` is intentionally paused as a scheduled job and can be dispatched manually. It reports two jobs separately: Projects sync and project-cache revalidation. Revalidation depends on a successful sync and uses its own secret. Its concurrency group prevents two synchronization runs from overlapping.
 
-Immediately before configuring the workflow, inventory the environment variables read by each workflow step and each invoked program. That inventory is the normative mapping. In the current code, the sync step reads Supabase configuration and the canonical site URL, while the protected revalidation and RAG steps read their own bearer secret and URL. Each job validates only names and never prints values.
+Immediately before configuring the workflow, inventory the environment variables read by each workflow step and each invoked program. That inventory is the normative mapping. In the current code, the sync step reads Supabase configuration and the canonical site URL, while the protected revalidation step reads its own bearer secret and URL. Each job validates only names and never prints values.
 
 ## Required secrets
 
-The workflows use Supabase, rate-limit, cache-revalidation, and RAG-job secrets. Vercel keeps deployment variables in the linked project. Public URLs belong in repository variables, not secrets. `.env.example` is the maintained variable reference; real `.env*` files are ignored by Git.
+The workflows use Supabase, rate-limit, and cache-revalidation secrets. Vercel keeps deployment variables in the linked project. Public URLs belong in repository variables, not secrets. `.env.example` is the maintained variable reference; real `.env*` files are ignored by Git.
 
 ## Code scanning and dependency updates
 

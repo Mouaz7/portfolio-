@@ -20,7 +20,7 @@ jest.mock("@/lib/backend/supabaseAdminClient", () => ({
 }));
 
 const rpcMock = supabaseAdmin.rpc as jest.Mock;
-const policy = PROTECTION_POLICIES.cv_chat;
+const policy = PROTECTION_POLICIES.contact;
 
 describe("API request protection", () => {
   beforeEach(() => {
@@ -40,9 +40,6 @@ describe("API request protection", () => {
   });
 
   it("uses the exact configured quotas", () => {
-    expect(PROTECTION_POLICIES.cv_chat).toMatchObject({ sessionLimit: 10, sessionWindowSeconds: 600, ipLimit: 20, globalLimit: 500, concurrencyLimit: 4 });
-    expect(PROTECTION_POLICIES.code_review).toMatchObject({ sessionLimit: 5, ipLimit: 10, globalLimit: 100, concurrencyLimit: 2 });
-    expect(PROTECTION_POLICIES.code_review_chat).toMatchObject({ sessionLimit: 12, ipLimit: 24, globalLimit: 300, concurrencyLimit: 2 });
     expect(PROTECTION_POLICIES.contact).toMatchObject({ sessionLimit: 3, ipLimit: 5, globalLimit: 50, concurrencyLimit: 2 });
   });
 

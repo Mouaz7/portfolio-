@@ -21,27 +21,12 @@ SMTP_SECURE=false
 RATE_LIMIT_PEPPER=
 SESSION_COOKIE_SECRET=
 CRON_SECRET=
-RAG_JOB_SECRET=
 REVALIDATE_SECRET=
 CV_STORAGE_BUCKET=private-cv
 CV_STORAGE_OBJECT="cv/Cv .pdf"
 ```
 
-The five security/automation secrets must be independently generated, unique, non-placeholder values of at least 32 UTF-8 bytes. The central server-only validator runs when sensitive server modules initialize and is reused by health checks; failures expose variable names and error types, never values.
-
-## AI Key Security
-
-AI requests already run through Next.js server routes:
-
-- `/api/ai/cv-chat`
-- `/api/ai/code-review`
-- `/api/ai/code-review/chat`
-
-NVIDIA-compatible API keys stay in server environment variables and are never sent to browser code. On Vercel, add them under Project Settings > Environment Variables. Do not use `NEXT_PUBLIC_` for AI keys. Treat any credential found in Git, logs, screenshots, chats, or another verified exposure surface as compromised; revoke it before installing a fresh replacement.
-
-Code submitted to the review tools is sent to the configured NVIDIA chat endpoint. Portfolio chatbot retrieval sends source chunks, including configured CV content, to the NVIDIA embedding endpoint during reindexing and sends only the retrieved context to the chat endpoint when answering. Changing `NVIDIA_EMBEDDING_MODEL` requires a protected RAG reindex; the model ID is included in the source hash so the next run rebuilds all vectors consistently.
-
-Free NVIDIA endpoints still have quotas and rate limits. For higher traffic, add provider-side rate limiting or an authenticated gateway before exposing these routes publicly.
+The four security/automation secrets must be independently generated, unique, non-placeholder values of at least 32 UTF-8 bytes. The central server-only validator runs when sensitive server modules initialize and is reused by health checks; failures expose variable names and error types, never values.
 
 ## Vercel
 
@@ -93,6 +78,10 @@ Official reference: https://nextjs.org/docs/app/guides/self-hosting
 ## Pre-Deploy Checks
 
 For background/loading changes, also run the lifecycle and cross-browser suites, the existing pixel lock, Lighthouse and the motion-enabled before/after performance comparison described in `testing-guide.md`. Keep screenshot references unchanged unless an intentional visual change has been approved. Create a PR, wait for Quality (and CodeQL when it is genuinely available), and verify its Vercel preview before merging. Production is created by the existing Git integration; verify the deployed commit and public routes afterward without sending contact emails. Keep the previous successful deployment available for rollback.
+
+### Local removal validation (2026-10-24)
+
+The local cleanup passes the unit, browser, source/pixel-lock and isolated PostgreSQL checks documented in `implementation-status.md` and `testing-guide.md`. It includes a forward migration for retired index data. Deploy the application without the removed endpoints and jobs before applying that migration. This task has not deployed the application, applied the migration remotely or removed hosting/provider secrets.
 
 ### Historical local validation (2026-09-19)
 
@@ -152,7 +141,6 @@ then enforce with HTTP 429:
 
 | Route | Limit |
 | --- | ---: |
-| `/api/ai/*` | 20 requests/minute/IP |
 | `/api/contact/prepare`, `/api/contact/send` | 10 requests/minute/IP |
 | `/api/github/repo-stats` | 30 requests/minute/IP |
 | `/api/health`, `/api/internal/health` | 60 requests/minute/IP |

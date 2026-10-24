@@ -1,4 +1,4 @@
-import ProjectsPage from "@/app/projects-page/projects-page";
+import ProjectsPage from "@/app/projects/projects-page";
 import { localizedPageMetadata } from "@/lib/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getProjects } from "@/lib/projects/data.server";

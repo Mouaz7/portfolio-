@@ -75,14 +75,6 @@
   margin: 0.55rem 0 0;
 }
 
-.warning {
-  padding: 0.8rem 0.9rem;
-  border-inline-start: 3px solid #d29922;
-  background: rgb(210 153 34 / 12%);
-  color: var(--fg) !important;
-  font-weight: 650;
-}
-
 .contactLink {
   display: inline-flex;
   min-height: 44px;
@@ -112,8 +104,7 @@
 }
 
 @media (forced-colors: active) {
-  .article,
-  .warning {
+  .article {
     border: 1px solid CanvasText;
     background: Canvas;
   }

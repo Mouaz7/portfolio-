@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("a skill icon opens every matching project category", async ({ page }) => {
   await page.setViewportSize({ width: 967, height: 943 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/skills-page");
+  await page.goto("/skills");
 
   await page.locator('[data-skill-project-link="Python"]').click();
   await expect(page).toHaveURL(/\/projects\?technology=Python$/);
@@ -60,7 +60,7 @@ test("a skill with no published projects has a clear exit", async ({ page }) => 
 
 test("the skill link keeps the Swedish locale and works from the keyboard", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/sv/skills-page");
+  await page.goto("/sv/skills");
 
   const link = page.getByRole("link", { name: "Visa projekt med Python" });
   await link.focus();

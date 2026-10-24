@@ -17,7 +17,7 @@ test("background, menu and contact validation remain usable", async ({ page }) =
     await route.fulfill({ response, headers });
   });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/contact-page", { waitUntil: "domcontentloaded" });
+  await page.goto("/contact", { waitUntil: "domcontentloaded" });
   const canvas = page.locator("canvas[data-background-fps]");
   await expect(canvas).not.toHaveAttribute("data-background-device-tier", "pending");
   await page.getByRole("button", { name: "Open menu" }).click();
@@ -53,11 +53,10 @@ test("short desktop windows keep every public page usable", async ({ page }) => 
 
   const checks = [
     { route: "/", ready: ".home-main", target: "[data-home-actions]" },
-    { route: "/skills-page", ready: ".skills-bento-grid", target: ".skills-card-surface" },
+    { route: "/skills", ready: ".skills-bento-grid", target: ".skills-card-surface" },
     { route: "/journey", ready: ".commit-row", target: ".commit-row" },
-    { route: "/projects-page", ready: ".projects-shell", target: ".projects-project-row" },
-    { route: "/code-review-page", ready: "[data-code-review-shell]", target: 'button[type="submit"]:visible' },
-    { route: "/contact-page", ready: ".contact-repository-shell", target: ".site-footer" },
+    { route: "/projects", ready: ".projects-shell", target: ".projects-project-row" },
+    { route: "/contact", ready: ".contact-repository-shell", target: ".site-footer" },
   ] as const;
 
   for (const check of checks) {
@@ -68,7 +67,7 @@ test("short desktop windows keep every public page usable", async ({ page }) => 
       check.route,
     ).toBeLessThanOrEqual(1);
     const target = page.locator(check.target).last();
-    if (check.route === "/projects-page") {
+    if (check.route === "/projects") {
       // The last repository card is intentionally below the fold on this
       // scrolling page; verify that it can be reached instead of requiring
       // every card to fit in a 600 px-tall window at once.

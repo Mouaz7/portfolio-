@@ -1,6 +1,6 @@
 # Privacy data inventory
 
-Verification date: 2026-09-13
+Provider/deployment evidence date: 2026-09-13. Inventory updated for feature removal: 2026-10-24.
 
 This inventory separates behavior proven by the repository from behavior that
 still needs production or contractual evidence. It is the source for the
@@ -15,14 +15,12 @@ must not be copied into the public notice.
 | Contact name, email and message | Deliver and protect a contact request | Private Supabase rows, then the configured SMTP service and recipient mailbox | Prepared submission validity is 15 minutes. A daily cleanup selects expired rows older than two hours in batches of 100. No guaranteed maximum deletion time is established. | Code verified; production schedule and backlog monitoring still require operational evidence |
 | Hashed session/network identifiers | Abuse prevention and concurrency/rate controls | Private Supabase quota and lease rows | Rows carry expiries and expired rows are removed during protected database operations | Verified in code and migrations |
 | Contact email after delivery | Receive and answer the message | Configured email service and recipient mailbox | No automated 12-month deletion rule is verified | Mailbox operation unverified |
-| Code-review input and follow-up context | Generate an AI review or answer | Configured external AI endpoint during the request | The application does not intentionally insert the submitted input into portfolio content tables. Provider-side handling and the production endpoint owner require separate verification. | Application flow verified; production/provider contract unverified |
-| Portfolio-chat question and retrieved context | Generate a portfolio-grounded answer | Configured external AI and embedding endpoints during processing | Chat input is not intentionally persisted by the application. Indexed portfolio source chunks remain in private Supabase RAG tables until reindexed or removed. | Application flow verified; production/provider contract unverified |
 | Technical page-performance data | Measure page performance | Vercel Speed Insights when `VERCEL=1` | No repository-controlled retention period is claimed | Production HTML and code presence verified; contractual retention not verified here |
 | Contact attachments | Future contact delivery with quarantine and malware scanning | Private `contact-uploads` bucket and a future external scanner | Disabled unless the feature flag and scanner configuration are present. No scanner is an active recipient under this inventory. | Disabled-by-default code verified; vendor not selected |
 
 ## Release checks
 
-- Verify the production environment and deployed HTML before naming an AI,
+- Verify the production environment and deployed HTML before naming an
   email, analytics, hosting or malware-scanning recipient publicly.
 - Verify that the daily contact cleanup is enabled, monitored and keeping pace
   before publishing a maximum deletion promise.

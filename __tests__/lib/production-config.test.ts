@@ -21,7 +21,7 @@ function productionEnvironment(
 }
 
 describe("production security configuration", () => {
-  it("accepts five distinct non-placeholder secrets of at least 32 UTF-8 bytes", () => {
+  it("accepts four distinct non-placeholder secrets of at least 32 UTF-8 bytes", () => {
     const environment = productionEnvironment();
 
     expect(productionSecurityConfigIssues(environment)).toEqual([]);
@@ -32,9 +32,8 @@ describe("production security configuration", () => {
     const duplicated = "a-secure-value-that-is-definitely-long-enough";
     const environment = productionEnvironment({
       RATE_LIMIT_PEPPER: undefined,
-      SESSION_COOKIE_SECRET: "short",
-      CRON_SECRET: "generate-your-secret-value-that-is-long-enough",
-      RAG_JOB_SECRET: duplicated,
+      SESSION_COOKIE_SECRET: "generate-your-secret",
+      CRON_SECRET: duplicated,
       REVALIDATE_SECRET: duplicated,
     });
 
@@ -42,8 +41,8 @@ describe("production security configuration", () => {
     expect(issues).toEqual(expect.arrayContaining([
       "RATE_LIMIT_PEPPER:missing",
       "SESSION_COOKIE_SECRET:too_short",
-      "CRON_SECRET:placeholder",
-      "RAG_JOB_SECRET+REVALIDATE_SECRET:duplicate",
+      "SESSION_COOKIE_SECRET:placeholder",
+      "CRON_SECRET+REVALIDATE_SECRET:duplicate",
     ]));
     expect(() => assertProductionSecurityConfig(environment)).toThrow(
       /RATE_LIMIT_PEPPER:missing/,

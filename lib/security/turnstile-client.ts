@@ -138,7 +138,7 @@ async function executeTurnstile(action: string): Promise<string> {
 export async function fetchWithTurnstile(
   input: RequestInfo | URL,
   init: RequestInit,
-  action: "cv_chat" | "code_review" | "code_review_chat" | "contact",
+  action: "contact",
 ): Promise<Response> {
   const response = await fetch(input, init);
   if (response.status !== 428) return response;

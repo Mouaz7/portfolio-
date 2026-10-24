@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useAccentRgb, rgbToHex } from "@/lib/useAccentRgb";
+import { useAccentRgb, rgbToHex } from "@/hooks/useAccentRgb";
 import { type Project } from "@/components/project/types";
 import { iconPathToKey } from "@/lib/projects/githubSync";
 import { useI18n } from "@/components/i18n/I18nProvider";

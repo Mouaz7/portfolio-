@@ -45,8 +45,8 @@ describe("safe server logger", () => {
     });
 
     logServerError("api.ai.failed", error, {
-      provider: "nvidia",
-      route: "/api/ai/code-review",
+      provider: "smtp",
+      route: "/api/contact/send",
     });
 
     const output = String(errorSpy.mock.calls[0][0]);
@@ -54,7 +54,7 @@ describe("safe server logger", () => {
     expect(output).not.toContain("person@example.com");
     expect(JSON.parse(output)).toMatchObject({
       code: "redacted",
-      provider: "nvidia",
+      provider: "smtp",
       status: 502,
     });
   });

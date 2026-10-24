@@ -1,0 +1,196 @@
+/* The flex parent already accounts for the actual header height. Container
+   units let the server-rendered grid fit that remaining space before React
+   measures it. Unsupported engines keep useViewportStage's hidden fallback. */
+.viewport {
+  container-type: size;
+}
+
+@supports (transform: scale(calc(1px / 1px))) {
+  .stage[data-initial-layout="pending"] {
+    /* Keep these profiles in sync with SkillsGrid's measured fallback. */
+    --initial-cols: 2;
+    --initial-rows: 5;
+    --initial-card-width: 360px;
+    --initial-card-height: 288px;
+    --initial-gap: 10px;
+    --initial-pad-x: 4px;
+    --initial-pad-y: 6px;
+    --initial-min-scale: 0.5;
+    --initial-max-scale: 99999;
+    --initial-link-gap: 24px;
+    --initial-width: calc(var(--initial-cols) * var(--initial-card-width) + (var(--initial-cols) - 1) * var(--initial-gap));
+    --initial-height: calc(var(--initial-rows) * var(--initial-card-height) + (var(--initial-rows) - 1) * var(--initial-gap));
+    --initial-available-width: max(0px, calc(100cqw - 2 * var(--initial-pad-x)));
+    --initial-available-height: max(0px, calc(100cqh - 2 * var(--initial-pad-y)));
+    --initial-width-scale: calc(var(--initial-available-width) / var(--initial-width));
+    --initial-scale: max(
+      min(var(--initial-min-scale), var(--initial-width-scale)),
+      min(var(--initial-max-scale), var(--initial-width-scale), calc(var(--initial-available-height) / var(--initial-height)))
+    );
+    height: 100% !important;
+    padding: var(--initial-pad-y) var(--initial-pad-x) !important;
+    justify-content: safe center;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .stage[data-initial-layout="pending"] .fitted {
+    width: calc(var(--initial-width) * var(--initial-scale)) !important;
+    height: calc(var(--initial-height) * var(--initial-scale)) !important;
+    visibility: visible !important;
+  }
+
+  .stage[data-initial-layout="pending"] .canvas {
+    width: var(--initial-width) !important;
+    height: var(--initial-height) !important;
+    transform: scale(var(--initial-scale)) !important;
+  }
+
+  .stage[data-initial-layout="pending"] :global(.skills-bento-grid) {
+    grid-template-columns: repeat(var(--initial-cols), var(--initial-card-width)) !important;
+    grid-auto-rows: var(--initial-card-height) !important;
+    gap: var(--initial-gap) !important;
+  }
+
+  .stage[data-initial-layout="pending"] :global(.skills-card-surface) {
+    width: var(--initial-card-width) !important;
+    height: var(--initial-card-height) !important;
+  }
+
+  @media (min-width: 640px) {
+    .stage[data-initial-layout="pending"] {
+      --initial-cols: 3;
+      --initial-rows: 3;
+      --initial-card-height: 300px;
+      --initial-gap: 24px;
+      --initial-pad-x: 16px;
+      --initial-pad-y: 40px;
+      --initial-min-scale: 0;
+      --initial-max-scale: 1;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-bento-grid) > li {
+      position: relative;
+      grid-column: auto !important;
+      justify-self: auto !important;
+    }
+
+    /* Match the existing repository connectors before the layout attributes
+       are populated. The hydrated styles continue to own their appearance. */
+    .stage[data-initial-layout="pending"] :global(.skills-bento-grid) > li:not(:nth-child(3n))::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 50%;
+      right: calc(-1 * var(--initial-link-gap));
+      width: var(--initial-link-gap);
+      height: 7px;
+      transform: translateY(-50%);
+      background:
+        radial-gradient(circle, #2da44e 0 2px, var(--page-panel) 2.5px 3.5px, transparent 4px) center / 7px 7px no-repeat,
+        linear-gradient(color-mix(in srgb, var(--page-text) 24%, transparent), color-mix(in srgb, var(--page-text) 24%, transparent)) center / 100% 1px no-repeat;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-bento-grid) > li:nth-child(-n + 6)::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      bottom: calc(-1 * var(--initial-link-gap));
+      left: 50%;
+      width: 7px;
+      height: var(--initial-link-gap);
+      transform: translateX(-50%);
+      background:
+        radial-gradient(circle, #2da44e 0 2px, var(--page-panel) 2.5px 3.5px, transparent 4px) center / 7px 7px no-repeat,
+        linear-gradient(90deg, color-mix(in srgb, var(--page-text) 24%, transparent), color-mix(in srgb, var(--page-text) 24%, transparent)) center / 1px 100% no-repeat;
+    }
+  }
+
+  @media (min-width: 676px) {
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface) {
+      --skill-icon-canvas: 61px;
+    }
+  }
+
+  @media (min-width: 1200px) and (min-height: 1000px) and (max-aspect-ratio: 8/5) {
+    .stage[data-initial-layout="pending"] {
+      --initial-card-height: 270px;
+      --initial-max-scale: 1.5;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface):has([data-single-row="true"]) {
+      --skill-icon-canvas: 48px;
+    }
+  }
+
+  @media (min-width: 1000px) and (min-aspect-ratio: 8/5), (min-width: 2200px) and (min-height: 1100px) {
+    .stage[data-initial-layout="pending"] {
+      --initial-card-width: 620px;
+      --initial-card-height: calc(620px / 1.9);
+      --initial-gap: 16px;
+      --initial-pad-x: 32px;
+      --initial-pad-y: 28px;
+      --initial-max-scale: 99999;
+      --initial-link-gap: 14px;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface),
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface):has([data-single-row="true"]) {
+      --skill-icon-canvas: clamp(73px, 3.6vw, 96px);
+      grid-template-rows: 31px 54px 24px minmax(0, 1fr) 22px;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface) > div:nth-child(3) {
+      padding-top: 2px;
+      padding-bottom: 1px;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface) > div:nth-child(2) > div:first-child > svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-title) {
+      font-size: 24px;
+      line-height: 29px;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-body) {
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-label) {
+      height: 18px;
+      font-size: 14px;
+      line-height: 18px;
+    }
+  }
+
+  @media (min-width: 2200px) and (min-height: 1100px) {
+    .stage[data-initial-layout="pending"] {
+      --initial-card-width: 760px;
+      --initial-card-height: 380px;
+      --initial-gap: 18px;
+      --initial-pad-y: 32px;
+      --initial-link-gap: 18px;
+    }
+  }
+
+  @media (min-width: 3200px) and (min-height: 1500px) {
+    .stage[data-initial-layout="pending"] {
+      --initial-card-width: 900px;
+      --initial-card-height: 450px;
+      --initial-gap: 22px;
+      --initial-pad-x: 40px;
+      --initial-pad-y: 36px;
+      --initial-max-scale: 1;
+      --initial-link-gap: 22px;
+    }
+
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface),
+    .stage[data-initial-layout="pending"] :global(.skills-card-surface):has([data-single-row="true"]) {
+      --skill-icon-canvas: 96px;
+    }
+  }
+}

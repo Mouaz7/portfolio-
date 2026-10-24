@@ -28,18 +28,6 @@ Project categories are defined in `lib/projects/githubSync.ts`:
 - `Mobile`
 - `Systems`
 
-## AI Tools
-
-The code-review page includes one integrated multilingual code assistant. The portfolio has no competing global floating chatbot.
-
-- Portfolio questions in the assistant call `/api/ai/cv-chat`, which retrieves CV, project, skill, journey, and profile context from Supabase pgvector.
-- Retrieval includes recent conversation context, filters weak or near-duplicate matches, and limits repeated chunks from one source. If no relevant portfolio information exists, the API returns a short localized answer without calling the language model.
-- Portfolio data stays internal to the answer flow. The chatbot performs no live web search, and the API does not return citations or a source list.
-- `/code-review` provides a native code editor, result workspace, and code assistant. It calls `/api/ai/code-review` and `/api/ai/code-review/chat` and stores no submitted code, review output, or conversation. The old `/code-review-page` URL redirects here.
-- `/ai-page` remains a backwards-compatible redirect to `/`.
-
-The language selector supports `Auto`, `Svenska`, `English`, and `العربية`. Arabic output uses RTL layout; input fields use `dir="auto"`.
-
 ## Journey
 
 `/journey` server-loads the same cached data exposed by `/api/journey` and renders seven Journey rows as a git-style commit graph in the current seed. The 2025–2026 and 2026–2027 C++ Teaching Assistant appointments remain separate rows; the new database migration must be applied in its intended environment before that seventh row appears there.
@@ -58,7 +46,7 @@ The home CTA calls `/api/cv`. The API reads only the configured private Supabase
 
 ## Loading behavior
 
-Skills, Journey, and Projects render immediately when their server preload is available. If server preloading fails, the existing loading stage accompanies a real client fetch only while it is pending; there is no artificial 400 ms minimum. Code Review renders directly during normal navigation; only genuine route/chunk loading uses the shared route-level loading stage.
+Skills, Journey, and Projects render immediately when their server preload is available. If server preloading fails, the existing loading stage accompanies a real client fetch only while it is pending; there is no artificial 400 ms minimum. Genuine route/chunk loading uses the shared route-level loading stage.
 
 
 ## Theme and Navigation

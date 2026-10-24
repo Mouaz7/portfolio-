@@ -6,16 +6,15 @@
       "startServerReadyTimeout": 30000,
       "numberOfRuns": 3,
       "settings": {
-        "chromeFlags": "--headless=new --no-sandbox --disable-dev-shm-usage --force-prefers-reduced-motion",
+        "chromeFlags": "--headless=new --no-sandbox --disable-dev-shm-usage",
         "throttlingMethod": "provided"
       },
       "url": [
         "http://localhost:3000/",
-        "http://localhost:3000/skills-page?audit=performance",
+        "http://localhost:3000/skills",
         "http://localhost:3000/journey",
-        "http://localhost:3000/projects-page",
-        "http://localhost:3000/code-review-page",
-        "http://localhost:3000/contact-page"
+        "http://localhost:3000/projects",
+        "http://localhost:3000/contact"
       ]
     },
     "assert": {

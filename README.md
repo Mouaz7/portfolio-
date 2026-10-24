@@ -38,10 +38,6 @@ Supabase. Explore the site in light or dark mode, on desktop, tablet or phone.
 <td>Search, category filters and GitHub repository details.</td>
 </tr>
 <tr>
-<td><strong>Code Review</strong></td>
-<td>AI code review and an assistant that answers portfolio questions.</td>
-</tr>
-<tr>
 <td><strong>Contact</strong></td>
 <td>A contact form presented as a repository workflow.</td>
 </tr>

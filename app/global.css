@@ -138,11 +138,10 @@ html.light {
     drop-shadow(0 6px 12px rgba(12, 13, 20, 0.12));
 }
 
-/* Text-sized Journey and Code Review accents need the darker member of the
+/* Text-sized Journey accents need the darker member of the
  * same teal/blue palette on pale surfaces. Geometry and component structure
  * remain unchanged. */
-html.light [data-viewport-page="journey"],
-html.light [data-viewport-page="code-review"] {
+html.light [data-viewport-page="journey"] {
   --accent: #006d73;
   --accent-strong: #005c62;
   --accent-rgb: 0, 109, 115;

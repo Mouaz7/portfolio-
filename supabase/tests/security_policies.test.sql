@@ -1,9 +1,9 @@
 begin;
-select plan(34);
+select plan(36);
 
 select ok((select relrowsecurity from pg_class where oid = 'public.project'::regclass), 'project has RLS');
 select ok((select relrowsecurity from pg_class where oid = 'public.site_cv'::regclass), 'site_cv has RLS');
-select ok((select relrowsecurity from pg_class where oid = 'public.rag_chunk'::regclass), 'rag_chunk has RLS');
+select ok(to_regclass('public.rag_chunk') is null, 'retired AI chunks are removed');
 select ok((select relrowsecurity from pg_class where oid = 'public.contact_submission'::regclass), 'contact submissions have RLS');
 select ok((select relrowsecurity from pg_class where oid = 'public.content_translation'::regclass), 'content translations have RLS');
 
@@ -15,7 +15,7 @@ select ok(has_table_privilege('anon', 'public.content_translation', 'select'), '
 select ok(not has_table_privilege('anon', 'public.project', 'insert'), 'anon cannot insert projects');
 select ok(not has_table_privilege('anon', 'public.content_translation', 'insert'), 'anon cannot insert translations');
 select ok(not has_table_privilege('anon', 'public.site_cv', 'select'), 'anon cannot read CV source text');
-select ok(not has_table_privilege('anon', 'public.rag_chunk', 'select'), 'anon cannot read RAG chunks');
+select ok(to_regclass('public.rag_source') is null, 'retired AI sources are removed');
 select ok(not has_table_privilege('anon', 'public.contact_submission', 'select'), 'anon cannot read contact submissions');
 
 insert into public.home_capability (id, title, description, icon_key, sort_order, is_active)
@@ -46,8 +46,14 @@ select ok(not has_table_privilege('authenticated', 'public.contact_submission', 
 select ok(has_table_privilege('service_role', 'public.request_quota', 'insert'), 'service role can manage quotas');
 select ok(has_table_privilege('service_role', 'public.contact_submission', 'select'), 'service role can read contact submissions');
 
-select ok(not has_function_privilege('anon', 'public.match_rag_chunks(extensions.vector,integer,double precision,text)', 'execute'), 'anon cannot execute RAG search');
-select ok(has_function_privilege('service_role', 'public.match_rag_chunks(extensions.vector,integer,double precision,text)', 'execute'), 'service role can execute RAG search');
+select ok(to_regprocedure('public.match_rag_chunks(extensions.vector,integer,double precision,text)') is null, 'retired AI search is removed');
+select ok(to_regclass('public.rag_index_run') is null and to_regclass('public.job_lease') is null, 'retired AI jobs are removed');
+select ok(to_regprocedure('public.replace_rag_source(text,text,text,text,text,jsonb,jsonb)') is null, 'retired AI indexing is removed');
+select ok(
+  to_regprocedure('public.acquire_job_lease(text,integer)') is null
+  and to_regprocedure('public.release_job_lease(text,uuid)') is null,
+  'retired AI job lock functions are removed'
+);
 select ok(not has_function_privilege('anon', 'public.acquire_request_budget(text,text,text,integer,integer,integer,integer,integer,integer,integer,integer,boolean)', 'execute'), 'anon cannot consume internal quotas directly');
 select is((select public from storage.buckets where id = 'contact-uploads'), false, 'contact upload bucket is private');
 select is(

@@ -6,21 +6,20 @@ import sharp from "sharp";
 // Approved responsive references. They are refreshed only after the complete
 // light/dark viewport set has passed accessibility checks and been reviewed at
 // native resolution; see docs/testing-guide.md.
+// Navigation references updated after the requested feature removal.
+// The 12 changed headers were compared with an isolated pre-change render;
+// existing text masks, dimensions and geometry tolerances are retained.
 const expected = {
-  "desktop-code-review-page-dark.png": "19e083a4198a86e609e5023921fc446d7199b45257ac8a1392ef0870696a6393",
-  "desktop-code-review-page-light.png": "ed28a95cc86a35fb6d41b9319008169375487f402c5ab2600be0f6e5e0c9bd24",
-  "desktop-contact-page-dark.png": "0b5897a93ee99b0e5636819c474c61c04ef0003524b0105a7e7bbdc74ca8af64",
-  "desktop-contact-page-light.png": "50ae4899b8ddd3eb4906c9cf15aa4a68cc2889e7f4a2d4b1c43adde5c3b7f424",
-  "desktop-home-dark.png": "af25cac12cfd1f363ec0694f62a05c81a06b96e883f66d5b7777d3271b2d45e0",
-  "desktop-home-light.png": "dacfaeeb63240dcaa863644afbeacc3d7acbe0f9e594e160e7b136d6235779d4",
-  "desktop-projects-page-dark.png": "440d6d352874cd938ef7440f2fb3c1b881007dbad4b0efb4b4100357e2d4fc64",
-  "desktop-projects-page-light.png": "3355687d8555e13ad6cfd29f499be55dc488072532e099849cde49b4dbf65b98",
-  "desktop-journey-dark.png": "aadcb83f74c262494d69553b95f2a65225ac22e5dec3f4ce66940d2e2d509e25",
-  "desktop-journey-light.png": "78462b50130f7b83932e3b1fbc9a206d1a54396fe1a85bc30a15996b63a8db78",
-  "desktop-skills-page-dark.png": "aa81d031c8d0ce8f378031f70b07b7fadc9f68be9f32a01be6ac8ed2e8ee0ba1",
-  "desktop-skills-page-light.png": "df9386d188f6edb8220430951c2e2445d694db8ccfa1e41380ce803dcc2e3df3",
-  "mobile-code-review-page-dark.png": "12fafe011338723d514e72f87f28980865d1dbc76662de2cb3b7f2df1e3ef025",
-  "mobile-code-review-page-light.png": "f170dc87ba2cc54a9e25bcb64b57c4b6c0787faa40350587141e2289f20e762b",
+  "desktop-contact-page-dark.png": "cf7e9f76352c4d16c8615023f9d8ded0983f0f6cebd3a6605665b8358e51ac7d",
+  "desktop-contact-page-light.png": "c4726e1e616bada26c9193093581476f65f9fd8d3152a437204d23fc50e9c5b1",
+  "desktop-home-dark.png": "702262c504c19d6ce6fed48ec835501e8d1c72df3876900f4781e9e40d6c35b1",
+  "desktop-home-light.png": "e60745c3528f795cb8cfbe0f5e84fdf271c0e018c02490f5af9fed34c934bc86",
+  "desktop-projects-page-dark.png": "f92f99fb2f8f3bcd815b4f2d6f40040b6733006ac6be9a2dbdd330906cff71e2",
+  "desktop-projects-page-light.png": "7ff8dbec2d68d1077063d1c7613263762e5db0e5323f75c976fb6a1f259f85ae",
+  "desktop-journey-dark.png": "a44076132fc033f790ed73a58d79671388c9a034cc3effc002cf083c68cd1a2a",
+  "desktop-journey-light.png": "811a102a55cd348c3ceeb17c6cc6a640ce3e706ad5449f81e77f37dbfae14221",
+  "desktop-skills-page-dark.png": "14df99119b3e8e19d293d53eca594a7ce50dc6287bfc0a6a7b1c9f9af7bf4d0b",
+  "desktop-skills-page-light.png": "0f3b7c77ce873c2cb4dc89793ef0c9897a05af122953d7b71a3eb428eae6ae2c",
   "mobile-contact-page-dark.png": "bd2692cf398b8da76686571d30b404dff20b9ab141d88c091b421daeca3818f6",
   "mobile-contact-page-light.png": "b5ee2cbd9a574c9fb60c690e7fd52ae3b3baf5a3ef48150e2c3b0d0395b49f7e",
   "mobile-home-dark.png": "0d9d798ec2e6b562ecef9802ad66eeb7187234fd04fd60f4de35ccc04c98747b",
@@ -31,12 +30,10 @@ const expected = {
   "mobile-journey-light.png": "3966bcb8dabad5c3dd94eacc4202443ebe86933bab2a90b3820cad90a936b95e",
   "mobile-skills-page-dark.png": "31a09f73eddf8ded2b5d2194519d8c6783460a17b1ae57821d239e23c1ae6f6e",
   "mobile-skills-page-light.png": "3392b146d891d30d89631db740a2c538af6b16d2b543c2b3cbdc9c734fe7c8aa",
-  "tablet-code-review-page-dark.png": "465442877d480b37c23ab76cdb70a440dc90136842dcbddde5bbbaba9c37eb6c",
-  "tablet-code-review-page-light.png": "e0c6315eb34eba74cf9fa2bda344c6d87a3e4ab32081bcb70a72df323f0d3e26",
   "tablet-contact-page-dark.png": "1da79e5515a3d8869c098141d71499932734103035818243fd59b329bb5b918d",
   "tablet-contact-page-light.png": "93f253ddeaa15b9e36efffa7878ad41743e2e058a19f443f12248c8e9441f3c8",
-  "tablet-home-dark.png": "4d6c8ebdf6c6244532c84d54ff1c13ad17d15f50f66a16331ce8d4a4746c58c1",
-  "tablet-home-light.png": "56222d9b2d36824e8c508ad18922ed2419d6c92c499d14112af68ec4ad26c2ab",
+  "tablet-home-dark.png": "73b599830548f160d81b6a189a2a91f1d961035d305c1e97fa3be6e784047fb7",
+  "tablet-home-light.png": "f558f2bfeb5dfcf61f9f4b93af2a8e1671f1e72a6dcdb8299cc173a0a8043813",
   "tablet-projects-page-dark.png": "635aaf6154b2105eaf8a61c15d69950fab9e415dd18cde8c6dd111a1aa8c6c9a",
   "tablet-projects-page-light.png": "5e977c2ee88504b549164485e7874689fad6e9bd3de32d1d06ce14841f9a2834",
   "tablet-journey-dark.png": "1e30ece57e9031d99e0deb9bde3db21f5b233642fba79ebca392c9cf8c654dbd",
@@ -49,20 +46,16 @@ const expected = {
 // for the handful of subpixel anti-aliasing differences Linux Chromium can
 // produce while preserving the same dimensions, geometry and visible edges.
 const expectedPerceptual = {
-  "desktop-code-review-page-dark.png": "1edd2c98e15ea305e074c9c969e081ccfed2099b676903b4b631984018adc23b",
-  "desktop-code-review-page-light.png": "3d53e1b3d8238d91c68a9f899424825d6e22f792387bc60782e63049294de59c",
-  "desktop-contact-page-dark.png": "c1f6237413da8d3eb49c55ab461036ff933b6c3daf503d227875bcbf802c568e",
-  "desktop-contact-page-light.png": "094def21bc4b9fcb6f71dc19f2ab66edb7b3c7242e66104fadae8d7a64b7210c",
-  "desktop-home-dark.png": "ca4c2d8ba94610d42a41f3699fa6e6bc5a7796a234d4320fb16c27b37eb3d8f4",
-  "desktop-home-light.png": "b496ece0aa4c96c35429d592096f6f1d9299052e4631aafb2f733e4445fb1fa1",
-  "desktop-journey-dark.png": "8c3a463d6d7c6ee496f543d5e0fea26c9a30d7da8e21f5bb1ecf74c82586db01",
-  "desktop-journey-light.png": "856f63e049087ae1220894547427d7ed5b6daeb7b198ec9dd53b91c304c3af5e",
-  "desktop-projects-page-dark.png": "67e043a8e7213297464f3c8de200a667001cb1758aeeb6993f9e2ba2438e35f8",
-  "desktop-projects-page-light.png": "0f8924b31ab30fbd1b50fcbb67038e66b997e026e3cd048f3959b049bbbfeaff",
-  "desktop-skills-page-dark.png": "c92907778942259d39fa226c9d96f643448fdb14d1fac4fde50f9c6cead701d0",
-  "desktop-skills-page-light.png": "a5995700d1b3ac4e8bcc4a11208ca20ff4c64615aa7bf5b5b25fae421d4ef062",
-  "mobile-code-review-page-dark.png": "64c16660b1c9353f1cf190f93cbf5cbe0ea34d4c03943910f8a520543f97fc4a",
-  "mobile-code-review-page-light.png": "17cb93a5c398e96121d072b9a17454b6e8d662443ddb471a2ff307a0c1256095",
+  "desktop-contact-page-dark.png": "3f0195d031b723561c74f948677359c76b8be23985bd6d93d7d4673c5880b5e3",
+  "desktop-contact-page-light.png": "a80b08e4ddc8e02915f0849d11d8392a9964cd1b2268479d1fbd84c5e39617a3",
+  "desktop-home-dark.png": "b8ff22c348e837405f626400dace617a80a24c1c5ddb01415a651f9e904e29cf",
+  "desktop-home-light.png": "2fac2cf82104bd18fb9d66482906bd6c6b5d0b5fb63e463dc914a287f34760f1",
+  "desktop-journey-dark.png": "c6e047a3f2fa629ce83c17c883f73bf4e92017a8cc34f7186b0d5515feb1089b",
+  "desktop-journey-light.png": "5d829b8317c3327ff7b5322304378018ac2f9ed894448154141b35c3ea997077",
+  "desktop-projects-page-dark.png": "ff0640261520e391c68ca2597ae3f02e5adf5c495d0617fc1f3bef254db37e81",
+  "desktop-projects-page-light.png": "9b22789929f905505740734b14ac5b86b3e0be317d9f7ab434dc6b7768976676",
+  "desktop-skills-page-dark.png": "a8c12f8a80f421091ef129bc7eb2ba7d47ba2c943204560a56061e32494be2a2",
+  "desktop-skills-page-light.png": "4ab0644755294e2105de269deebd7eb985e9befee1829688bda427af328cf8d7",
   "mobile-contact-page-dark.png": "939a0da72c3f602c4f1e3271ee4e2153290abf5d9cee7b7e9acd9285f58152eb",
   "mobile-contact-page-light.png": "175ba796223584aaf4a7ea07ee1e40064fc2f1a40cc0e21af962d08e391d0ae2",
   "mobile-home-dark.png": "f35dd7643d66011efe4bdb8f68c0818b5e335f039c50eb1034d950ad26a5d4e4",
@@ -73,12 +66,10 @@ const expectedPerceptual = {
   "mobile-projects-page-light.png": "1e1bc0139c7220cbc85cbded7d0f7b2884a452d5f96c8b02fa16b1c6e365d8ed",
   "mobile-skills-page-dark.png": "48f661aa8b531dbe49534d0c1f4d03bc557d72a75bd354bf54cd970174076425",
   "mobile-skills-page-light.png": "b2afb54543c716efc133c2e932047e5604630f0cc51437fa4da6932f20d85738",
-  "tablet-code-review-page-dark.png": "be6f6a24e1da1b6d0d42d5fda07805fd1a63c8f349f0325e29e693c492bc82b3",
-  "tablet-code-review-page-light.png": "51ebe18ac991f97632c1ed529e723e13009b886d4cf0e625f3e0004e57518893",
   "tablet-contact-page-dark.png": "f4a13a63cd608f562d53ad0605eafd25bee58b84d474850a7736043b605f329c",
   "tablet-contact-page-light.png": "03f147263a9bdec5ffd6cb00587648917520c440b7c67f8c551b360d1eb0b0e3",
-  "tablet-home-dark.png": "8164156d42a17504f7ff976328ab201dae2e81a9a6102609f9b6faf7f61d945f",
-  "tablet-home-light.png": "ad57db6370d93e935d384c3b5bb39eb4f407eac3ffb685050c7a6273d40a46c8",
+  "tablet-home-dark.png": "17bf40089265d5996f5cb5dab8e52b2c3b169c3d8ef0c88d00007640eea1c96f",
+  "tablet-home-light.png": "142be32b9f770421a5565a21da6d1bf52c429a0cefe65c465c087cc857ecf0e1",
   "tablet-journey-dark.png": "bf649d0a1e812e6e1cec3f456270e50148d34d6d5c6e26f35b1fedd39de03a5c",
   "tablet-journey-light.png": "450e3153a57ec7eaed5906fad6b6f14988e15d65fa3b52c9c12f9b62881e62f5",
   "tablet-projects-page-dark.png": "858bb32d72efa55784c47b343203195c1e62b6e9d32d9c5f7aa91003d8f0dd8e",
@@ -87,22 +78,14 @@ const expectedPerceptual = {
   "tablet-skills-page-light.png": "974d4bd428d5596550b5293663480beb7cf09f75de36f8a300421671a3b0cd71",
 };
 
-// Reviewed Linux CI rasterization of the same desktop Journey layout.
-// Keep these exact edge signatures separate from the local reference instead
-// of widening the geometry allowance for every future screenshot.
-const reviewedPerceptualVariants = {
-  "desktop-journey-dark.png": "155eac3d8585b298282ce4a3b610053242d8dca4dd810881abea1091da2e6066",
-  "desktop-journey-light.png": "88446cf3c8217db194cd7ea2424b743c2f294697f54f81fca3f6dcbe8a914f9b",
-};
-
 // Journey retains its six-bit allowance out of 1024 for reviewed desktop
 // border/logo rasterization differences. Skills retain their four-bit
 // allowance for SVG logo rasterization.
 const expectedGeometrySignatures = {
-  "desktop-journey-dark.png": "0AlTatEJU2vkBp2QSwFgLoNgAA4IwAAcJDIATEYuAAwFjgA0UFgATEJvAExCLwA2WDgAHETAAExGTgAMRDYANlhQAExGXgBMRm4ANlEwADxQbABMRm8ADEKeAD4QsAAsRj4ALEZOAB4RGAAMUHgALEZuAA4GPAAeIDAADAhAAAA=",
-  "desktop-journey-light.png": "IAaslCAGrJATAWJspMIJEiyAIDQDMAAMCsAAMiiQADQqYAAMJyYAMCaQADIk0AAMJsIADCcwADIokAA0KkAADCeEADApoAAyKJAADCbMAAwnkgAyJJAANCQgAAwnRgAaKcEAEiiwAAwmJgAMJ6QAEiiQABw4gAAMBggAGAggAAA=",
-  "desktop-skills-page-dark.png": "0AlTatAJU2vAQmWQWA0K6XJMy5kD8Pwfdo0rTTZk2ZM2ZN2TNmTZkzZk2ZM2ZNmTVKVqjWNM65lDoHYfck6ZlTZk3ZM2ZN2TMk7ZszZE2ZMmZNmzbAsI5WNMaxkD6HwfMkabxTJE2Zs2RN2TNiTJkzYkyZM2ZNhtCGkJjYCAAjA=",
-  "desktop-skills-page-light.png": "IAaslCAGrJAgAZpogrD0FoyhNGZ8LwnhwnNcE8mTImzNmyZtSbsibMmbImxJmyJtq1uVUoyjFGY8T4nhjaFma0m7JmxJuyJtTbEmTUm7Im1Zuytsk7QXGpyjlOd8b4nhzbskG02bJmVNqyJsyVs2bUlbNm3JGSmS9pJmMAghCAk=",
+  "desktop-journey-dark.png": "0ACTatEAk2vkAGmQSwAWLoNgAQ4IwAAcJDIATEYuAAwFjgA0UFgATEJvAExCLwA2WDgAHETAAExGTgAMRDYANlhQAExGXgBMRm4ANlEwADxQbABMRm8ADEKeAD4QsAAsRj4ALEZOAB4RGAAMUHgALEZuAA4GPAAeIDAADAhAAAA=",
+  "desktop-journey-light.png": "IABslCABbJATABYspMApkiyABDQDMAAMCsAAMiiQADQqYAAMJyYAMCaQADIk0AAMJsIADCMwADIokAA0KEAADCeEADApoAAyKJAADCbMAAwnkgAyJJAANCQgAAwnRgAaKcEAEiiwAAwmJgAMJ6QAEiiQABw4gAAMBggAGAggAAA=",
+  "desktop-skills-page-dark.png": "0ACTatAAk2vAQGaQWA0J6XJMy5kD8Pwfdo0rTTZk2ZM2ZN2TNmTZkzZk2ZM2ZNmTVKVqjWNM65lDoHYfck6ZlTZk3ZM2ZN2TMk7ZszZE2ZMmZNmzbAsI5WNMaxkD6HwfMkabxTJE2Zs2RN2TNiTJkzYkyZM2ZNhtCGkJjYCAAjA=",
+  "desktop-skills-page-light.png": "IABslCABbJAgBBlogrDWFoyhNGZ8LwnhwnNcE8mTImzNmyZtSbsibMmbImxJmyJtq1uVUoyjFGY8T4nhjaFma0m7JmxJuyJtTbEmTUm7Im1Zuytsk7QXGpyjlOd8b4nhzbskG02bJmVNqyJsyVs2bUlbNm3JGSmS9pJmMAghCAk=",
   "mobile-skills-page-dark.png": "NAAAEjYAk5PBL2RtMPk4YRjGnMYZxpzGGMacxhyLHOdBeWEZMGcy3RimHOecxhhnHMYcZhSvHMdDGWG5IpcY9ZzKmMc8ppjWHOacxhzNXONjOWMZGjcIfRjmnGcY5BjDONocwxlvHOXGUTeIEmM5ggIcx4ACGOeAAgytgAILEYA=",
   "mobile-skills-page-light.png": "yACCDIiwQGw6AZqTzobHlsc5YxnnOWMZ4xljGWN0YxiShJ7nzpbNIkM5YxhjGWOdZzljmWsQYzmc555H3TjGCmM1YxhDGWMpQxFjCWMyoxycxpzj5Yj3gmcZY5hnOWc95ydjPMYQYxkRjsnUApzGiAJjGYACZxmAAtNSgADkzgA=",
   "tablet-skills-page-dark.png": "aAAaAWgAGgEAAOQCgAAYAAAAAAAAAAAAKAUCQEZI2RtDaGkdNmTZ0zbk3JM2ZNmTNuTYk1RrKU1Nyfk/CelpLTbEnJM2RJmTNsTZkzbk2JNIS8lhS+h5LzJkyWU2xNmTNuTYkzZk2alIazktUBCCkgAAAAgAAAAAAAAAAAAAAAA=",
@@ -233,7 +216,6 @@ for (const [name, expectedHash] of Object.entries(expected)) {
   } else if (
     actual.hash !== expectedHash
     && actual.perceptual !== expectedPerceptual[name]
-    && actual.perceptual !== reviewedPerceptualVariants[name]
     && !geometryMatches
   ) {
     failures.push(

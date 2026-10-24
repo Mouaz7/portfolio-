@@ -1,4 +1,4 @@
-import ContactPage from "@/app/contact-page/contact-page";
+import ContactPage from "@/app/contact/contact-page";
 import { localizedPageMetadata } from "@/lib/page-metadata";
 import { getContactLinks } from "@/lib/contact/data.server";
 import { contactAttachmentsAvailable } from "@/lib/contact/malware-scanner.server";

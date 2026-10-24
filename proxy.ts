@@ -12,7 +12,6 @@ import {
 const LEGACY_PUBLIC_ROUTES = new Map([
   ["/skills-page", "/skills"],
   ["/projects-page", "/projects"],
-  ["/code-review-page", "/code-review"],
   ["/contact-page", "/contact"],
 ]);
 

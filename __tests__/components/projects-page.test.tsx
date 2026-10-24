@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@/tests/test-utils";
-import ProjectsPage from "@/app/projects-page/projects-page";
+import ProjectsPage from "@/app/projects/projects-page";
 import React from "react";
 import { MANUAL_PORTFOLIO_URL } from "@/lib/projects/githubSync";
 import { aegisDbPreview } from "@/lib/projects/aegisdb-preview";

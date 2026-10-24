@@ -46,7 +46,7 @@ describe("lazy Turnstile client", () => {
 
   it("returns ordinary responses without loading Turnstile", async () => {
     const fetchMock = jest.mocked(global.fetch).mockResolvedValue(testResponse("ok", 200));
-    const response = await fetchWithTurnstile("/api/test", { method: "POST" }, "cv_chat");
+    const response = await fetchWithTurnstile("/api/test", { method: "POST" }, "contact");
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(document.querySelector("script[data-portfolio-turnstile]")).toBeNull();
@@ -69,12 +69,12 @@ describe("lazy Turnstile client", () => {
       .mockResolvedValueOnce(testResponse(JSON.stringify({ code: "captcha_required" }), 428))
       .mockResolvedValueOnce(testResponse("ok", 200));
 
-    const response = await fetchWithTurnstile("/api/test", { headers: { "Content-Type": "application/json" } }, "code_review");
+    const response = await fetchWithTurnstile("/api/test", { headers: { "Content-Type": "application/json" } }, "contact");
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const retry = fetchMock.mock.calls[1][1]!;
     expect(new Headers(retry.headers).get("X-Turnstile-Token")).toBe("verified-token");
-    expect(window.turnstile.render).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({ action: "code_review", execution: "execute", sitekey: "test-site-key", size: "invisible" }));
+    expect(window.turnstile.render).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({ action: "contact", execution: "execute", sitekey: "test-site-key", size: "invisible" }));
     expect(document.body.children).toHaveLength(0);
   });
 
@@ -95,7 +95,7 @@ describe("lazy Turnstile client", () => {
       testResponse(JSON.stringify({ code: "captcha_required" }), 428),
     );
 
-    const request = fetchWithTurnstile("/api/test", {}, "code_review");
+    const request = fetchWithTurnstile("/api/test", {}, "contact");
     const rejection = expect(request).rejects.toThrow("verification timed out");
     await jest.advanceTimersByTimeAsync(10_000);
 

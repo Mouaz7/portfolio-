@@ -4,13 +4,13 @@ import Header from '@/components/navigation/Header'
 describe('Header Component', () => {
   it('renders navigation links', () => {
     render(<Header />)
-    
+
     // Check if navigation links are present (using getAllByText for multiple matches)
     expect(screen.getAllByText(/home/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/projects/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/skills/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/journey/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/code review/i).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/code review/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/^AI$/i)).not.toBeInTheDocument()
     expect(screen.getAllByText(/contact/i).length).toBeGreaterThan(0)
   })

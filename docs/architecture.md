@@ -1,8 +1,8 @@
 # Architecture
 
-This portfolio is a Next.js 16 App Router application that combines server-first page rendering with interactive client presentation. Supabase provides public content, row-level security, private file storage, distributed request budgets, and the pgvector retrieval index. Server-only route handlers integrate NVIDIA-compatible AI services, SMTP, GitHub-derived data, and protected automation.
+This portfolio is a Next.js 16 App Router application that combines server-first page rendering with interactive client presentation. Supabase provides public content, row-level security, private file storage, and distributed request budgets. Server-only route handlers integrate SMTP, GitHub-derived data, and protected automation.
 
-The UI is one responsive GitHub/Git-inspired workspace across Home, Skills, Journey, Projects, Code Review, and Contact. Source design locks and 36 screenshot signatures check that presentation; a failing lock still needs manual review.
+The UI is one responsive GitHub/Git-inspired workspace across Home, Skills, Journey, Projects, and Contact. Source design locks and 30 screenshot signatures check that presentation; a failing lock still needs manual review.
 
 ## System overview
 
@@ -21,11 +21,10 @@ flowchart TD
   Shells -. fallback fetch when preload fails .-> PublicRoutes[Public API routes]
   PublicRoutes --> Loaders
 
-  Shells --> ProtectedRoutes[AI and Contact routes]
+  Shells --> ProtectedRoutes[Contact routes]
   ProtectedRoutes --> Protection[Session + Turnstile + budgets + concurrency]
   Protection --> AdminClient[Server-only Supabase admin client]
-  AdminClient --> PrivateData[(Private rows + Storage + pgvector)]
-  ProtectedRoutes --> Models[NVIDIA-compatible models]
+  AdminClient --> PrivateData[(Private rows + Storage)]
   ProtectedRoutes --> Mail[SMTP]
 
   GitHub[Allowlisted GitHub repositories] --> ProjectSync[Manually dispatched project sync]
@@ -80,9 +79,8 @@ Page entries preload localized data directly through server-only loaders. They d
 | Journey | `getJourney(locale)` plus request-derived initial mobile mode | `/api/journey?locale=...`. |
 | Projects | `getProjects(null, locale)` | `/api/project?locale=...`; repository counters load after cards are visible. |
 | Contact | `getContactLinks()` | `/api/contact`. |
-| Code Review | No initial data dependency | No data fallback; it renders directly on normal navigation. |
 
-When server data is present, Skills, Journey, and Projects render it without a second primary-data request or a minimum loading duration. If preload fails, the client performs a real fallback fetch and shows `PageLoadingStage` while that request is pending. Code Review has no initial data request and renders directly on normal navigation.
+When server data is present, Skills, Journey, and Projects render it without a second primary-data request or a minimum loading duration. If preload fails, the client performs a real fallback fetch and shows `PageLoadingStage` while that request is pending.
 
 The visible shells remain client components where animation, input, filters, and viewport state are required. DTO shaping, URL validation, localization joins, and cached queries remain server-only.
 
@@ -94,11 +92,9 @@ The visible shells remain client components where animation, input, filters, and
 | `/skills` | `app/skills/page.tsx` | Connected repository-style Skills grid. |
 | `/journey` | `app/journey/page.tsx` | Git commit graph for education and experience. |
 | `/projects` | `app/projects/page.tsx` | Searchable GitHub-style repository catalog. |
-| `/code-review` | `app/code-review/page.tsx` | Code editor, structured review, and contextual assistant. |
 | `/contact` | `app/contact/page.tsx` | Repository-style contact composer and social links. |
-| `/ai-page` | `app/ai-page/page.tsx` | Backwards-compatible redirect to Home. |
 
-Every canonical page also has Swedish and Arabic aliases through proxy rewriting, for example `/sv/projects` and `/ar/projects`. The legacy `*-page` URLs redirect to their short canonical routes. Legacy and canonical route entries reuse the same page components.
+Every canonical page also has Swedish and Arabic aliases through proxy rewriting, for example `/sv/projects` and `/ar/projects`. The legacy Skills, Projects and Contact `*-page` URLs redirect in the proxy, preserving locale and query parameters. Each canonical route directory owns its server entry and client shell; Contact also owns its page styles. There are no duplicate legacy page entries. Reusable hooks live under `hooks/`.
 
 ## Presentation architecture
 
@@ -107,18 +103,19 @@ Every canonical page also has Swedish and Arabic aliases through proxy rewriting
 - Skills uses repository paths, branches, hashes, checks, contribution strips, `HEAD`, and graph connectors.
 - Journey uses branch rails, commit prefixes, hashes, metadata, verified states, and a current head.
 - Projects uses repository search, filters, visibility, languages, stars, and forks.
-- Code Review models an editor/review workflow with findings and contextual follow-up.
 - Contact models a repository plus commit composer with changed files and clean working-tree states.
 
 CSS variables in `app/global.css` define the shared theme. Page CSS and CSS Modules own exact responsive geometry. Presentation components and critical assets are protected by `scripts/check-design-lock.mjs`; browser screenshots are protected by `scripts/check-pixel-lock.mjs`.
 
 ### Skills asset model
 
+In browsers supporting CSS typed division, the server-rendered Skills grid fits the space below the actual header using container units before hydration. The initial CSS mirrors the measured layout's breakpoints and readability floor. Once React measures the viewport, the existing JavaScript fitting and resize handling take over. Unsupported engines retain that measured fallback. A delayed-script browser test compares the initial and hydrated geometry across layout profiles and locales.
+
 Skills icons are vendored under `public/skill-icons`. `docs/skill-icon-sources.json` is both the source/license manifest and the application allowlist. `lib/skills/data.server.ts` resolves catalog entries to same-origin paths and rejects stale remote database URLs. Each source mark is rendered inside an equal clipped canvas with an optical correction; hover/touch transforms cannot escape the canvas or create shadows/collisions.
 
 ### Navigation and viewport fitting
 
-The header uses Next.js links and explicitly prefetches a destination when its link receives pointer hover, keyboard focus, or touch intent. The development server separately warms all six public routes during startup.
+The header uses Next.js links and explicitly prefetches a destination when its link receives pointer hover, keyboard focus, or touch intent. The development server separately warms the five main public routes during startup.
 
 `RouteScrollNavigator` provides the portfolio's deliberate page-to-page wheel/swipe narrative. It accumulates vertical intent, applies a cooldown, prefetches before pushing, ignores interactive targets, and yields to any nested element that can still scroll in the requested direction. It installs no global keyboard shortcut and disables gesture enhancement for reduced-motion users. Mobile touch navigation can be disabled by page composition where it would conflict with interaction.
 
@@ -143,7 +140,7 @@ This keeps background animation from blocking navigation and prevents desktop sh
 ### Supabase clients
 
 - `lib/backend/supabaseClient.ts` uses the publishable key for RLS-protected public reads and connectivity checks.
-- `lib/backend/supabaseAdminClient.ts` is server-only and uses `SUPABASE_SECRET_KEY` for privileged AI, Contact, CV, sync, cleanup, and indexing operations.
+- `lib/backend/supabaseAdminClient.ts` is server-only and uses `SUPABASE_SECRET_KEY` for privileged Contact, CV, sync, and cleanup operations.
 
 The admin client must never be imported by a client component. Next.js `server-only` guards enforce that boundary in sensitive modules.
 
@@ -157,7 +154,6 @@ The admin client must never be imported by a client component. Next.js `server-o
 | Projects | `project` plus GitHub-derived repository metadata |
 | Localization | `content_translation` for localized editable fields |
 | Contact | `contact_social`, private `contact_submission`, `contact_upload`, and `contact-uploads` Storage |
-| RAG | `site_cv`, `rag_source`, `rag_chunk`, `rag_index_run`, pgvector match RPC |
 | CV download | Private `private-cv` bucket with a configured PDF object |
 | Protection | Request-budget/concurrency tables and RPCs installed by security migrations |
 
@@ -184,9 +180,6 @@ In production, static assets under `brand`, `contact`, `home`, `journey`, `proje
 | `/api/contact` | GET | Cached public contact/social links. |
 | `/api/contact/prepare` | POST | Validate contact data/metadata, create pending rows, and issue signed upload targets. |
 | `/api/contact/send` | POST | Verify, claim, download, send, update status, and clean uploaded objects. |
-| `/api/ai/code-review` | POST | Structured review through an NVIDIA-compatible model; no submitted-code persistence. |
-| `/api/ai/code-review/chat` | POST | Bounded follow-up grounded in the active review context. |
-| `/api/ai/cv-chat` | POST | Portfolio-grounded RAG answer used by the Code Review assistant's About mode. |
 | `/api/cv` | GET | Validated private Storage PDF stream with HTTP validators. |
 | `/api/health` | GET | Cached shallow production-configuration health. |
 
@@ -228,30 +221,6 @@ sequenceDiagram
 
 Allowed attachment families are PDF, PNG, JPG/JPEG, WebP, and TXT. Extra, missing, substituted, oversized, or signature-spoofed objects are rejected. A busy response occurs before the atomic claim, so the submission remains pending and can be retried. The claim RPC protects against concurrent delivery and replay.
 
-## AI and RAG architecture
-
-Code Review and portfolio Q&A are exposed in the Code Review workspace. There is no global chatbot mounted by the root layout.
-
-### Review flow
-
-1. The server validates language, review focus, body size, and code length.
-2. Distributed request protection applies session/IP/global budgets and a concurrency lease.
-3. The NVIDIA-compatible client executes the configured model/fallback chain within a bounded deadline.
-4. The response parser converts model output into controlled structured findings or safe React-rendered Markdown.
-5. Submitted code and conversation are not persisted by application code.
-
-### Portfolio RAG flow
-
-1. Index refresh reads active CV text, projects, skill categories/skills, Journey, and Home profile content.
-2. Stable source hashes avoid rebuilding unchanged rows.
-3. Content is chunked, embedded, and stored in Supabase pgvector with run tracking.
-4. A query embedding calls the `match_rag_chunks` RPC.
-5. Retrieval applies an absolute threshold, a relative score margin, a two-chunk-per-source cap, and near-duplicate filtering.
-6. If no useful context remains, the API returns a localized missing-information response without invoking the chat model.
-7. Otherwise, the model receives only bounded portfolio context and recent bounded conversation context.
-
-The assistant answers from portfolio data and does not perform live web search.
-
 ## CV delivery
 
 The public URL is stable at `/api/cv`, while the PDF itself lives in a private bucket at the exact object path configured by `CV_STORAGE_BUCKET` and `CV_STORAGE_OBJECT`. The current path is `private-cv/cv/Cv .pdf`.
@@ -276,10 +245,9 @@ Replacing the CV means uploading a new version-named private object, updating th
 - `RATE_LIMIT_PEPPER`
 - `SESSION_COOKIE_SECRET`
 - `CRON_SECRET`
-- `RAG_JOB_SECRET`
 - `REVALIDATE_SECRET`
 
-In production, all five must exist, contain at least 32 UTF-8 bytes, avoid placeholder patterns, and be pairwise unique. Errors contain variable names and issue types, never secret values. Sensitive server modules and both health paths reuse this validation.
+In production, all four must exist, contain at least 32 UTF-8 bytes, avoid placeholder patterns, and be pairwise unique. Errors contain variable names and issue types, never secret values. Sensitive server modules and both health paths reuse this validation.
 
 ### Public request protection
 
@@ -305,15 +273,13 @@ The proxy builds a per-request nonce CSP. Production also sends HSTS, `X-Frame-O
 | --- | --- | --- |
 | `/api/internal/health` | `CRON_SECRET` | Uncached read-only Supabase connectivity check. |
 | `/api/internal/revalidate` | `REVALIDATE_SECRET` | Revalidates allowlisted application cache tags. |
-| `/api/internal/rag/reindex` | `RAG_JOB_SECRET` or `CRON_SECRET` | Refreshes source hashes, embeddings, chunks, and index-run state. |
 | `/api/internal/contact-cleanup` | `CRON_SECRET` | Removes expired non-sending submissions and private upload objects. |
 
 `vercel.json` registers Production cron schedules:
 
-- contact cleanup at `0 3 * * *`;
-- RAG reindex at `0 4 * * *`.
+- contact cleanup at `0 3 * * *`.
 
-Vercel Cron authenticates with `Authorization: Bearer <CRON_SECRET>`. GitHub project sync uses its dedicated RAG credential and revalidation credential after updating Supabase.
+Vercel Cron authenticates with `Authorization: Bearer <CRON_SECRET>`. GitHub project sync uses its revalidation credential after updating Supabase.
 
 `/api/health` is a short-cached shallow check and does not query the database. `/api/internal/health` is authenticated, uncached, and performs the real read-only Supabase query.
 
@@ -324,9 +290,8 @@ Vercel Cron authenticates with `Authorization: Bearer <CRON_SECRET>`. GitHub pro
 The `Sync GitHub projects` workflow is currently manual-only; its daily schedule is paused. After a manually dispatched synchronization it:
 
 1. calls the protected revalidation endpoint for `projects`;
-2. calls the protected RAG reindex endpoint;
-3. derives every public endpoint from the non-sensitive `CANONICAL_SITE_URL` repository variable;
-4. keeps the matching Production credentials in GitHub Actions secrets rather than the source tree.
+2. derives every public endpoint from the non-sensitive `CANONICAL_SITE_URL` repository variable;
+3. keeps the matching Production credentials in GitHub Actions secrets rather than the source tree.
 
 ## Deployment and quality boundaries
 
@@ -342,9 +307,9 @@ The `Quality` workflow runs on pushes and pull requests to `main`:
 2. ESLint, TypeScript, Knip, and design-lock verification;
 3. Jest with coverage;
 4. isolated Supabase startup/reset and pgTAP security-policy tests;
-5. production build with five independently generated CI security values;
+5. production build with four independently generated CI security values;
 6. Chromium browser, accessibility, responsive, loader, and behavior tests;
-7. 36 visual screenshots and pixel comparison;
+7. 30 visual screenshots and pixel comparison;
 8. three Lighthouse runs per public route with median assertions;
 9. whitespace checks and short-lived diagnostic artifacts.
 
@@ -356,7 +321,7 @@ Separate workflows enforce semantic PR titles/report size, synchronize projects,
 app/               Server page entries, client page shells, API routes, metadata, CSS
 components/        Feature and shared presentation components
 hooks/             Shared browser measurement/loading/media hooks
-lib/               Server loaders, domain logic, localization, AI, security, integrations
+lib/               Server loaders, domain logic, localization, security, integrations
 public/            Canonical brand SVG and optimized static assets
 scripts/           Sync, design lock, pixel lock, Lighthouse runner
 supabase/          Migrations, deterministic seed, local configuration, pgTAP tests

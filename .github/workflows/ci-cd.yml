@@ -134,13 +134,11 @@ jobs:
           rate_limit_pepper="$(openssl rand -hex 32)"
           session_cookie_secret="$(openssl rand -hex 32)"
           cron_secret="$(openssl rand -hex 32)"
-          rag_job_secret="$(openssl rand -hex 32)"
           revalidate_secret="$(openssl rand -hex 32)"
 
           echo "::add-mask::$rate_limit_pepper"
           echo "::add-mask::$session_cookie_secret"
           echo "::add-mask::$cron_secret"
-          echo "::add-mask::$rag_job_secret"
           echo "::add-mask::$revalidate_secret"
 
           {
@@ -152,7 +150,6 @@ jobs:
             echo "RATE_LIMIT_PEPPER=$rate_limit_pepper"
             echo "SESSION_COOKIE_SECRET=$session_cookie_secret"
             echo "CRON_SECRET=$cron_secret"
-            echo "RAG_JOB_SECRET=$rag_job_secret"
             echo "REVALIDATE_SECRET=$revalidate_secret"
           } >> "$GITHUB_ENV"
 
@@ -210,7 +207,7 @@ jobs:
         if: steps.motion_baseline.outputs.ref != ''
         run: |
           npm ci --prefix .motion-baseline
-          npm run build --prefix .motion-baseline
+          PERF_SERVER_ROOT=.motion-baseline node scripts/run-motion-ci.mjs --build
           PERF_RECORD_BASELINE=1 PERF_SERVER_ROOT=.motion-baseline PERF_OUTPUT=.performance-results/baseline.json node scripts/run-motion-ci.mjs
 
       - name: Motion-enabled constrained-device regression gate

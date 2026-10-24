@@ -3,25 +3,20 @@ import { readFile, readdir } from "node:fs/promises";
 import { basename, join } from "node:path";
 
 const lockedFiles = {
-  "app/code-review-page.module.css": "075f23e29b7bd1dafc7989d064976a4e944e91a2d0b707dcabf5efe5df6ea770",
   "app/fonts.ts": "c6132ac9f3af551fefa720bab1edecff3dc8ccf05184e878e101979c7e5fac8c",
   "app/fonts/urbanist-latin.woff2": "ce6e0dd89c3ffa4de97bda85f9b08bcb775bea4df456b3dbb7e819c1c879be50",
-  "app/global.css": "fff34fe1dcc37bab081f34fe5225431f63358e99078f144fff4e53c40408a990",
+  "app/global.css": "568dbe2189eb900e077ec437dd96de16ea5fa1daea8ca476a7fb67fa3f044040",
   "app/home-page.module.css": "24bc428c9e960997d7406d39b1a22ce498d04aba4cbd674e184ffd164f69d7ed",
-  "app/i18n.css": "b42eaa1be2a06e554e3cfbf8c2f5c2fade22a340e994a18cc7dc677af55e366b",
-  "app/contact-page/contact-repository.css": "4ce52f7d6220879c87530bf127800c3313f98702033f78c5ebdcad9808e9a304",
+  "app/i18n.css": "45a5b57eac8146d5607c044636030d44116ccf3953f89c3e52f410313f32ead1",
+  "app/contact/contact-repository.css": "4ce52f7d6220879c87530bf127800c3313f98702033f78c5ebdcad9808e9a304",
   "components/brand/MouazPremiumLogo.module.css": "10e7b16344705f5739adce71f88fca565cb2222965f3735145d3d5294dca415b",
-  "components/code-editor.module.css": "eeebbdd23ca0a20f24566f2179a5c6ea320fd1e9edfd83fd69664fca482b41e7",
-  "components/code-review-markdown.module.css": "0dae178097e3d13f0452b7c2d1d1ae2bc4e89fff67e76471b2a2ff53918704b5",
-  "components/code-review/ReviewChat.module.css": "f06135f101b17b6bd3570cf260dc2031fad9a7844c2d4e7689764a4e4d1b5f28",
   "components/contact/ContactRepositoryHeader.tsx": "a6fcbd25d8ff9f02c15cbf31849dc2cf91965641b58f73c51866ffc89ddb84be",
   "components/contact/photo-social-container.tsx": "3a2624852585c57808b1d654848c0d8ced4b25eb56f29a9ecb0695c7ee4d3caf",
-  "components/project/ProjectCard.tsx": "bd94d2bfb796ec7f07926facb64b041623881a6e1d670ca11c33b1d5749f2e57",
-  "components/navigation/Header.tsx": "44c6a947a09086a8d67e22412c03de09902cac740f0d0e85a56258567092141d",
+  "components/project/ProjectCard.tsx": "5d9b29b700ab31b2a56a11425aa534b90bdffdd85d1eab1f3425339733dcb21d",
+  "components/navigation/Header.tsx": "85086b1e2ee213d3558b9abebb8831b270d81ee050629e40ab61f897a51a1067",
   "components/skills/SkillCard.module.css": "f579f1fdcb9700c7302dc6d005d41c04f0834f7950df82be08a6ebae838ab7e6",
   "components/skills/SkillCard.tsx": "50387842e52e9629094ce8a37f00acdcd818c59e3fbeaf89e273ff21db906934",
   "components/skills/SkillIcon.tsx": "a217af6158b8cb8fe6ee87c1014eac0b9aa013372d32b439e3c6e688936375e9",
-  "public/brand/mouaz-logo-light-4k.png": "661f812a74cfbe5d86003f9b9662104e8df1082af3885e0cad3111a61763fb99",
   "public/brand/mouaz-logo.svg": "663081d638244c242715749df6066070b24a067b2b4a7e6d7f542f944b8dcb9d",
   "public/contact/check.svg": "abd410a3361f682a8bc24a2ce005bf5a4918c79ee0bb4b309eb9a508cc92495d",
   "public/contact/send-alt.svg": "6fa98ec84360d23c9359e31375abb542ee4f21afc943479dca3c19ff309420ce",
@@ -53,9 +48,9 @@ const splitFileParts = {
     "app/styles/projects-and-contact.css",
     "app/styles/adaptive-and-motion.css",
   ],
-  "app/contact-page/contact-repository.css": [
-    "app/contact-page/contact-repository.css",
-    "app/contact-page/contact-repository-adaptive.css",
+  "app/contact/contact-repository.css": [
+    "app/contact/contact-repository.css",
+    "app/contact/contact-repository-adaptive.css",
   ],
 };
 

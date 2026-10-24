@@ -13,8 +13,7 @@ html[dir="rtl"] .home-main,
 html[dir="rtl"] .projects-main,
 html[dir="rtl"] .journey-main,
 html[dir="rtl"] .skills-stage,
-html[dir="rtl"] .contact-main,
-html[dir="rtl"] [data-page="code-review"] {
+html[dir="rtl"] .contact-main {
   direction: ltr;
 }
 

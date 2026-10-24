@@ -40,12 +40,6 @@ export default async function PrivacyPage() {
           </section>
 
           <section>
-            <h2>{copy.aiTitle}</h2>
-            <p>{copy.aiBody}</p>
-            <p className={styles.warning}>{copy.aiWarning}</p>
-          </section>
-
-          <section>
             <h2>{copy.performanceTitle}</h2>
             <p>{copy.performanceBody}</p>
           </section>

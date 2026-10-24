@@ -1,4 +1,4 @@
-import SkillsPage from "@/app/skills-page/skills-page";
+import SkillsPage from "@/app/skills/skills-page";
 import { localizedPageMetadata } from "@/lib/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getSkillCategories, getSkills } from "@/lib/skills/data.server";

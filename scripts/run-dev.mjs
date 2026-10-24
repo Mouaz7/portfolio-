@@ -5,11 +5,10 @@ const forwardedArgs = process.argv.slice(2);
 const nextBin = fileURLToPath(new URL("../node_modules/next/dist/bin/next", import.meta.url));
 const publicRoutes = [
   "/",
-  "/skills-page",
+  "/skills",
   "/journey",
-  "/projects-page",
-  "/code-review-page",
-  "/contact-page",
+  "/projects",
+  "/contact",
 ];
 
 function optionValue(shortName, longName, fallback) {

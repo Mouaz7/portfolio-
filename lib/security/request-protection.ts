@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/lib/backend/supabaseAdminClient";
 import { securitySecret } from "@/lib/security/production-config";
 import { logServerError } from "@/lib/security/safe-logger.server";
 
-export type ProtectedAction = "cv_chat" | "code_review" | "code_review_chat" | "contact";
+export type ProtectedAction = "contact";
 
 type ProtectionPolicy = {
   action: ProtectedAction;
@@ -21,36 +21,6 @@ type ProtectionPolicy = {
 };
 
 export const PROTECTION_POLICIES: Record<ProtectedAction, ProtectionPolicy> = {
-  cv_chat: {
-    action: "cv_chat",
-    sessionLimit: 10,
-    sessionWindowSeconds: 10 * 60,
-    ipLimit: 20,
-    ipWindowSeconds: 60 * 60,
-    globalLimit: 500,
-    globalWindowSeconds: 24 * 60 * 60,
-    concurrencyLimit: 4,
-  },
-  code_review: {
-    action: "code_review",
-    sessionLimit: 5,
-    sessionWindowSeconds: 10 * 60,
-    ipLimit: 10,
-    ipWindowSeconds: 60 * 60,
-    globalLimit: 100,
-    globalWindowSeconds: 24 * 60 * 60,
-    concurrencyLimit: 2,
-  },
-  code_review_chat: {
-    action: "code_review_chat",
-    sessionLimit: 12,
-    sessionWindowSeconds: 10 * 60,
-    ipLimit: 24,
-    ipWindowSeconds: 60 * 60,
-    globalLimit: 300,
-    globalWindowSeconds: 24 * 60 * 60,
-    concurrencyLimit: 2,
-  },
   contact: {
     action: "contact",
     sessionLimit: 3,

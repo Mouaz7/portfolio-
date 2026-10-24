@@ -10,7 +10,7 @@ Short path through project docs. Start here, move to deep guide you need, skip n
 | --- | --- |
 | [Features](features.md) | Best overview of what site actually does. |
 | [Architecture](architecture.md) | Best map of app structure and data flow. |
-| [Database](database.md) | Supabase tables, pgvector RAG, and storage setup. |
+| [Database](database.md) | Supabase tables and storage setup. |
 | [Deployment](deployment.md) | Best launch path for Vercel, Netlify, or self-hosted. |
 | [Privacy inventory](privacy-data-inventory.md) | Verified data flows, lifecycle evidence, and open production checks. |
 
@@ -42,7 +42,7 @@ npm run build
     </td>
     <td align="center" width="33%">
       <strong><a href="database.md">🗄️ Database</a></strong><br />
-      Supabase tables, pgvector RAG, storage buckets, migration reality.
+      Supabase tables, storage buckets, migration reality.
     </td>
     <td align="center" width="33%">
       <strong><a href="features.md">✨ Features</a></strong><br />
@@ -85,7 +85,6 @@ npm run build
 | --- | --- |
 | Understand app quickly | [Features](features.md) → [Architecture](architecture.md) |
 | Hook up Supabase correctly | [Database](database.md) → [CV Setup](cv-setup.md) |
-| Configure AI tools | [Database](database.md) → [Features](features.md) |
 | Ship to production | [Deployment](deployment.md) → [CI/CD Pipeline](cicd-pipeline.md) |
 | Verify privacy claims | [Privacy inventory](privacy-data-inventory.md) → [Deployment](deployment.md) |
 | Work safely in repo | [Testing Guide](testing-guide.md) → [Root README](../README.md) |

@@ -5,7 +5,7 @@ const sizes = [
   [800, 600], [900, 600], [1024, 600], [1024, 768], [1280, 720], [1366, 768],
   [712, 1138], [768, 1024], [853, 1280], [912, 1368], [960, 1440], [1032, 1376], [1280, 800],
 ];
-const pages = ["/", "/skills-page", "/journey", "/projects-page", "/code-review-page", "/contact-page"];
+const pages = ["/", "/skills", "/journey", "/projects", "/contact"];
 
 test("home slide and navigation fit short viewports", async ({ page }) => {
   for (const viewport of [
@@ -155,7 +155,7 @@ test("Skills keeps its existing short-phone scroll behavior", async ({ page }) =
   await page.emulateMedia({ reducedMotion: "reduce" });
   const viewport = { width: 390, height: 500 };
   await page.setViewportSize(viewport);
-  await page.goto("/skills-page");
+  await page.goto("/skills");
 
   const main = page.locator(".skills-stage");
   await expect(main).toHaveAttribute("data-skills-layout", "phone");
@@ -188,7 +188,7 @@ test("Skills fits nine larger cards without scroll on tablets and desktops", asy
     { width: 1730, height: 1310, minCardWidth: 480, minIconWidth: 60 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.goto("/skills-page");
+    await page.goto("/skills");
 
     const main = page.locator(".skills-stage");
     await expect(main).toHaveAttribute("data-skills-layout", "desktop");
@@ -217,7 +217,7 @@ test("Skills fits nine larger cards without scroll on tablets and desktops", asy
 test("AI icon canvases match the other skill icons on tall desktops", async ({ page }) => {
   await page.setViewportSize({ width: 1730, height: 1310 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/skills-page");
+  await page.goto("/skills");
 
   const stage = page.locator(".skills-stage");
   await expect.poll(async () => Number(await stage.getAttribute("data-viewport-scale")))

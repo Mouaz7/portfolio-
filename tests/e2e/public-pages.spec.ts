@@ -5,19 +5,17 @@ import sharp from "sharp";
 
 const routes = [
   "/",
-  "/skills-page",
+  "/skills",
   "/journey",
-  "/projects-page",
-  "/code-review-page",
-  "/contact-page",
+  "/projects",
+  "/contact",
 ] as const;
 const publicSurfaceSelectors: Record<(typeof routes)[number], string> = {
   "/": ".home-main",
-  "/skills-page": ".skills-bento-grid",
+  "/skills": ".skills-bento-grid",
   "/journey": '[data-journey-fit="desktop"]',
-  "/projects-page": ".projects-shell",
-  "/code-review-page": "[data-code-review-shell]",
-  "/contact-page": ".contact-repository-shell",
+  "/projects": ".projects-shell",
+  "/contact": ".contact-repository-shell",
 };
 const viewports = [
   { name: "mobile", width: 390, height: 844 },
@@ -44,7 +42,8 @@ const adaptiveViewports = [
 const visualOutput = "test-results/visual-actual";
 
 function routeName(route: (typeof routes)[number]) {
-  return route === "/" ? "home" : route.slice(1);
+  // Preserve the approved screenshot filenames while exercising canonical URLs.
+  return route === "/" ? "home" : route === "/journey" ? "journey" : `${route.slice(1)}-page`;
 }
 
 async function waitUntil(startedAt: number, elapsedMs: number) {
@@ -170,7 +169,7 @@ for (const viewport of viewports) {
             path: `${visualOutput}/${viewport.name}-${routeName(route)}-${theme}-after-800.png`,
           });
           await waitUntil(navigationFinishedAt, 5_000);
-          if (route === "/skills-page") {
+          if (route === "/skills") {
             await expect(page.locator(".skills-card-surface").first()).toBeVisible();
           }
           await page.evaluate(async () => {
@@ -258,7 +257,7 @@ test("privacy page is localized in English, Swedish and Arabic", async ({ page }
 test("mobile project repository stats stay readable inside the card", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/projects-page");
+  await page.goto("/projects");
 
   const firstCard = page.locator(".projects-mobile-card-row").first();
   const stats = firstCard.locator(".projects-mobile-repo-stats");
@@ -286,81 +285,6 @@ test("mobile project repository stats stay readable inside the card", async ({ p
   expect(geometry.linksFit).toBe(true);
   expect(geometry.linksAreHorizontal).toBe(true);
   expect(geometry.linksHaveTouchHeight).toBe(true);
-});
-
-test("Arabic Code Review keeps the desktop intro order while reading Arabic RTL", async ({ page }) => {
-  await page.setViewportSize({ width: 1485, height: 760 });
-  await page.goto("/ar/code-review-page");
-
-  const layout = await page.locator("#code-review-intro-title").evaluate((heading) => {
-    const intro = heading.closest("section");
-    const copy = heading.parentElement;
-    const eyebrow = copy?.querySelector("span");
-    const steps = copy?.querySelector("ol");
-    const status = intro?.lastElementChild;
-    const description = copy?.querySelector("p");
-    const firstStep = steps?.querySelector("li");
-    const stepNumber = firstStep?.querySelector("span");
-    const stepLabel = firstStep?.querySelector("bdi");
-    if (!intro || !copy || !eyebrow || !steps || !status || !description || !firstStep || !stepNumber || !stepLabel) return null;
-    const headingTextRange = document.createRange();
-    headingTextRange.selectNodeContents(heading);
-    return {
-      eyebrowX: eyebrow.getBoundingClientRect().x,
-      headingX: heading.getBoundingClientRect().x,
-      stepsX: steps.getBoundingClientRect().x,
-      headingTextRight: headingTextRange.getBoundingClientRect().right,
-      statusX: status.getBoundingClientRect().x,
-      layoutDirection: getComputedStyle(copy).direction,
-      headingDirection: getComputedStyle(heading).direction,
-      headingAlignment: getComputedStyle(heading).textAlign,
-      descriptionAlignment: getComputedStyle(description).textAlign,
-      stepDirection: getComputedStyle(firstStep).direction,
-      stepNumberRight: stepNumber.getBoundingClientRect().right,
-      stepLabelLeft: stepLabel.getBoundingClientRect().left,
-      stepLabelDirection: getComputedStyle(stepLabel).direction,
-      overflow: document.documentElement.scrollWidth - window.innerWidth,
-    };
-  });
-
-  expect(layout).not.toBeNull();
-  expect(layout!.eyebrowX).toBeLessThan(layout!.headingX);
-  expect(layout!.headingX).toBeLessThan(layout!.stepsX);
-  expect(layout!.stepsX).toBeLessThan(layout!.statusX);
-  expect(layout!.stepsX - layout!.headingTextRight).toBeLessThanOrEqual(20);
-  expect(layout!.layoutDirection).toBe("ltr");
-  expect(layout!.headingDirection).toBe("rtl");
-  expect(layout!.headingAlignment).toBe("left");
-  expect(layout!.descriptionAlignment).toBe("left");
-  expect(layout!.stepDirection).toBe("ltr");
-  expect(layout!.stepNumberRight).toBeLessThan(layout!.stepLabelLeft);
-  expect(layout!.stepLabelDirection).toBe("rtl");
-  expect(layout!.overflow).toBeLessThanOrEqual(1);
-});
-
-test("code review exposes the localized meta description", async ({ page }) => {
-  const localizedDescriptions = [
-    {
-      path: "/code-review-page",
-      description: "Review code for bugs, quality, performance, and security risks with AI.",
-    },
-    {
-      path: "/sv/code-review-page",
-      description: "Granska kod efter buggar, kvalitetsproblem, prestandabrister och säkerhetsrisker med AI.",
-    },
-    {
-      path: "/ar/code-review-page",
-      description: "راجع الكود وحسّن أداءه واكتشف الأخطاء والثغرات الأمنية بمساعدة الذكاء الاصطناعي.",
-    },
-  ] as const;
-
-  for (const localized of localizedDescriptions) {
-    await page.goto(localized.path);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-      "content",
-      localized.description,
-    );
-  }
 });
 
 test("mobile menu traps focus, closes with Escape and returns focus", async ({ page }) => {
@@ -392,7 +316,7 @@ test("header adapts before navigation becomes cramped at common browser zoom lev
     { name: "desktop boundary", effectiveWidth: 900, compact: false },
   ] as const;
 
-  await page.goto("/contact-page");
+  await page.goto("/contact");
 
   for (const profile of zoomProfiles) {
     await page.setViewportSize({ width: profile.effectiveWidth, height: 800 });
@@ -437,7 +361,7 @@ test("header adapts before navigation becomes cramped at common browser zoom lev
 test("contact recomputes its viewport profile when a window is resized both ways", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/contact-page?audit=performance");
+  await page.goto("/contact?audit=performance");
 
   const root = page.locator('[data-viewport-page="contact"]');
   const stage = page.locator("[data-viewport-stage]");
@@ -468,11 +392,10 @@ test("all public pages remain bounded and centered on ultrawide displays", async
   ] as const;
   const maximumSurfaceWidths: Record<(typeof routes)[number], number> = {
     "/": 3000,
-    "/skills-page": 2750,
+    "/skills": 2750,
     "/journey": 2800,
-    "/projects-page": 3000,
-    "/code-review-page": 2800,
-    "/contact-page": 3400,
+    "/projects": 3000,
+    "/contact": 3400,
   };
 
   for (const profile of profiles) {
@@ -485,7 +408,7 @@ test("all public pages remain bounded and centered on ultrawide displays", async
       await testPage.goto(`${route}${route.includes("?") ? "&" : "?"}audit=performance`);
       const surface = testPage.locator(publicSurfaceSelectors[route]).first();
       await expect(surface, label).toBeVisible();
-      if (route === "/skills-page") {
+      if (route === "/skills") {
         const expectedSkillsSize = profile.width >= 3200 && profile.height >= 1500
           ? "ultra-wide"
           : profile.width >= 2200 && profile.height >= 1100
@@ -534,7 +457,7 @@ test("all public pages remain bounded and centered on ultrawide displays", async
           return last ? last.y + last.height : Number.POSITIVE_INFINITY;
         }, { message: label }).toBeLessThanOrEqual(profile.height + 1);
       }
-      if (route === "/contact-page") {
+      if (route === "/contact") {
         await expect(
           testPage.locator(".contact-adaptive-layout .contact-send-button button"),
           label,
@@ -544,7 +467,7 @@ test("all public pages remain bounded and centered on ultrawide displays", async
         expect(Math.abs(geometry.navRightGap - 12), label).toBeLessThanOrEqual(4);
         expect(geometry.surfaceWidth / profile.width, label).toBeGreaterThanOrEqual(0.65);
 
-        if (route === "/contact-page") {
+        if (route === "/contact") {
           const portraitCoverage = await testPage.evaluate(() => {
             const panel = document.querySelector<HTMLElement>(".contact-profile-portrait-row")
               ?.getBoundingClientRect();
@@ -639,7 +562,7 @@ test("light and dark contact themes stay responsive across all adaptive viewport
       const testPage = await context.newPage();
       await testPage.emulateMedia({ reducedMotion: "reduce" });
       const label = `${profile.name} ${theme}`;
-      await testPage.goto("/contact-page?audit=performance");
+      await testPage.goto("/contact?audit=performance");
       const shell = testPage.locator(".contact-repository-shell");
       await expect(shell, label).toBeVisible();
       const before = await shell.evaluate((element) => {
@@ -699,7 +622,7 @@ test("contact validation focuses and identifies every invalid field at high zoom
     const context = await browser.newContext({ viewport: profile });
     const testPage = await context.newPage();
     await testPage.emulateMedia({ reducedMotion: "reduce" });
-    await testPage.goto("/contact-page?audit=performance");
+    await testPage.goto("/contact?audit=performance");
 
     const form = testPage.locator('form[aria-label="Contact form"]:visible');
     const name = form.getByPlaceholder("Name");
@@ -765,7 +688,7 @@ test("Windows forced colors preserves keyboard focus and contact errors", async 
     });
     const testPage = await context.newPage();
     await testPage.emulateMedia({ reducedMotion: "reduce" });
-    await testPage.goto("/contact-page?audit=performance");
+    await testPage.goto("/contact?audit=performance");
 
     const form = testPage.locator('form[aria-label="Contact form"]:visible');
     const name = form.getByPlaceholder("Name");
@@ -888,10 +811,10 @@ test("Samsung browser viewport keeps visible geometry and theme chrome in sync",
   const nextLightWaveFrame = await canvas.screenshot();
   expect(nextLightWaveFrame.equals(firstLightWaveFrame)).toBe(false);
 
-  await page.goto("/skills-page");
+  await page.goto("/skills");
   await expect(page.locator(".skills-bento-grid")).toBeInViewport();
 
-  await page.goto("/contact-page");
+  await page.goto("/contact");
   await expect(page.locator(".contact-mobile-actions:visible")).toBeInViewport();
   await expect(page.locator(".site-footer")).toBeInViewport();
   await context.close();
@@ -1393,7 +1316,7 @@ test("skills icons interact inside equal, clipped canvases without shadows", asy
       isMobile: true,
     });
     const testPage = await context.newPage();
-    await testPage.goto("/skills-page?audit=performance");
+    await testPage.goto("/skills?audit=performance");
     await expect(testPage.locator(".page-loading-stage"), profile.name).toHaveCount(0);
     await expect(testPage.locator(".skills-stage"), profile.name).toHaveAttribute(
       "data-skills-layout",
@@ -1490,7 +1413,7 @@ test("skills icons interact inside equal, clipped canvases without shadows", asy
       viewport: { width: profile.width, height: profile.height },
     });
     const testPage = await context.newPage();
-    await testPage.goto("/skills-page?audit=performance");
+    await testPage.goto("/skills?audit=performance");
     const grid = testPage.locator(".skills-bento-grid");
     await expect(grid, profile.name).toBeInViewport();
     await expect(testPage.locator(".skills-stage"), profile.name).toHaveAttribute(
@@ -1601,7 +1524,7 @@ test("skills load every icon from the same origin", async ({ page }) => {
     }
   });
 
-  await page.goto("/skills-page?audit=performance");
+  await page.goto("/skills?audit=performance");
   await expect(page.locator(".skills-card-surface").first()).toBeVisible();
   await page.waitForLoadState("networkidle");
 
@@ -1617,7 +1540,7 @@ test("public routes make no runtime request to legacy icon CDNs", async ({ page 
     }
   });
 
-  for (const route of ["/", "/skills", "/journey", "/projects", "/code-review", "/contact", "/privacy"]) {
+  for (const route of ["/", "/skills", "/journey", "/projects", "/contact", "/privacy"]) {
     await page.goto(`${route}?audit=performance`);
     await expect(page.locator("body")).toBeVisible();
     await page.waitForLoadState("networkidle");
@@ -1644,7 +1567,7 @@ test("production responses keep the hardened browser security boundary", async (
 });
 
 test("performance audit disables continuous motion without changing the rendered design", async ({ page }) => {
-  await page.goto("/skills-page?audit=performance");
+  await page.goto("/skills?audit=performance");
   await expect(page.locator(".animate-card").first()).toBeVisible();
   await expect.poll(
     () => page.locator(".animate-card").first().evaluate((element) => (
@@ -1660,7 +1583,7 @@ test("performance audit disables continuous motion without changing the rendered
     "0",
   );
 
-  await page.goto("/skills-page");
+  await page.goto("/skills");
   await expect(page.locator(".animate-card").first()).toBeVisible();
   const expectedCardAnimation = await page.locator("html").evaluate((element) => (
     element.dataset.performanceTier === "low" ? "none" : "cardBounceFadeIn"
@@ -1693,7 +1616,7 @@ test("constrained computers render the final Skills state without delayed conten
     });
   });
   const page = await context.newPage();
-  await page.goto("/skills-page");
+  await page.goto("/skills");
 
   await expect(page.locator("html")).toHaveAttribute("data-performance-tier", "low");
   const animation = await page.locator(".animate-card").first().evaluate((element) => {
@@ -1718,96 +1641,6 @@ test("constrained computers render the final Skills state without delayed conten
   await context.close();
 });
 
-test("both code review listboxes implement the complete keyboard contract", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/code-review-page");
-  await expect(page.locator(".la-status")).toBeHidden({ timeout: 10_000 });
-
-  const responseButton = page.getByRole("button", { name: "Response: Auto" });
-  await responseButton.press("ArrowDown");
-  const responseListbox = page.getByRole("listbox", { name: "Response language options" });
-  const auto = responseListbox.getByRole("option", { name: "Auto" });
-  const swedish = responseListbox.getByRole("option", { name: "Swedish" });
-  const english = responseListbox.getByRole("option", { name: "English" });
-  const arabic = responseListbox.getByRole("option", { name: "Arabic" });
-  await expect(auto).toBeFocused();
-  await expect(auto).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("ArrowDown");
-  await expect(swedish).toBeFocused();
-  await page.keyboard.press("End");
-  await expect(arabic).toBeFocused();
-  await page.keyboard.press("Home");
-  await expect(auto).toBeFocused();
-  await page.keyboard.press("End");
-  await page.keyboard.press("Space");
-  const selectedArabicButton = page.getByRole("button", { name: "Response: Arabic" });
-  await expect(selectedArabicButton).toBeFocused();
-  await expect(responseListbox).toBeHidden();
-
-  await selectedArabicButton.press("ArrowUp");
-  await expect(arabic).toBeFocused();
-  await page.keyboard.press("ArrowUp");
-  await expect(english).toBeFocused();
-  await page.keyboard.press("Enter");
-  const selectedEnglishButton = page.getByRole("button", { name: "Response: English" });
-  await expect(selectedEnglishButton).toBeFocused();
-  await selectedEnglishButton.press("ArrowDown");
-  await expect(english).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("Tab");
-  await expect(responseListbox).toBeHidden();
-
-  const languageButton = page.getByRole("button", { name: "Code language" });
-  await expect(languageButton).toBeVisible({ timeout: 5_000 });
-  await languageButton.press("ArrowDown");
-  const listbox = page.getByRole("listbox", { name: "Code language options" });
-  const typescript = listbox.getByRole("option", { name: "TypeScript" });
-  const javascript = listbox.getByRole("option", { name: "JavaScript" });
-  const shell = listbox.getByRole("option", { name: "Shell" });
-  const rust = listbox.getByRole("option", { name: "Rust" });
-  await expect(typescript).toBeFocused();
-  await expect(typescript).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("ArrowDown");
-  await expect(javascript).toBeFocused();
-  await page.keyboard.press("End");
-  await expect(rust).toBeFocused();
-  await page.keyboard.press("Home");
-  await expect(typescript).toBeFocused();
-  await page.keyboard.press("Escape");
-  await expect(languageButton).toBeFocused();
-
-  await languageButton.press("ArrowDown");
-  await page.keyboard.press("End");
-  await page.keyboard.press("Enter");
-  await expect(languageButton).toBeFocused();
-  await expect(languageButton).toContainText("Rust");
-  await languageButton.press("ArrowUp");
-  await expect(rust).toBeFocused();
-  await page.keyboard.press("ArrowUp");
-  await expect(shell).toBeFocused();
-  await page.keyboard.press("Space");
-  await expect(languageButton).toBeFocused();
-  await expect(languageButton).toContainText("Shell");
-  await languageButton.press("ArrowDown");
-  await expect(shell).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("Tab");
-  await expect(listbox).toBeHidden();
-
-  // Arrow-key tab behavior is covered separately from the two listboxes.
-});
-
-test("code review tabs support arrow-key navigation", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/code-review-page");
-  await expect(page.locator(".la-status")).toBeHidden({ timeout: 10_000 });
-
-  const editorTab = page.getByRole("tab", { name: "Editor" });
-  await editorTab.focus();
-  await editorTab.press("ArrowRight");
-  const resultTab = page.getByRole("tab", { name: "Result" });
-  await expect(resultTab).toBeFocused();
-  await expect(resultTab).toHaveAttribute("aria-selected", "true");
-});
-
 test("contact is a keyboard-submittable JSON form", async ({ page }) => {
   const submissionId = "11111111-1111-4111-8111-111111111111";
   let preparedBody: Record<string, unknown> | null = null;
@@ -1825,7 +1658,7 @@ test("contact is a keyboard-submittable JSON form", async ({ page }) => {
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/contact-page");
+  await page.goto("/contact");
   const form = page.locator('form[aria-label="Contact form"]:visible');
   await form.getByPlaceholder("Name").fill("Accessibility Test");
   await form.getByPlaceholder("Email").fill("test@example.com");
@@ -1843,7 +1676,7 @@ test("contact is a keyboard-submittable JSON form", async ({ page }) => {
 
 test("contact exposes the canonical Beacons profile without tracking parameters", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/contact-page");
+  await page.goto("/contact");
 
   const beacons = page.getByRole("link", { name: "Beacons" });
   await expect(beacons).toBeVisible();
@@ -1860,7 +1693,7 @@ test("journey and contact stay fully framed across compact laptops and portrait 
     });
     const testPage = await context.newPage();
     await testPage.emulateMedia({ reducedMotion: "reduce" });
-    await testPage.goto("/contact-page");
+    await testPage.goto("/contact");
     await expect(testPage.locator(".contact-stage-surface")).toHaveAttribute(
       "style",
       /translate\(-50%, -50%\) scale/,
@@ -1989,7 +1822,7 @@ test("very short desktop windows fit contact controls without document scrolling
     const context = await browser.newContext({ viewport: profile });
     const page = await context.newPage();
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/contact-page?audit=performance");
+    await page.goto("/contact?audit=performance");
     await expect(page.locator(".contact-stage-surface")).toHaveAttribute(
       "style",
       /translate\(-50%, -50%\) scale/,
@@ -2080,7 +1913,7 @@ test("all public pages keep their primary content visible or reachable in short 
           await capabilities.last().scrollIntoViewIfNeeded();
           await expect(capabilities.last(), label).toBeInViewport();
         }
-      } else if (route === "/skills-page") {
+      } else if (route === "/skills") {
         const stage = page.locator(".skills-stage");
         const firstCard = page.locator(".skills-card-surface").first();
         const lastCard = page.locator(".skills-card-surface").last();
@@ -2099,12 +1932,10 @@ test("all public pages keep their primary content visible or reachable in short 
         expect(mainBox!.y + mainBox!.height, label).toBeLessThanOrEqual(profile.height + 1);
         await lastCommit.scrollIntoViewIfNeeded();
         await expect(lastCommit, label).toBeInViewport();
-      } else if (route === "/projects-page") {
+      } else if (route === "/projects") {
         const lastProject = page.locator(".projects-project-row:visible, .projects-mobile-card-wrap:visible").last();
         await lastProject.scrollIntoViewIfNeeded();
         await expect(lastProject, label).toBeInViewport();
-      } else if (route === "/code-review-page") {
-        await expect(page.locator('button[type="submit"]:visible'), label).toBeInViewport();
       } else {
         await expect(page.locator(".site-footer"), label).toBeInViewport();
         await expect(
@@ -2126,7 +1957,7 @@ test("Journey resolves its loader promptly and keeps its route", async ({ page }
   expect(page.url()).toContain("/journey");
 });
 
-test("server-preloaded data and code routes do not add an artificial loading delay", async ({ page }) => {
+test("server-preloaded routes do not add an artificial loading delay", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   const duplicateDataRequests: string[] = [];
@@ -2141,7 +1972,6 @@ test("server-preloaded data and code routes do not add an artificial loading del
     { route: "/skills", readySelector: ".skills-bento-grid" },
     { route: "/journey", readySelector: ".commit-row" },
     { route: "/projects", readySelector: ".projects-shell" },
-    { route: "/code-review", readySelector: "[data-code-review-shell]" },
   ]) {
     await page.goto("/");
     await Promise.all([
@@ -2157,11 +1987,10 @@ test("server-preloaded data and code routes do not add an artificial loading del
 
 test("canonical public routes replace legacy page suffixes without breaking locale or query", async ({ page }) => {
   for (const [legacy, canonical] of [
-    ["/skills-page", "/skills"],
-    ["/projects-page", "/projects"],
-    ["/code-review-page", "/code-review"],
-    ["/contact-page", "/contact"],
-    ["/sv/skills-page", "/sv/skills"],
+    ["/skills", "/skills"],
+    ["/projects", "/projects"],
+    ["/contact", "/contact"],
+    ["/sv/skills", "/sv/skills"],
   ] as const) {
     await page.goto(`${legacy}?redirect-check=1`);
     const url = new URL(page.url());

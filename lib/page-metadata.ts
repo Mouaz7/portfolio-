@@ -4,7 +4,7 @@ import { getRequestLocale } from "./i18n/request-locale";
 import { getDictionary } from "./i18n/get-dictionary";
 import { localizedPath, locales } from "./i18n/config";
 
-type MetadataPage = "home" | "skills" | "journey" | "projects" | "codeReview" | "contact" | "privacy";
+type MetadataPage = "home" | "skills" | "journey" | "projects" | "contact" | "privacy";
 
 export async function localizedPageMetadata(page: MetadataPage, path: string): Promise<Metadata> {
   const locale = await getRequestLocale();

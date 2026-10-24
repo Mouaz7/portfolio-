@@ -37,9 +37,11 @@ describe("locale proxy", () => {
   it.each([
     ["/skills-page?from=old", "/skills?from=old"],
     ["/projects-page", "/projects"],
-    ["/code-review-page", "/code-review"],
     ["/contact-page", "/contact"],
     ["/sv/skills-page", "/sv/skills"],
+    ["/sv/projects-page?technology=C%2B%2B", "/sv/projects?technology=C%2B%2B"],
+    ["/ar/contact-page?from=old", "/ar/contact?from=old"],
+    ["/en/skills-page?audit=performance", "/skills?audit=performance"],
   ])("permanently redirects %s to canonical %s", (legacy, canonical) => {
     const response = proxy(new NextRequest(`https://portfolio.test${legacy}`));
 

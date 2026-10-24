@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { useAccentRgb, rgbToHex } from "@/lib/useAccentRgb";
+import { useAccentRgb, rgbToHex } from "@/hooks/useAccentRgb";
 
 type Props = {
   label?: string;

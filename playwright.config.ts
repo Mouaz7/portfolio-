@@ -11,8 +11,8 @@ export default defineConfig({
   reporter: process.env.CI ? [["html", { open: "never" }], ["github"]] : "list",
   projects: [
     { name: "chromium", use: { browserName: "chromium" } },
-    { name: "firefox", testMatch: "browser-compatibility.spec.ts", use: { browserName: "firefox" } },
-    { name: "webkit", testMatch: "browser-compatibility.spec.ts", use: { browserName: "webkit" } },
+    { name: "firefox", testMatch: ["browser-compatibility.spec.ts", "skills-first-paint.spec.ts"], use: { browserName: "firefox" } },
+    { name: "webkit", testMatch: ["browser-compatibility.spec.ts", "skills-first-paint.spec.ts"], use: { browserName: "webkit" } },
   ],
   use: {
     baseURL,

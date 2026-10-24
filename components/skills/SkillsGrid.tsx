@@ -7,6 +7,7 @@ import { SkillCard } from "./SkillCard";
 import PageLoadingStage from "@/components/ui/PageLoadingStage";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import styles from "./SkillsGrid.module.css";
 import type {
   SkillCategoryData,
   SkillData,
@@ -253,10 +254,11 @@ export default function SkillsGrid({
 
   return (
     <main
-      className={`skills-stage page-fade-in flex flex-col items-center ${
+      className={`${styles.stage} skills-stage page-fade-in flex flex-col items-center ${
         needsVerticalScroll ? "justify-start overflow-x-hidden overflow-y-auto" : "justify-center overflow-hidden"
       }`}
       data-viewport-content
+      data-initial-layout={isMeasured ? undefined : "pending"}
       data-viewport-profile={profile}
       data-viewport-scale={scale.toFixed(3)}
       data-skills-overflow={needsVerticalScroll ? "scroll" : "fit"}
@@ -275,16 +277,16 @@ export default function SkillsGrid({
       style={wrapperStyle(STAGE.padY, STAGE.padX)}
     >
       <div
-        className="relative shrink-0"
-        // The server cannot measure the viewport. Reveal the fitted grid in
-        // the first layout effect, before an unscaled fallback can be painted.
+        className={`${styles.fitted} relative shrink-0`}
+        // Supporting browsers fit the server-rendered grid with CSS before
+        // hydration. Other browsers retain the measured JavaScript fallback.
         style={{
           width: baseW * scale,
           height: baseH * scale,
           visibility: isMeasured ? "visible" : "hidden",
         }}
       >
-        <div className="absolute left-0 top-0" style={stageStyle}>
+        <div className={`${styles.canvas} absolute left-0 top-0`} style={stageStyle}>
           <ul
             className="skills-bento-grid grid"
             style={{

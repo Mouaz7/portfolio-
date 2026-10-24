@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@/tests/test-utils";
-import ContactPage from "@/app/contact-page/contact-page";
+import ContactPage from "@/app/contact/contact-page";
 
 jest.mock("@/components/navigation/Header", () => ({
   __esModule: true,
